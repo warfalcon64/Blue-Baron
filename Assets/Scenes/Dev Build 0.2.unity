@@ -2120,6 +2120,10 @@ PrefabInstance:
       value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+      propertyPath: movementDelay
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: laserInaccuracy
       value: 100
       objectReference: {fileID: 0}

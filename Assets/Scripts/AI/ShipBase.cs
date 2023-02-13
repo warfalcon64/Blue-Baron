@@ -28,6 +28,7 @@ public class ShipBase : MonoBehaviour
 
     protected bool leftFire;
     protected float nextFire;
+    protected float nextTurn;
     protected GameObject target;
     protected Rigidbody2D rb;
     protected shipType ship;
@@ -74,6 +75,7 @@ public class ShipBase : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         target = null;
         nextFire = 0f;
+        nextTurn = Time.time + Random.value;
         leftFire = false;
     }
 
@@ -124,7 +126,7 @@ public class ShipBase : MonoBehaviour
             float angle = GetAngleToTarget();
             //print(angle);
 
-            if (Mathf.Abs(angle) > faceEnemyAngle)
+            if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= Time.time)
             {
                 if (angle > 0)
                 {
@@ -134,6 +136,10 @@ public class ShipBase : MonoBehaviour
                 {
                     turn = -1f;
                 }
+            } 
+            else if (Mathf.Abs(angle) < faceEnemyAngle)
+            {
+                nextTurn = Time.time + Random.value;
             }
         }
 
