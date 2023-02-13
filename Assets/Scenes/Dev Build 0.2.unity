@@ -537,7 +537,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.05
+        value: 0.04
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -803,7 +803,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.05
+        value: 0.04
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -2118,6 +2118,10 @@ PrefabInstance:
     - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: fieldOfFire
       value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+      propertyPath: laserInaccuracy
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 8497475259681279302, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: m_RootOrder

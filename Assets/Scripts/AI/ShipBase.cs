@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal.Internal;
 using UnityEngine.UIElements;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 using static UnityEngine.GraphicsBuffer;
 
 public class ShipBase : MonoBehaviour
@@ -20,6 +21,7 @@ public class ShipBase : MonoBehaviour
     [Header("Attack")]
     [SerializeField] protected float primaryCoolDown = 0.2f;
     [SerializeField] protected float fieldOfFire = 45f; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
+    [SerializeField] protected float laserInaccuracy = 0.0f;
     [SerializeField] protected Transform leftGun;
     [SerializeField] protected Transform rightGun;
     [SerializeField] protected Transform laser;
@@ -55,7 +57,11 @@ public class ShipBase : MonoBehaviour
 
             if (Mathf.Abs(angle) <= fieldOfFire)
             {
-                Vector2 targetAcceleration = GetTargetAcceleration();
+                Vector2 posDiff = target.GetComponent<Rigidbody2D>().position - rb.position;
+                float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
+
+                Vector2 targetAcceleration = GetTargetAcceleration() 
+                    + (new Vector2(Random.Range(-laserInaccuracy, laserInaccuracy), Random.Range(-laserInaccuracy, laserInaccuracy)) * (1 / distance));
                 ShootProjectiles(targetAcceleration);
             }
         }
