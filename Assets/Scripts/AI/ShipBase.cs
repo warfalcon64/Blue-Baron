@@ -13,7 +13,7 @@ public class ShipBase : MonoBehaviour
     [SerializeField] protected float health = 100f;
 
     [Header("Movement")]
-    [SerializeField] protected float speed = 500f;
+    [SerializeField] protected float speed = 10f;
     [SerializeField] protected float turnSpeed = 2f;
     [SerializeField] protected float faceEnemyAngle = 1f;
 
@@ -26,6 +26,10 @@ public class ShipBase : MonoBehaviour
     [SerializeField] protected Transform laser;
 
     protected bool leftFire;
+    protected float maxSpeed;
+    protected float minSpeed;
+    protected float maxTurn;
+    protected float minTurn;
     protected float nextFire;
     protected float nextTurn;
     protected GameObject target;
@@ -71,6 +75,10 @@ public class ShipBase : MonoBehaviour
 
     protected virtual void Init()
     {
+        maxSpeed = speed;
+        minSpeed = speed / 2;
+        maxTurn = turnSpeed + 1;
+        minTurn = turnSpeed;
         rb = GetComponent<Rigidbody2D>();
         target = null;
         nextFire = 0f;
@@ -136,13 +144,13 @@ public class ShipBase : MonoBehaviour
                     turn = -1f;
                 }
             } 
-            else if (Mathf.Abs(angle) < faceEnemyAngle)
+            else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= Time.time)
             {
                 nextTurn = Time.time + Random.value;
             }
         }
 
-        rb.velocity = transform.up * speed * Time.deltaTime;
+        rb.velocity = transform.up * speed;
         rb.MoveRotation(rb.rotation + (turnSpeed * turn));
     }
 

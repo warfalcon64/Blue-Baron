@@ -1973,7 +1973,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ff0828d8f3a974896de608205832da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 500
+  speed: 10
   turnSpeed: 2
   fieldOfFire: 45
   primaryCoolDown: 0.2

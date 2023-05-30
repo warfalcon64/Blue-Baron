@@ -732,11 +732,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 100
-  speed: 500
+  speed: 10
   turnSpeed: 2
   faceEnemyAngle: 10
   primaryCoolDown: 0.2
   fieldOfFire: 45
+  laserInaccuracy: 100
   leftGun: {fileID: 0}
   rightGun: {fileID: 0}
   laser: {fileID: 0}

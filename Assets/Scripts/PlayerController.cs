@@ -6,8 +6,8 @@ using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    [SerializeField] private float turnSpeed;
+    [SerializeField] private float speed = 10f;
+    [SerializeField] private float turnSpeed = 2f;
     [SerializeField] private float fieldOfFire; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
     [SerializeField] private float primaryCoolDown;
     [SerializeField] private Transform pfBlueLaser;
@@ -31,16 +31,25 @@ public class PlayerController : MonoBehaviour
     private shipType ship;
     private shootType shootMode;
     private float turn;
+    private float minTurn;
+    private float maxTurn;
+    private float minSpeed;
+    private float maxSpeed;
+    private float acceleration;
     private float nextFire;
-    private bool shootLMB;
     private bool leftFire;
     private Vector2 worldMousePosition;
+    private Vector3 mousePosition;
 
 
     Rigidbody2D rb;
     // Start is called before the first frame update
     private void Awake()
     {
+        minSpeed = speed / 2;
+        maxSpeed = speed;
+        minTurn = turnSpeed;
+        maxTurn = turnSpeed + 1;
         shootMode = shootType.None;
         leftFire = false;
         nextFire = 0f;
@@ -52,6 +61,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         turn = -Input.GetAxisRaw("Horizontal");
+        acceleration = Input.GetAxisRaw("Vertical");
 
         if (Input.GetMouseButton(0))
         {
@@ -62,7 +72,7 @@ public class PlayerController : MonoBehaviour
             shootMode = shootType.None;
         }
 
-        Vector3 mousePosition = Input.mousePosition;
+        mousePosition = Input.mousePosition;
         mousePosition.z = Camera.main.nearClipPlane;
         worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
 
@@ -70,30 +80,56 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Maybe use switch here
-        if (ship == shipType.Fighter)
+        switch (ship)
         {
-            rb.velocity = transform.up * speed * Time.deltaTime;
-            rb.MoveRotation(rb.rotation + (turnSpeed * turn));
-
-            shootProjectiles(worldMousePosition);
+            case shipType.Fighter:
+                fighterControl();
+                break;
         }
+
     }
 
-    private void shootProjectiles(Vector2 mousePosition)
+    private void fighterControl()
     {
-        Vector2 shootDirection = (mousePosition - rb.position).normalized;
+
+        if (acceleration < 0f && speed > minSpeed)
+        {
+            speed -= 0.2f;
+
+            if (turnSpeed < maxTurn)
+            {
+                turnSpeed += 0.1f;
+            }
+        } else if (acceleration > 0f && speed < maxSpeed)
+        {
+            speed += 0.2f;
+
+            if (turnSpeed > minTurn)
+            {
+                turnSpeed -= 0.1f;
+            }
+        }
+
+        rb.velocity = transform.up * speed;
+        rb.MoveRotation(rb.rotation + (turnSpeed * turn));
+        shootProjectiles();
+    }
+
+    private void shootProjectiles()
+    {
+        Vector2 shootDirection = (worldMousePosition - rb.position).normalized;
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
 
         if (shootMode == shootType.Primary && angle <= fieldOfFire && nextFire <= Time.time)
         {
-            shootLaser(worldMousePosition);
+            shootLaser();
             nextFire = Time.time + primaryCoolDown;
         }
     }
 
-    private void shootLaser(Vector2 mousePosition)
+    private void shootLaser()
     {
+
         Vector2 laserSpawn;
         laserSpawn = leftGun.position;
 
@@ -108,9 +144,8 @@ public class PlayerController : MonoBehaviour
             leftFire = false;
         }
 
-        Vector2 shootDirection = (mousePosition - laserSpawn).normalized;
+        Vector2 shootDirection = (worldMousePosition - laserSpawn).normalized;
         Transform bulletClone = Instantiate(pfBlueLaser, laserSpawn, leftGun.rotation);
         bulletClone.GetComponent<Laser>().setup(shootDirection, rb.velocity);
-
     }
 }
