@@ -10,8 +10,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float turnSpeed = 2f;
     [SerializeField] private float fieldOfFire; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
     [SerializeField] private float primaryCoolDown;
-    [SerializeField] private Transform pfBlueLaser;
-    [SerializeField] private Transform leftGun;
+    [SerializeField] private Transform pfBlueLaser; // Laser gameobject for the ship to shoot
+    [SerializeField] private Transform leftGun; // Positions to shoot lasers from
     [SerializeField] private Transform rightGun;
 
 
@@ -30,14 +30,17 @@ public class PlayerController : MonoBehaviour
 
     private shipType ship;
     private shootType shootMode;
-    private float turn;
-    private float minTurn;
+   
+    private float turn; // Input axis for turning (-1 turns left, 1 turns right)
+    private float minTurn; // Speeds for turning and forward movement
     private float maxTurn;
     private float minSpeed;
     private float maxSpeed;
-    private float acceleration;
-    private float nextFire;
+    private float acceleration; // Input axis for forward movement (-1 slows down, 1 speeds up)
+    
+    private float nextFire; // In game time for next moment lasers can fire
     private bool leftFire;
+   
     private Vector2 worldMousePosition;
     private Vector3 mousePosition;
 
@@ -60,6 +63,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        // Horizontal axis = A, D  Vertical Axis = W, S
         turn = -Input.GetAxisRaw("Horizontal");
         acceleration = Input.GetAxisRaw("Vertical");
 
@@ -72,10 +76,10 @@ public class PlayerController : MonoBehaviour
             shootMode = shootType.None;
         }
 
+        // Calculate mouse position on screen
         mousePosition = Input.mousePosition;
         mousePosition.z = Camera.main.nearClipPlane;
         worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-
     }
 
     private void FixedUpdate()
@@ -144,6 +148,7 @@ public class PlayerController : MonoBehaviour
             leftFire = false;
         }
 
+        // Create laser and call its setup function from the script attached to it
         Vector2 shootDirection = (worldMousePosition - laserSpawn).normalized;
         Transform bulletClone = Instantiate(pfBlueLaser, laserSpawn, leftGun.rotation);
         bulletClone.GetComponent<Laser>().setup(shootDirection, rb.velocity);

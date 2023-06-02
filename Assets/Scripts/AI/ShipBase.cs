@@ -65,7 +65,7 @@ public class ShipBase : MonoBehaviour
                 float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
 
                 Vector2 targetAcceleration = GetTargetAcceleration() 
-                    + (new Vector2(Random.Range(-laserInaccuracy, laserInaccuracy), Random.Range(-laserInaccuracy, laserInaccuracy)) * (1 / distance));
+                    + (new Vector2(Random.Range(-laserInaccuracy, laserInaccuracy), Random.Range(-laserInaccuracy, laserInaccuracy)) * (1 / distance)); // Adding inaccuracy to prevent player skill diff
                 ShootProjectiles(targetAcceleration);
             }
         }
@@ -133,6 +133,7 @@ public class ShipBase : MonoBehaviour
             float angle = GetAngleToTarget();
             //print(angle);
 
+            // Adding delay for turning to prevent player skill diff and so AI doesn't go around in circles forever
             if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= Time.time)
             {
                 if (angle > 0)
@@ -207,6 +208,7 @@ public class ShipBase : MonoBehaviour
         return targetAcceleration;
     }
 
+    // Imma be real idk how any of the stuff below works, I found it on the internet
     protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations)
     {
         Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>();
