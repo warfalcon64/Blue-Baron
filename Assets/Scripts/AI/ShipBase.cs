@@ -32,6 +32,7 @@ public class ShipBase : MonoBehaviour
     protected float minTurn;
     protected float nextFire;
     protected float nextTurn;
+    protected float nextAdjust;
     protected GameObject target;
     protected Rigidbody2D rb;
     protected shipType ship;
@@ -83,6 +84,7 @@ public class ShipBase : MonoBehaviour
         target = null;
         nextFire = 0f;
         nextTurn = Time.time + Random.value;
+        nextAdjust = Time.time + Random.value;
         leftFire = false;
     }
 
@@ -133,7 +135,7 @@ public class ShipBase : MonoBehaviour
             float angle = GetAngleToTarget();
             //print(angle);
 
-            // Adding delay for turning to prevent player skill diff and so AI doesn't go around in circles forever
+            // Turning logic
             if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= Time.time)
             {
                 if (angle > 0)
@@ -148,6 +150,22 @@ public class ShipBase : MonoBehaviour
             else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= Time.time)
             {
                 nextTurn = Time.time + Random.value;
+            }
+
+            // Acceleration logic
+            if (nextAdjust <= Time.time)
+            {
+                if (Mathf.Abs(angle) < 90 && speed < maxSpeed)
+                {
+                    speed += 0.2f;
+                }
+                if (Mathf.Abs(angle) >= 90 && speed > minSpeed)
+                {
+                    speed -= 0.2f;
+                }
+            } else
+            {
+                nextAdjust = Time.time + Random.value;
             }
         }
 

@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 shootDirection = (worldMousePosition - rb.position).normalized;
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
+        //print(angle);
 
         if (shootMode == shootType.Primary && angle <= fieldOfFire && nextFire <= Time.time)
         {
