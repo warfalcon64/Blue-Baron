@@ -46,7 +46,13 @@ public class ShipBase : MonoBehaviour
 
     private void Awake()
     {
+        //StartCoroutine(Turn());
         Init();
+    }
+
+    private void Start()
+    {
+        //StartCoroutine(Turn());
     }
 
     private void FixedUpdate()
@@ -171,6 +177,37 @@ public class ShipBase : MonoBehaviour
 
         rb.velocity = transform.up * speed;
         rb.MoveRotation(rb.rotation + (turnSpeed * turn));
+    }
+
+    IEnumerator Turn()
+    {
+        while (true)
+        {
+            if (!target) yield return new WaitForFixedUpdate();
+
+            float turn = 0f;
+            float angle = GetAngleToTarget();
+
+            // Turning logic
+            if (Mathf.Abs(angle) > faceEnemyAngle)
+            {
+                if (angle > 0)
+                {
+                    turn = 1f;
+                }
+                if (angle < 0)
+                {
+                    turn = -1f;
+                }
+            }
+            
+            if (Mathf.Abs(angle) < faceEnemyAngle)
+            {
+                yield return new WaitForSeconds(Random.Range(0, 1.5f));
+            }
+
+            rb.MoveRotation(rb.rotation + (turnSpeed * turn));
+        }
     }
 
     protected virtual GameObject FindTarget()
