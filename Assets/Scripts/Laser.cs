@@ -1,17 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class Laser : MonoBehaviour
 {
     [SerializeField] float speed;
     [SerializeField] float damage;
 
+    VisualEffect spark;
+
     Rigidbody2D rb;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        spark = GetComponent<VisualEffect>();
     }
 
     public void setup(Vector2 shootDirection, Vector2 shipVelocity) 
@@ -29,10 +33,13 @@ public class Laser : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collider) 
     {
         // Checks if target is valid and not an ally
-        if (collider.GetComponent<Rigidbody2D>() != null && collider.tag != gameObject.tag)
+        if (collider.gameObject.GetComponent<Rigidbody2D>() != null && !collider.gameObject.CompareTag(tag))
         {
+            spark.SendEvent("LaserHit");
+            
             // Damage collider here
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            
         }
     }
 
