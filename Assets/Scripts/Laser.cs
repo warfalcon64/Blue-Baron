@@ -9,8 +9,9 @@ public class Laser : MonoBehaviour
     [SerializeField] float damage;
 
     VisualEffect spark;
-
     Rigidbody2D rb;
+
+    public string damageType = "Laser";
 
     private void Awake()
     {

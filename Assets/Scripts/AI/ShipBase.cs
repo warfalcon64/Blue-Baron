@@ -1,30 +1,35 @@
-
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.Rendering.Universal.Internal;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
+using UnityEngine.VFX;
+using Random = UnityEngine.Random;
 
-public class ShipBase : MonoBehaviour
+public abstract class ShipBase : MonoBehaviour
 {
-    [Header("Health")]
-    [SerializeField] protected float health = 100f;
+    [Header("Health/Shields")]
+    [SerializeField] protected float health = 100;
+    [SerializeField] protected float shield = 0;
 
     [Header("Movement")]
-    [SerializeField] protected float speed = 10f;
+    [SerializeField] protected float speed = 10;
     [SerializeField] protected float turnSpeed = 2f;
-    [SerializeField] protected float faceEnemyAngle = 1f;
+    [SerializeField] protected float faceEnemyAngle = 1; // The min FOV to keep enemy in
 
     [Header("Attack")]
     [SerializeField] protected float primaryCoolDown = 0.2f;
-    [SerializeField] protected float fieldOfFire = 45f; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
-    [SerializeField] protected float laserInaccuracy = 0.0f;
+    [SerializeField] protected float fieldOfFire = 45; // Angle between the vertical line bisecting the craft and the line representing the edge of field
+    [SerializeField] protected float plasmaInaccuracy = 0;
     [SerializeField] protected Transform leftGun;
     [SerializeField] protected Transform rightGun;
-    [SerializeField] protected Transform laser;
+    [SerializeField] protected Transform plasma;
 
+    [Header("VFX")]
+    [SerializeField] protected Transform smoke;
+
+    protected bool isSmoking;
     protected bool leftFire;
     protected float maxSpeed;
     protected float minSpeed;
@@ -33,8 +38,12 @@ public class ShipBase : MonoBehaviour
     protected float nextFire;
     protected float nextTurn;
     protected float nextAdjust;
+
+    protected GameObject vfxManager; //*** MAKE VFX MANAGER A SCRIPTABLE OBJECT TO AVOID FIND GAMEOBJECT CALLS
+    protected VisualEffect effects;
     protected GameObject target;
     protected Rigidbody2D rb;
+    protected Rigidbody2D targetRb;
     protected shipType ship;
     protected Vector2 lastVelocity;
 
@@ -44,24 +53,28 @@ public class ShipBase : MonoBehaviour
         Bomber
     }
 
-    private void Awake()
+    // Start is called before the first frame update
+    protected virtual void Awake()
     {
-        //StartCoroutine(Turn());
         Init();
     }
 
-    private void Start()
+    protected virtual void Update()
     {
-        //StartCoroutine(Turn());
-    }
-
-    private void FixedUpdate()
-    {
-        if (!target)
+        if (health <= (health * 0.25f) && !isSmoking)
         {
-            target = FindTarget();
+            VFXEventAttribute eventAttribute = effects.CreateVFXEventAttribute();
         }
 
+        if (health <= 0)
+        {
+            OnDeath();
+        }
+    }
+
+    // Update is called once per frame
+    protected virtual void FixedUpdate()
+    {
         if (target != null)
         {
             float angle = GetAngleToTarget();
@@ -71,10 +84,14 @@ public class ShipBase : MonoBehaviour
                 Vector2 posDiff = target.GetComponent<Rigidbody2D>().position - rb.position;
                 float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
 
-                Vector2 targetAcceleration = GetTargetAcceleration() 
-                    + (new Vector2(Random.Range(-laserInaccuracy, laserInaccuracy), Random.Range(-laserInaccuracy, laserInaccuracy)) * (1 / distance)); // Adding inaccuracy to prevent player skill diff
+                Vector2 targetAcceleration = GetTargetAcceleration()
+                    + (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance)); // Adding inaccuracy to prevent player skill diff
                 ShootProjectiles(targetAcceleration);
             }
+        }
+        else
+        {
+            target = FindTarget();
         }
 
         Move();
@@ -86,52 +103,111 @@ public class ShipBase : MonoBehaviour
         minSpeed = speed / 2;
         maxTurn = turnSpeed + 1;
         minTurn = turnSpeed;
-        rb = GetComponent<Rigidbody2D>();
         target = null;
+        targetRb = null;
         nextFire = 0f;
         nextTurn = Time.time + Random.value;
         nextAdjust = Time.time + Random.value;
         leftFire = false;
+        isSmoking = false;
+
+        vfxManager = GameObject.FindGameObjectWithTag("VFX Manager");
+        rb = GetComponent<Rigidbody2D>();
+        effects = vfxManager.GetComponent<VisualEffect>();
+    }
+
+    protected virtual void OnDeath()
+    {
+        
+    }
+
+    protected virtual void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
+        {
+            string type = collider.GetComponent<WeaponsBase>().damageType;
+            float damage = collider.GetComponent<WeaponsBase>().getDamage();
+
+            switch (type)
+            {
+                case "Plasma":
+                    if (shield <= 0) damage *= 2;
+                    break;
+
+                default:
+                    print("DID NOT APPLY DAMAGE CORRECTLY");
+                    break;
+            }
+
+            health -= damage;
+
+            PlayHitVFX(type);
+        }
+    }
+
+    protected virtual void PlayHitVFX(string type)
+    {
+        string effectEvent = "null";
+
+        switch (type)
+        {
+            case "Plasma":
+                effectEvent = "LaserHit"; // ***Change the name of "LaserHit" to something more generic and not have laser in it
+                break;
+
+            default:
+                print("COULD NOT GET DAMAGE TYPE OF WEAPON");
+                break;
+
+        }
+
+        VFXEventAttribute eventAttribute = effects.CreateVFXEventAttribute();
+
+        // Get the ID of the property we want to modify
+        int vfxPosition = Shader.PropertyToID("Position");
+
+        // Set the property, and send event with the attribute carrying the info to the vfx graph
+        effects.SetVector3(vfxPosition, transform.position);
+        effects.SendEvent(effectEvent, eventAttribute);
     }
 
     protected virtual void ShootProjectiles(Vector2 targetAcceleration)
     {
         if (nextFire <= Time.time)
         {
-            ShootLaser(targetAcceleration);
+            ShootPlasma(targetAcceleration);
             nextFire = Time.time + primaryCoolDown;
         }
     }
 
-    protected virtual void ShootLaser(Vector2 targetAcceleration)
+    protected virtual void ShootPlasma(Vector2 targetAcceleration)
     {
-        Vector2 laserSpawn = leftGun.position;
+        Vector2 plasmaSpawn = leftGun.position;
 
         if (!leftFire)
         {
             leftFire = true;
-            laserSpawn = leftGun.position;
+            plasmaSpawn = leftGun.position;
         }
         else
         {
             leftFire = false;
-            laserSpawn = rightGun.position;
+            plasmaSpawn = rightGun.position;
         }
 
-        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0);
-        Vector2 shootDirection = (aimPos - laserSpawn).normalized;
+        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, plasma);
+        Vector2 shootDirection = (aimPos - plasmaSpawn).normalized;
 
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
 
         if (angle <= fieldOfFire)
         {
-            Transform bulletClone = Instantiate(laser, laserSpawn, leftGun.rotation);
-            bulletClone.GetComponent<Laser>().setup(shootDirection, rb.velocity);
+            Transform plasmaClone = Instantiate(plasma, plasmaSpawn, leftGun.rotation);
+            plasmaClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
         }
-        
     }
 
-    // Moves the ship to face the specified target gameobject
+    // Moves the ship to keep the specified target gameobject within the given parameters
     protected virtual void Move()
     {
         float turn = 0f;
@@ -139,7 +215,6 @@ public class ShipBase : MonoBehaviour
         if (target != null)
         {
             float angle = GetAngleToTarget();
-            //print(angle);
 
             // Turning logic
             if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= Time.time)
@@ -152,7 +227,7 @@ public class ShipBase : MonoBehaviour
                 {
                     turn = -1f;
                 }
-            } 
+            }
             else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= Time.time)
             {
                 nextTurn = Time.time + Random.value;
@@ -161,15 +236,16 @@ public class ShipBase : MonoBehaviour
             // Acceleration logic
             if (nextAdjust <= Time.time)
             {
-                if (Mathf.Abs(angle) < 90 && speed < maxSpeed)
+                if (Math.Abs(angle) < 90 && speed < maxSpeed)
                 {
                     speed += 0.2f;
                 }
-                if (Mathf.Abs(angle) >= 90 && speed > minSpeed)
+                if (Math.Abs(angle) >= 90 && speed > minSpeed)
                 {
                     speed -= 0.2f;
                 }
-            } else
+            }
+            else
             {
                 nextAdjust = Time.time + Random.value;
             }
@@ -177,37 +253,6 @@ public class ShipBase : MonoBehaviour
 
         rb.velocity = transform.up * speed;
         rb.MoveRotation(rb.rotation + (turnSpeed * turn));
-    }
-
-    IEnumerator Turn()
-    {
-        while (true)
-        {
-            if (!target) yield return new WaitForFixedUpdate();
-
-            float turn = 0f;
-            float angle = GetAngleToTarget();
-
-            // Turning logic
-            if (Mathf.Abs(angle) > faceEnemyAngle)
-            {
-                if (angle > 0)
-                {
-                    turn = 1f;
-                }
-                if (angle < 0)
-                {
-                    turn = -1f;
-                }
-            }
-            
-            if (Mathf.Abs(angle) < faceEnemyAngle)
-            {
-                yield return new WaitForSeconds(Random.Range(0, 1.5f));
-            }
-
-            rb.MoveRotation(rb.rotation + (turnSpeed * turn));
-        }
     }
 
     protected virtual GameObject FindTarget()
@@ -248,7 +293,7 @@ public class ShipBase : MonoBehaviour
 
     protected virtual float GetAngleToTarget()
     {
-        Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>();
+        targetRb = target.GetComponent<Rigidbody2D>();
         Vector2 targetDirection = targetRb.position - rb.position;
 
         return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
@@ -256,19 +301,19 @@ public class ShipBase : MonoBehaviour
 
     protected virtual Vector2 GetTargetAcceleration()
     {
-        Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>();
-        Vector2 targetAcceleration = (targetRb.velocity - lastVelocity) / Time.fixedDeltaTime;
+        targetRb = target.GetComponent<Rigidbody2D>();
+        Vector2 targetAccelearation = (targetRb.velocity - lastVelocity) / Time.fixedDeltaTime;
         lastVelocity = targetRb.velocity;
 
-        return targetAcceleration;
+        return targetAccelearation;
     }
 
-    // Imma be real idk how any of the stuff below works, I found it on the internet
-    protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations)
+    // Imma be real idk how any of the math stuff works, stole it from the internet
+    protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, Transform weapon)
     {
-        Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>();
+        targetRb = target.GetComponent<Rigidbody2D>();
 
-        float s = laser.GetComponent<Laser>().getSpeed();
+        float s = weapon.GetComponent<WeaponsBase>().getSpeed(); // *maybe add ship speed somehow?
         float distance = Vector2.Distance(targetRb.position, rb.position);
 
         Vector2 pT = targetRb.position - rb.position;
@@ -302,6 +347,7 @@ public class ShipBase : MonoBehaviour
 
         Vector2 travel = pT + vT * guess + 0.5f * aT * guess * guess;
         return rb.position + travel;
+
     }
 
     protected virtual float SolveQuarticNewton(float guess, int iterations, float a, float b, float c, float d, float e)

@@ -8,6 +8,7 @@ TagManager:
   - Blue Team
   - Red Team
   - Red
+  - VFX Manager
   layers:
   - Default
   - TransparentFX

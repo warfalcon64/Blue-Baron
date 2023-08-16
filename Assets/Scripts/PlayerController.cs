@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.VFX;
 
 public class PlayerController : MonoBehaviour
 {
+    public float health = 100f;
     [SerializeField] private float speed = 10f;
     [SerializeField] private float turnSpeed = 2f;
     [SerializeField] private float fieldOfFire; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
@@ -13,6 +15,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform pfBlueLaser; // Laser gameobject for the ship to shoot
     [SerializeField] private Transform leftGun; // Positions to shoot lasers from
     [SerializeField] private Transform rightGun;
+
+    [SerializeField] private Transform vfxManager;
 
 
     private enum shipType
@@ -44,6 +48,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 worldMousePosition;
     private Vector3 mousePosition;
 
+    private VisualEffect effects;
+
 
     Rigidbody2D rb;
     // Start is called before the first frame update
@@ -57,7 +63,9 @@ public class PlayerController : MonoBehaviour
         leftFire = false;
         nextFire = 0f;
         ship = shipType.Fighter;
+
         rb = GetComponent<Rigidbody2D>();
+        effects = vfxManager.GetComponent<VisualEffect>();
     }
 
     // Update is called once per frame
@@ -91,6 +99,21 @@ public class PlayerController : MonoBehaviour
                 break;
         }
 
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
+        {
+            // Grab the vfx attached to whatever weapon just hit the ship, and create an attribute to send to vfx
+            VFXEventAttribute eventAttribute = effects.CreateVFXEventAttribute();
+
+            // Get the ID of the property we want to modify
+            int vfxPosition = Shader.PropertyToID("Position");
+            // Set the property, and send event with the attribute carrying the info to the vfx graph
+            effects.SetVector3(vfxPosition, transform.position);
+            effects.SendEvent("LaserHit", eventAttribute);
+        }
     }
 
     private void fighterControl()
@@ -152,6 +175,6 @@ public class PlayerController : MonoBehaviour
         // Create laser and call its setup function from the script attached to it
         Vector2 shootDirection = (worldMousePosition - laserSpawn).normalized;
         Transform bulletClone = Instantiate(pfBlueLaser, laserSpawn, leftGun.rotation);
-        bulletClone.GetComponent<Laser>().setup(shootDirection, rb.velocity);
+        bulletClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
     }
 }
