@@ -27,6 +27,7 @@ public abstract class ShipBase : MonoBehaviour
     [SerializeField] protected Transform plasma;
 
     [Header("VFX")]
+    [SerializeField] protected float lowHealth = 25;
     [SerializeField] protected Transform smoke;
 
     protected bool isSmoking;
@@ -40,7 +41,8 @@ public abstract class ShipBase : MonoBehaviour
     protected float nextAdjust;
 
     protected GameObject vfxManager; //*** MAKE VFX MANAGER A SCRIPTABLE OBJECT TO AVOID FIND GAMEOBJECT CALLS
-    protected VisualEffect effects;
+    protected VisualEffect mainEffects;
+    protected VisualEffect shipEffects;
     protected GameObject target;
     protected Rigidbody2D rb;
     protected Rigidbody2D targetRb;
@@ -61,15 +63,12 @@ public abstract class ShipBase : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (health <= (health * 0.25f) && !isSmoking)
-        {
-            VFXEventAttribute eventAttribute = effects.CreateVFXEventAttribute();
-        }
-
         if (health <= 0)
         {
             OnDeath();
         }
+
+        UpdateSmoke();
     }
 
     // Update is called once per frame
@@ -113,7 +112,8 @@ public abstract class ShipBase : MonoBehaviour
 
         vfxManager = GameObject.FindGameObjectWithTag("VFX Manager");
         rb = GetComponent<Rigidbody2D>();
-        effects = vfxManager.GetComponent<VisualEffect>();
+        mainEffects = vfxManager.GetComponent<VisualEffect>();
+        shipEffects = GetComponent<VisualEffect>();
     }
 
     protected virtual void OnDeath()
@@ -128,6 +128,7 @@ public abstract class ShipBase : MonoBehaviour
             string type = collider.GetComponent<WeaponsBase>().damageType;
             float damage = collider.GetComponent<WeaponsBase>().getDamage();
 
+            // Determine the type of damage weapon deals, apply modifiers accordingly
             switch (type)
             {
                 case "Plasma":
@@ -142,6 +143,36 @@ public abstract class ShipBase : MonoBehaviour
             health -= damage;
 
             PlayHitVFX(type);
+
+            if (health <= lowHealth && !isSmoking)
+            {
+                isSmoking = true;
+                shipEffects.SendEvent("OnDamage");
+            }
+        }
+    }
+
+    protected virtual void UpdateSmoke()
+    {
+        if (!isSmoking) return;
+
+        int lifetime = Shader.PropertyToID("SmokeLifetime");
+
+        if (speed < 6.1f)
+        {
+            shipEffects.SetFloat(lifetime, 1.2f);
+        }
+        else if (speed < 7.4f)
+        {
+            shipEffects.SetFloat(lifetime, 1f);
+        }
+        else if (speed < 10f)
+        {
+            shipEffects.SetFloat(lifetime, 0.9f);
+        }
+        else if (speed == 10f)
+        {
+            shipEffects.SetFloat(lifetime, 0.85f);
         }
     }
 
@@ -161,14 +192,14 @@ public abstract class ShipBase : MonoBehaviour
 
         }
 
-        VFXEventAttribute eventAttribute = effects.CreateVFXEventAttribute();
+        VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
 
         // Get the ID of the property we want to modify
         int vfxPosition = Shader.PropertyToID("Position");
 
         // Set the property, and send event with the attribute carrying the info to the vfx graph
-        effects.SetVector3(vfxPosition, transform.position);
-        effects.SendEvent(effectEvent, eventAttribute);
+        mainEffects.SetVector3(vfxPosition, transform.position);
+        mainEffects.SendEvent(effectEvent, eventAttribute);
     }
 
     protected virtual void ShootProjectiles(Vector2 targetAcceleration)

@@ -23,6 +23,11 @@ public class ShipFighter : ShipBase
         //StartCoroutine(Turn());
     }
 
+    protected override void Update()
+    {
+        base.Update();
+    }
+
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
@@ -36,6 +41,11 @@ public class ShipFighter : ShipBase
     protected override void OnTriggerEnter2D(Collider2D collider)
     {
         base.OnTriggerEnter2D(collider);
+    }
+
+    protected override void UpdateSmoke()
+    {
+        base.UpdateSmoke();
     }
 
     protected override void PlayHitVFX(string type)

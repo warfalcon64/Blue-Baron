@@ -4,10 +4,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.VFX;
+using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerController : MonoBehaviour
 {
-    public float health = 100f;
+    [SerializeField] public float health = 100f;
+    [SerializeField] public float shield = 0f;
     [SerializeField] private float speed = 10f;
     [SerializeField] private float turnSpeed = 2f;
     [SerializeField] private float fieldOfFire; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
@@ -34,7 +36,8 @@ public class PlayerController : MonoBehaviour
 
     private shipType ship;
     private shootType shootMode;
-   
+
+    private float lowHealth;
     private float turn; // Input axis for turning (-1 turns left, 1 turns right)
     private float minTurn; // Speeds for turning and forward movement
     private float maxTurn;
@@ -44,11 +47,13 @@ public class PlayerController : MonoBehaviour
     
     private float nextFire; // In game time for next moment lasers can fire
     private bool leftFire;
+    private bool isSmoking;
    
     private Vector2 worldMousePosition;
     private Vector3 mousePosition;
 
-    private VisualEffect effects;
+    private VisualEffect mainEffects;
+    private VisualEffect shipEffects;
 
 
     Rigidbody2D rb;
@@ -61,11 +66,24 @@ public class PlayerController : MonoBehaviour
         maxTurn = turnSpeed + 1;
         shootMode = shootType.None;
         leftFire = false;
+        isSmoking = false;
         nextFire = 0f;
         ship = shipType.Fighter;
 
         rb = GetComponent<Rigidbody2D>();
-        effects = vfxManager.GetComponent<VisualEffect>();
+        mainEffects = vfxManager.GetComponent<VisualEffect>();
+        shipEffects = GetComponent<VisualEffect>();
+
+        switch (ship)
+        {
+            case shipType.Fighter:
+                lowHealth = health * 0.25f;
+                break;
+
+            default:
+                print("Error: Player ship type is undefined!");
+                break;
+        }
     }
 
     // Update is called once per frame
@@ -83,6 +101,8 @@ public class PlayerController : MonoBehaviour
         {
             shootMode = shootType.None;
         }
+
+        UpdateSmoke();
 
         // Calculate mouse position on screen
         mousePosition = Input.mousePosition;
@@ -106,13 +126,36 @@ public class PlayerController : MonoBehaviour
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
             // Grab the vfx attached to whatever weapon just hit the ship, and create an attribute to send to vfx
-            VFXEventAttribute eventAttribute = effects.CreateVFXEventAttribute();
+            VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
 
             // Get the ID of the property we want to modify
             int vfxPosition = Shader.PropertyToID("Position");
             // Set the property, and send event with the attribute carrying the info to the vfx graph
-            effects.SetVector3(vfxPosition, transform.position);
-            effects.SendEvent("LaserHit", eventAttribute);
+            mainEffects.SetVector3(vfxPosition, transform.position);
+            mainEffects.SendEvent("LaserHit", eventAttribute);
+
+            string type = collider.GetComponent<WeaponsBase>().damageType;
+            float damage = collider.GetComponent<WeaponsBase>().getDamage();
+
+            // Determine the type of damage weapon deals, apply modifiers accordingly
+            switch (type)
+            {
+                case "Plasma":
+                    if (shield <= 0) damage *= 2;
+                    break;
+
+                default:
+                    print("DID NOT APPLY DAMAGE CORRECTLY");
+                    break;
+            }
+
+            health -= damage;
+
+            if (health <= lowHealth && !isSmoking)
+            {
+                isSmoking = true;
+                shipEffects.SendEvent("OnDamage");
+            }
         }
     }
 
@@ -176,5 +219,29 @@ public class PlayerController : MonoBehaviour
         Vector2 shootDirection = (worldMousePosition - laserSpawn).normalized;
         Transform bulletClone = Instantiate(pfBlueLaser, laserSpawn, leftGun.rotation);
         bulletClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
+    }
+
+    private void UpdateSmoke()
+    {
+        if (!isSmoking) return;
+
+        int lifetime = Shader.PropertyToID("SmokeLifetime");
+
+        if (speed < 6.1f)
+        {
+            shipEffects.SetFloat(lifetime, 1.2f);
+        }
+        else if (speed < 7.4f)
+        {
+            shipEffects.SetFloat(lifetime, 1f);
+        }
+        else if (speed < 10f)
+        {
+            shipEffects.SetFloat(lifetime, 0.9f);
+        }
+        else if (speed == 10f)
+        {
+            shipEffects.SetFloat(lifetime, 0.85f);
+        }
     }
 }
