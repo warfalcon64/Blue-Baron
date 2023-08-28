@@ -113,7 +113,7 @@ public abstract class ShipBase : MonoBehaviour
         vfxManager = GameObject.FindGameObjectWithTag("VFX Manager");
         rb = GetComponent<Rigidbody2D>();
         mainEffects = vfxManager.GetComponent<VisualEffect>();
-        shipEffects = GetComponent<VisualEffect>();
+        shipEffects = smoke.GetComponent<VisualEffect>();
     }
 
     protected virtual void OnDeath()

@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform rightGun;
 
     [SerializeField] private Transform vfxManager;
+    [SerializeField] private Transform smoke;
 
 
     private enum shipType
@@ -72,7 +73,7 @@ public class PlayerController : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
         mainEffects = vfxManager.GetComponent<VisualEffect>();
-        shipEffects = GetComponent<VisualEffect>();
+        shipEffects = smoke.GetComponent<VisualEffect>();
 
         switch (ship)
         {
