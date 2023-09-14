@@ -4764,7 +4764,7 @@ MonoBehaviour:
   - {fileID: 8926484042661614778}
   m_ExposedName: BoundsSize
   m_Exposed: 1
-  m_Order: 11
+  m_Order: 8
   m_Category: 
   m_Min:
     m_Type:

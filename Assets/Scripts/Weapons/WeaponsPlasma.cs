@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.VFX;
 
 public class WeaponsPlasma : WeaponsBase
@@ -22,7 +23,15 @@ public class WeaponsPlasma : WeaponsBase
         rb.rotation = angle;
         rb.velocity = (shootDirection * speed) + shipVelocity;
 
-        Destroy(gameObject, 10f);
+        Destroy(gameObject, lifetime);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
+        {
+            Destroy(gameObject);
+        }
     }
 
     public override float getSpeed() => base.getSpeed();

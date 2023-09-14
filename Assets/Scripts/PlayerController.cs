@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
     private float maxSpeed;
     private float acceleration; // Input axis for forward movement (-1 slows down, 1 speeds up)
     
-    private float nextFire; // In game time for next moment lasers can fire
+    private float nextFire;
     private bool leftFire;
     private bool isSmoking;
    
@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour
 
     private VisualEffect mainEffects;
     private VisualEffect shipEffects;
+
+    SectorObjectPool objectPool;
 
 
     Rigidbody2D rb;
@@ -104,6 +106,7 @@ public class PlayerController : MonoBehaviour
         }
 
         UpdateSmoke();
+        UpdateTimers();
 
         // Calculate mouse position on screen
         mousePosition = Input.mousePosition;
@@ -192,34 +195,24 @@ public class PlayerController : MonoBehaviour
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
         //print(angle);
 
-        if (shootMode == shootType.Primary && angle <= fieldOfFire && nextFire <= Time.time)
+        if (shootMode == shootType.Primary && angle <= fieldOfFire && nextFire <= 0)
         {
             shootLaser();
-            nextFire = Time.time + primaryCoolDown;
+            nextFire = primaryCoolDown;
         }
     }
 
     private void shootLaser()
     {
+        Vector2 plasmaSpawn = leftGun.position;
+        leftFire = !leftFire;
 
-        Vector2 laserSpawn;
-        laserSpawn = leftGun.position;
-
-        if (!leftFire)
-        {
-            leftFire = true;
-            laserSpawn = leftGun.position;
-        }
-        else
-        {
-            laserSpawn = rightGun.position;
-            leftFire = false;
-        }
+        if (!leftFire) plasmaSpawn = rightGun.position;
 
         // Create laser and call its setup function from the script attached to it
-        Vector2 shootDirection = (worldMousePosition - laserSpawn).normalized;
-        Transform bulletClone = Instantiate(pfBlueLaser, laserSpawn, leftGun.rotation);
-        bulletClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
+        Vector2 shootDirection = (worldMousePosition - plasmaSpawn).normalized;
+        Transform bulletClone = Instantiate(pfBlueLaser, plasmaSpawn, leftGun.rotation);
+        bulletClone.transform.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
     }
 
     private void UpdateSmoke()
@@ -243,6 +236,14 @@ public class PlayerController : MonoBehaviour
         else if (speed == 10f)
         {
             shipEffects.SetFloat(lifetime, 0.85f);
+        }
+    }
+
+    private void UpdateTimers()
+    {
+        if (nextFire > 0)
+        {
+            nextFire -= Time.deltaTime;
         }
     }
 }

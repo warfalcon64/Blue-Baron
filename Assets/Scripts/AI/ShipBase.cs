@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEditor.PackageManager;
 using UnityEngine;
@@ -30,6 +31,7 @@ public abstract class ShipBase : MonoBehaviour
     [SerializeField] protected float lowHealth = 25;
     [SerializeField] protected Transform smoke;
 
+    protected bool stopSearch;
     protected bool isSmoking;
     protected bool leftFire;
     protected float maxSpeed;
@@ -40,7 +42,7 @@ public abstract class ShipBase : MonoBehaviour
     protected float nextTurn;
     protected float nextAdjust;
 
-    protected GameObject vfxManager; //*** MAKE VFX MANAGER A SCRIPTABLE OBJECT TO AVOID FIND GAMEOBJECT CALLS
+    protected List<ShipBase> enemyTeam;
     protected VisualEffect mainEffects;
     protected VisualEffect shipEffects;
     protected GameObject target;
@@ -48,6 +50,9 @@ public abstract class ShipBase : MonoBehaviour
     protected Rigidbody2D targetRb;
     protected shipType ship;
     protected Vector2 lastVelocity;
+
+    public event EventHandler OnShipDeath;
+    public delegate GameObject GetTarget();
 
     protected enum shipType
     {
@@ -59,22 +64,30 @@ public abstract class ShipBase : MonoBehaviour
     protected virtual void Awake()
     {
         Init();
+        enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
+
+        foreach (ShipBase ship in enemyTeam)
+        {
+            ship.OnShipDeath += OnEnemyDeath;
+        }
     }
 
     protected virtual void Update()
     {
         if (health <= 0)
         {
+            OnShipDeath?.Invoke(this, EventArgs.Empty);
             OnDeath();
         }
 
         UpdateSmoke();
+        UpdateTimers();
     }
 
     // Update is called once per frame
     protected virtual void FixedUpdate()
     {
-        if (target != null)
+        if (target != null && !stopSearch)
         {
             float angle = GetAngleToTarget();
 
@@ -88,7 +101,7 @@ public abstract class ShipBase : MonoBehaviour
                 ShootProjectiles(targetAcceleration);
             }
         }
-        else
+        else if (!stopSearch)
         {
             target = FindTarget();
         }
@@ -105,20 +118,27 @@ public abstract class ShipBase : MonoBehaviour
         target = null;
         targetRb = null;
         nextFire = 0f;
-        nextTurn = Time.time + Random.value;
-        nextAdjust = Time.time + Random.value;
+        nextTurn = Random.Range(0, 2f);
+        nextAdjust = Random.Range(0, 2f);
+        stopSearch = false;
         leftFire = false;
         isSmoking = false;
 
-        vfxManager = GameObject.FindGameObjectWithTag("VFX Manager");
         rb = GetComponent<Rigidbody2D>();
-        mainEffects = vfxManager.GetComponent<VisualEffect>();
+        mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
         shipEffects = smoke.GetComponent<VisualEffect>();
     }
 
     protected virtual void OnDeath()
     {
-        
+        PlayDeathVFX();
+        //Destroy(gameObject);
+        gameObject.SetActive(false);
+    }
+
+    private void OnEnemyDeath(object sender, EventArgs e)
+    {
+        target = FindTarget();
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collider)
@@ -152,30 +172,6 @@ public abstract class ShipBase : MonoBehaviour
         }
     }
 
-    protected virtual void UpdateSmoke()
-    {
-        if (!isSmoking) return;
-
-        int lifetime = Shader.PropertyToID("SmokeLifetime");
-
-        if (speed < 6.1f)
-        {
-            shipEffects.SetFloat(lifetime, 1.2f);
-        }
-        else if (speed < 7.4f)
-        {
-            shipEffects.SetFloat(lifetime, 1f);
-        }
-        else if (speed < 10f)
-        {
-            shipEffects.SetFloat(lifetime, 0.9f);
-        }
-        else if (speed == 10f)
-        {
-            shipEffects.SetFloat(lifetime, 0.85f);
-        }
-    }
-
     protected virtual void PlayHitVFX(string type)
     {
         string effectEvent = "null";
@@ -202,29 +198,31 @@ public abstract class ShipBase : MonoBehaviour
         mainEffects.SendEvent(effectEvent, eventAttribute);
     }
 
+    protected virtual void PlayDeathVFX()
+    {
+        VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
+
+        int vfxPosition = Shader.PropertyToID("Position");
+
+        mainEffects.SetVector3(vfxPosition, transform.position);
+        mainEffects.SendEvent("OnDeath", eventAttribute);
+    }
+
     protected virtual void ShootProjectiles(Vector2 targetAcceleration)
     {
-        if (nextFire <= Time.time)
+        if (nextFire <= 0)
         {
             ShootPlasma(targetAcceleration);
-            nextFire = Time.time + primaryCoolDown;
+            nextFire = primaryCoolDown;
         }
     }
 
     protected virtual void ShootPlasma(Vector2 targetAcceleration)
     {
         Vector2 plasmaSpawn = leftGun.position;
+        leftFire = !leftFire;
 
-        if (!leftFire)
-        {
-            leftFire = true;
-            plasmaSpawn = leftGun.position;
-        }
-        else
-        {
-            leftFire = false;
-            plasmaSpawn = rightGun.position;
-        }
+        if (!leftFire) plasmaSpawn = rightGun.position;
 
         Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, plasma);
         Vector2 shootDirection = (aimPos - plasmaSpawn).normalized;
@@ -243,12 +241,12 @@ public abstract class ShipBase : MonoBehaviour
     {
         float turn = 0f;
 
-        if (target != null)
+        if (target != null && !stopSearch)
         {
             float angle = GetAngleToTarget();
 
             // Turning logic
-            if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= Time.time)
+            if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= 0)
             {
                 if (angle > 0)
                 {
@@ -259,13 +257,13 @@ public abstract class ShipBase : MonoBehaviour
                     turn = -1f;
                 }
             }
-            else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= Time.time)
+            else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= 0)
             {
-                nextTurn = Time.time + Random.value;
+                Random.Range(0, 0.5f);
             }
 
             // Acceleration logic
-            if (nextAdjust <= Time.time)
+            if (nextAdjust <= 0)
             {
                 if (Math.Abs(angle) < 90 && speed < maxSpeed)
                 {
@@ -278,8 +276,12 @@ public abstract class ShipBase : MonoBehaviour
             }
             else
             {
-                nextAdjust = Time.time + Random.value;
+                nextAdjust = Random.Range(0, 0.5f);
             }
+        }
+        else
+        {
+            turn = 0f;
         }
 
         rb.velocity = transform.up * speed;
@@ -288,26 +290,16 @@ public abstract class ShipBase : MonoBehaviour
 
     protected virtual GameObject FindTarget()
     {
-        GameObject enemyTeam;
-        GameObject target = null;
-        string enemyTag;
         float distance;
         float lowestDistance = Mathf.Infinity;
 
-        if (CompareTag("Blue"))
+        if (enemyTeam.Count == 0)
         {
-            enemyTag = "Red Team";
-        }
-        else
-        {
-            enemyTag = "Blue Team";
+            stopSearch = true;
+            return null;
         }
 
-        enemyTeam = GameObject.FindGameObjectWithTag(enemyTag);
-
-        if (enemyTeam.transform.childCount == 0) return target;
-
-        foreach (Transform enemy in enemyTeam.transform)
+        foreach (ShipBase enemy in enemyTeam)
         {
             Vector2 posDiff = enemy.GetComponent<Rigidbody2D>().position - rb.position;
             distance = posDiff.sqrMagnitude;
@@ -320,6 +312,39 @@ public abstract class ShipBase : MonoBehaviour
         }
 
         return target;
+    }
+
+    protected virtual void UpdateSmoke()
+    {
+        if (!isSmoking) return;
+
+        int lifetime = Shader.PropertyToID("SmokeLifetime");
+
+        if (speed < 6.1f)
+        {
+            shipEffects.SetFloat(lifetime, 1.2f);
+        }
+        else if (speed < 7.4f)
+        {
+            shipEffects.SetFloat(lifetime, 1f);
+        }
+        else if (speed < 10f)
+        {
+            shipEffects.SetFloat(lifetime, 0.9f);
+        }
+        else if (speed == 10f)
+        {
+            shipEffects.SetFloat(lifetime, 0.85f);
+        }
+    }
+
+    protected virtual void UpdateTimers()
+    {
+        if (nextFire > 0) nextFire -= Time.deltaTime;
+
+        if (nextTurn > 0) nextTurn -= Time.deltaTime;
+
+        if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
     }
 
     protected virtual float GetAngleToTarget()
@@ -378,7 +403,6 @@ public abstract class ShipBase : MonoBehaviour
 
         Vector2 travel = pT + vT * guess + 0.5f * aT * guess * guess;
         return rb.position + travel;
-
     }
 
     protected virtual float SolveQuarticNewton(float guess, int iterations, float a, float b, float c, float d, float e)

@@ -296,7 +296,7 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
---- !u!1 &8497475259681279303
+--- !u!1 &7329555380424856148
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -304,45 +304,37 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8497475259681279302}
-  - component: {fileID: 8497475259681279298}
-  - component: {fileID: 8497475259681279299}
-  - component: {fileID: 8497475259681279296}
-  - component: {fileID: 8497475259681279297}
+  - component: {fileID: 7862101490455230542}
+  - component: {fileID: 1324401581835120968}
   m_Layer: 7
-  m_Name: Blue Fighter
-  m_TagString: Blue
+  m_Name: Sprite
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8497475259681279302
+--- !u!4 &7862101490455230542
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8497475259681279303}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_GameObject: {fileID: 7329555380424856148}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.017, y: 0.017, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1425402346873535505}
-  - {fileID: 4237550023096101175}
-  - {fileID: 6332484119773087195}
-  - {fileID: 5088211741827659985}
-  - {fileID: 8897038711605021268}
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_Children: []
+  m_Father: {fileID: 8497475259681279302}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &8497475259681279298
+--- !u!212 &1324401581835120968
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8497475259681279303}
+  m_GameObject: {fileID: 7329555380424856148}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -388,6 +380,46 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &8497475259681279303
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8497475259681279302}
+  - component: {fileID: 8497475259681279299}
+  - component: {fileID: 8497475259681279296}
+  - component: {fileID: 8497475259681279297}
+  m_Layer: 7
+  m_Name: Blue Fighter
+  m_TagString: Blue
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8497475259681279302
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8497475259681279303}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.017, y: 0.017, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7862101490455230542}
+  - {fileID: 1425402346873535505}
+  - {fileID: 4237550023096101175}
+  - {fileID: 6332484119773087195}
+  - {fileID: 5088211741827659985}
+  - {fileID: 8897038711605021268}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &8497475259681279299
 Rigidbody2D:
   serializedVersion: 4
@@ -885,6 +917,7 @@ MonoBehaviour:
   leftGun: {fileID: 1425402346873535505}
   rightGun: {fileID: 4237550023096101175}
   plasma: {fileID: 8348708228034621631, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
+  shipData: {fileID: 11400000, guid: 6cb2b35daab4fe5488cc5b43e30bd944, type: 2}
   lowHealth: 25
   smoke: {fileID: 8897038711605021268}
 --- !u!1 &9045316319554966681

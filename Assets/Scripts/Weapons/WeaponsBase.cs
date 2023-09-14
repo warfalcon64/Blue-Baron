@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.VFX;
 
 public abstract class WeaponsBase : MonoBehaviour
 {
+
     [Header("Damage Type")]
     [SerializeField] public string damageType = "none";
 
@@ -15,6 +17,9 @@ public abstract class WeaponsBase : MonoBehaviour
     [SerializeField] protected float health = 0;
     [SerializeField] protected float damage = 10;
     [SerializeField] protected float range = 100;
+
+    [Header("Lifetime")]
+    [SerializeField] protected float lifetime = 5f;
 
     public virtual void setup(Vector2 shootDirection, Vector2 shipVelocity)
     {
