@@ -837,9 +837,11 @@ MonoBehaviour:
   leftGun: {fileID: 7424531800947282808}
   rightGun: {fileID: 4099872298902681536}
   plasma: {fileID: 7675769780192435603, guid: d3faccea2380520448a367ee21c88c14, type: 3}
-  shipData: {fileID: 11400000, guid: 6cb2b35daab4fe5488cc5b43e30bd944, type: 2}
   lowHealth: 25
   smoke: {fileID: 4119226456086350580}
+  weapons:
+  - type: 0
+    weapon: {fileID: -3986982957232520056, guid: d3faccea2380520448a367ee21c88c14, type: 3}
 --- !u!1 &7180944070711932923
 GameObject:
   m_ObjectHideFlags: 0

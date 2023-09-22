@@ -12,6 +12,26 @@ public class ShipData : ScriptableObject
     [Header("Red Team")]
     public string redTag = "Red";
     public GameObject redPlasma;
-    
 
+
+}
+
+public enum ShootType
+{
+    Primary,
+    Secondary,
+    None
+}
+
+public enum ShipType
+{
+    Fighter,
+    Bomber,
+    Corvette,
+    Frigate,
+    Destroyer,
+    Cruiser,
+    Battlecruiser,
+    Battleship,
+    Carrier
 }

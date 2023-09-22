@@ -36,6 +36,7 @@ public abstract class ShipBase : MonoBehaviour
     protected bool leftFire;
     protected float maxSpeed;
     protected float minSpeed;
+    protected float turn;
     protected float maxTurn;
     protected float minTurn;
     protected float nextFire;
@@ -48,16 +49,23 @@ public abstract class ShipBase : MonoBehaviour
     protected GameObject target;
     protected Rigidbody2D rb;
     protected Rigidbody2D targetRb;
-    protected shipType ship;
     protected Vector2 lastVelocity;
+    protected Vector2 targetAcceleration;
+
+    protected ShipType ship;
+    protected ShootType shootMode;
 
     public event EventHandler OnShipDeath;
-    public delegate GameObject GetTarget();
+    public event EventHandler<ShootArgs> PrimaryReady;
 
-    protected enum shipType
+    [Header("Weapon Slots")]
+    [SerializeField] private List<WeaponMap.WeaponMapEntry> weapons;
+    [SerializeField] private WeaponMap weaponMap;
+
+    public class ShootArgs : EventArgs
     {
-        Fighter,
-        Bomber
+        public readonly WeaponsBase primary;
+        public readonly Vector2 projectileSpawnPoint;
     }
 
     // Start is called before the first frame update
@@ -66,6 +74,7 @@ public abstract class ShipBase : MonoBehaviour
         Init();
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
 
+        // Make ship listen to enemy ships for their death events
         foreach (ShipBase ship in enemyTeam)
         {
             ship.OnShipDeath += OnEnemyDeath;
@@ -96,7 +105,7 @@ public abstract class ShipBase : MonoBehaviour
                 Vector2 posDiff = target.GetComponent<Rigidbody2D>().position - rb.position;
                 float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
 
-                Vector2 targetAcceleration = GetTargetAcceleration()
+                targetAcceleration = GetTargetAcceleration()
                     + (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance)); // Adding inaccuracy to prevent player skill diff
                 ShootProjectiles(targetAcceleration);
             }
@@ -113,6 +122,7 @@ public abstract class ShipBase : MonoBehaviour
     {
         maxSpeed = speed;
         minSpeed = speed / 2;
+        turn = 0f;
         maxTurn = turnSpeed + 1;
         minTurn = turnSpeed;
         target = null;
@@ -123,13 +133,16 @@ public abstract class ShipBase : MonoBehaviour
         stopSearch = false;
         leftFire = false;
         isSmoking = false;
+        shootMode = ShootType.None;
+
+        weaponMap = ScriptableObject.CreateInstance<WeaponMap>();
 
         rb = GetComponent<Rigidbody2D>();
         mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
         shipEffects = smoke.GetComponent<VisualEffect>();
     }
 
-    protected virtual void OnDeath()
+    protected virtual void OnDeath() // *** UNSUBSCRIBE FROM ONSHIPDEATH EVENT!!!
     {
         PlayDeathVFX();
         //Destroy(gameObject);
@@ -208,6 +221,8 @@ public abstract class ShipBase : MonoBehaviour
         mainEffects.SendEvent("OnDeath", eventAttribute);
     }
 
+
+    // Switch this to activate Primary/Secondary ready events
     protected virtual void ShootProjectiles(Vector2 targetAcceleration)
     {
         if (nextFire <= 0)
@@ -217,6 +232,9 @@ public abstract class ShipBase : MonoBehaviour
         }
     }
 
+    //protected virtual void ShootPrimary()
+
+    // Come up with a generic method to shoot whatever weapon has been put into primary or secondary slots
     protected virtual void ShootPlasma(Vector2 targetAcceleration)
     {
         Vector2 plasmaSpawn = leftGun.position;
@@ -239,7 +257,6 @@ public abstract class ShipBase : MonoBehaviour
     // Moves the ship to keep the specified target gameobject within the given parameters
     protected virtual void Move()
     {
-        float turn = 0f;
 
         if (target != null && !stopSearch)
         {
@@ -284,6 +301,7 @@ public abstract class ShipBase : MonoBehaviour
             turn = 0f;
         }
 
+        // keep this
         rb.velocity = transform.up * speed;
         rb.MoveRotation(rb.rotation + (turnSpeed * turn));
     }
@@ -422,5 +440,50 @@ public abstract class ShipBase : MonoBehaviour
     protected virtual float EvalQuarticDerivative(float t, float a, float b, float c, float d)
     {
         return 4f * a * t * t * t + 3f * b * t * t + 2f * c * t + d;
+    }
+
+    public virtual float GetShipSpeed()
+    {
+        return speed;
+    }
+
+    public virtual void SetShipSpeed(float newSpeed)
+    {
+        speed = newSpeed;
+    }
+
+    public virtual float GetShipMaxSpeed()
+    {
+        return maxSpeed;
+    }
+
+    public virtual float GetShipMinSpeed()
+    {
+        return minSpeed;
+    }
+
+    public virtual float GetFieldOfFire()
+    {
+        return fieldOfFire;
+    }
+
+    public virtual WeaponMap GetWeaponMap()
+    {
+        return weaponMap;
+    }
+
+    public virtual void SetShipTurn(float newTurn)
+    {
+        turn = newTurn;
+    }
+
+    public virtual void SetTargetAcceleration(Vector2 acceleration)
+    {
+        targetAcceleration = acceleration;
+    }
+
+    public virtual void SetShootType(ShootType type)
+    {
+        shootMode = type;
     }
 }

@@ -3565,41 +3565,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2209609999116798677, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: m_SortingLayer
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2209609999116798677, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: m_SortingLayerID
-      value: -1990381207
-      objectReference: {fileID: 0}
     - target: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_Name
       value: Orange Fighter
-      objectReference: {fileID: 0}
-    - target: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: smokeDamage
-      value: 
-      objectReference: {fileID: 9016085866560649083, guid: 3e4809f5bbb8ee94f937263fe7124a9f, type: 3}
-    - target: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: sceneManager
-      value: 
-      objectReference: {fileID: 1974449429}
-    - target: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: plasmaInaccuracy
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 7224475410352486718, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8741346072529909666, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

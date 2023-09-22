@@ -28,15 +28,8 @@ public class PlayerController : MonoBehaviour
         Bomber
     }
 
-    private enum shootType
-    {
-        Primary,
-        Secondary,
-        None
-    }
-
     private shipType ship;
-    private shootType shootMode;
+    private ShootType shootMode;
 
     private float lowHealth;
     private float turn; // Input axis for turning (-1 turns left, 1 turns right)
@@ -67,7 +60,7 @@ public class PlayerController : MonoBehaviour
         maxSpeed = speed;
         minTurn = turnSpeed;
         maxTurn = turnSpeed + 1;
-        shootMode = shootType.None;
+        shootMode = ShootType.None;
         leftFire = false;
         isSmoking = false;
         nextFire = 0f;
@@ -98,11 +91,11 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            shootMode = shootType.Primary;
+            shootMode = ShootType.Primary;
         }
         else
         {
-            shootMode = shootType.None;
+            shootMode = ShootType.None;
         }
 
         UpdateSmoke();
@@ -195,7 +188,7 @@ public class PlayerController : MonoBehaviour
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
         //print(angle);
 
-        if (shootMode == shootType.Primary && angle <= fieldOfFire && nextFire <= 0)
+        if (shootMode == ShootType.Primary && angle <= fieldOfFire && nextFire <= 0)
         {
             shootLaser();
             nextFire = primaryCoolDown;
