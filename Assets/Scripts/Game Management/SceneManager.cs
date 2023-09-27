@@ -68,11 +68,10 @@ public class SceneManager : MonoBehaviour
         ship.OnShipDeath -= RecordDeadShip;
     }
 
-
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public List<ShipBase> GetLiveEnemies(string team)

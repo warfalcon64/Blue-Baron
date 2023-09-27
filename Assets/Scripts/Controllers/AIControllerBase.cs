@@ -69,11 +69,15 @@ public abstract class AIControllerBase : MonoBehaviour
                 Vector2 inaccuracy = (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), 
                     Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
 
-                targetAcceleration = CalculateTargetAcceleration();
-                ship.SetTargetAcceleration(targetAcceleration + inaccuracy);
-                
+                targetAcceleration = CalculateTargetAcceleration() + inaccuracy;
             }
         }
+        else if (!stopSearch)
+        {
+            target = FindTarget();
+        }
+
+        Move();
     }
 
     protected virtual void AttackTarget(object sender, ShipBase.ShootArgs e)
@@ -87,8 +91,16 @@ public abstract class AIControllerBase : MonoBehaviour
 
         if (angle <= fieldOfFire)
         {
-            //ship.ShootPrimary();
-            
+            switch(e.type)
+            {
+                case ShootType.Primary:
+                    ship.ShootPrimary(shootDirection);
+                    break;
+                
+                default:
+                    print("Error in AIController : AttackTarget");
+                    break;
+            }
         }
     }
 

@@ -25,7 +25,7 @@ public abstract class ShipBase : MonoBehaviour
     [SerializeField] protected float plasmaInaccuracy = 0;
     [SerializeField] protected Transform leftGun;
     [SerializeField] protected Transform rightGun;
-    [SerializeField] protected Transform plasma;
+    [SerializeField] protected WeaponsBase plasma;
 
     [Header("VFX")]
     [SerializeField] protected float lowHealth = 25;
@@ -60,12 +60,13 @@ public abstract class ShipBase : MonoBehaviour
 
     [Header("Weapon Slots")]
     [SerializeField] private List<WeaponMap.WeaponMapEntry> weapons;
-    [SerializeField] private WeaponMap weaponMap;
+    private WeaponMap weaponMap;
 
     public class ShootArgs : EventArgs
     {
-        public readonly WeaponsBase primary;
-        public readonly Vector2 projectileSpawnPoint;
+        public ShootType type;
+        public WeaponsBase primary;
+        public Vector2 projectileSpawnPoint;
     }
 
     // Start is called before the first frame update
@@ -162,6 +163,7 @@ public abstract class ShipBase : MonoBehaviour
             float damage = collider.GetComponent<WeaponsBase>().getDamage();
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
+            // * Move damage code into an Interface
             switch (type)
             {
                 case "Plasma":
@@ -227,12 +229,30 @@ public abstract class ShipBase : MonoBehaviour
     {
         if (nextFire <= 0)
         {
-            ShootPlasma(targetAcceleration);
+            //ShootPlasma(targetAcceleration);
+            PrimaryReady?.Invoke(this, 
+                new ShootArgs() { 
+                    type = ShootType.Primary, 
+                    primary = weaponMap.GetWeapon(ShootType.Primary), 
+                    projectileSpawnPoint = leftGun.position 
+                });
+            // *** rename nextFire before adding secondary weapons!!!
             nextFire = primaryCoolDown;
         }
     }
 
-    //protected virtual void ShootPrimary()
+    public virtual void ShootPrimary(Vector2 shootDirection)
+    {
+        WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Primary);
+        Vector2 projectileSpawn = leftGun.position;
+
+        leftFire = !leftFire;
+
+        if (!leftFire) projectileSpawn = rightGun.position;
+
+        WeaponsBase temp = Instantiate(projectile, projectileSpawn, leftGun.rotation);
+        temp.setup(shootDirection, rb.velocity);
+    }
 
     // Come up with a generic method to shoot whatever weapon has been put into primary or secondary slots
     protected virtual void ShootPlasma(Vector2 targetAcceleration)
@@ -242,14 +262,14 @@ public abstract class ShipBase : MonoBehaviour
 
         if (!leftFire) plasmaSpawn = rightGun.position;
 
-        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, plasma);
+        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, plasma.getSpeed());
         Vector2 shootDirection = (aimPos - plasmaSpawn).normalized;
 
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
 
         if (angle <= fieldOfFire)
         {
-            Transform plasmaClone = Instantiate(plasma, plasmaSpawn, leftGun.rotation);
+            WeaponsBase plasmaClone = Instantiate(plasma, plasmaSpawn, leftGun.rotation);
             plasmaClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
         }
     }
@@ -258,48 +278,48 @@ public abstract class ShipBase : MonoBehaviour
     protected virtual void Move()
     {
 
-        if (target != null && !stopSearch)
-        {
-            float angle = GetAngleToTarget();
+        //if (target != null && !stopSearch)
+        //{
+        //    float angle = GetAngleToTarget();
 
-            // Turning logic
-            if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= 0)
-            {
-                if (angle > 0)
-                {
-                    turn = 1f;
-                }
-                if (angle < 0)
-                {
-                    turn = -1f;
-                }
-            }
-            else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= 0)
-            {
-                Random.Range(0, 0.5f);
-            }
+        //    // Turning logic
+        //    if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= 0)
+        //    {
+        //        if (angle > 0)
+        //        {
+        //            turn = 1f;
+        //        }
+        //        if (angle < 0)
+        //        {
+        //            turn = -1f;
+        //        }
+        //    }
+        //    else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= 0)
+        //    {
+        //        Random.Range(0, 0.5f);
+        //    }
 
-            // Acceleration logic
-            if (nextAdjust <= 0)
-            {
-                if (Math.Abs(angle) < 90 && speed < maxSpeed)
-                {
-                    speed += 0.2f;
-                }
-                if (Math.Abs(angle) >= 90 && speed > minSpeed)
-                {
-                    speed -= 0.2f;
-                }
-            }
-            else
-            {
-                nextAdjust = Random.Range(0, 0.5f);
-            }
-        }
-        else
-        {
-            turn = 0f;
-        }
+        //    // Acceleration logic
+        //    if (nextAdjust <= 0)
+        //    {
+        //        if (Math.Abs(angle) < 90 && speed < maxSpeed)
+        //        {
+        //            speed += 0.2f;
+        //        }
+        //        if (Math.Abs(angle) >= 90 && speed > minSpeed)
+        //        {
+        //            speed -= 0.2f;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        nextAdjust = Random.Range(0, 0.5f);
+        //    }
+        //}
+        //else
+        //{
+        //    turn = 0f;
+        //}
 
         // keep this
         rb.velocity = transform.up * speed;
@@ -383,11 +403,11 @@ public abstract class ShipBase : MonoBehaviour
     }
 
     // Imma be real idk how any of the math stuff works, stole it from the internet
-    protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, Transform weapon)
+    protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, float weaponSpeed)
     {
         targetRb = target.GetComponent<Rigidbody2D>();
 
-        float s = weapon.GetComponent<WeaponsBase>().getSpeed(); // *maybe add ship speed somehow?
+        float s = weaponSpeed; // *maybe add ship speed somehow?
         float distance = Vector2.Distance(targetRb.position, rb.position);
 
         Vector2 pT = targetRb.position - rb.position;

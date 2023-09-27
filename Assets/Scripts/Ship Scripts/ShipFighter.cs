@@ -117,9 +117,9 @@ public class ShipFighter : ShipBase
     }
 
     // Imma be real idk how any of the math stuff below works, I found it on the internet
-    protected override Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, Transform weapon)
+    protected override Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, float weaponSpeed)
     {
-        return base.GetTargetLeadingPosition(targetAcceleration, iterations, weapon);
+        return base.GetTargetLeadingPosition(targetAcceleration, iterations, weaponSpeed);
     }
 
     protected override float SolveQuarticNewton(float guess, int iterations, float a, float b, float c, float d, float e)

@@ -1,7 +1,9 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -19,12 +21,18 @@ public class WeaponMap : ScriptableObject
         }
     }
 
+    public WeaponsBase GetWeapon(ShootType type)
+    {
+        return weapons[type];
+    }
+
     [Serializable]
     public class WeaponMapEntry
     {
         public ShootType type;
         public WeaponsBase weapon;
     }
-}
 
+    
+}
 
