@@ -79,7 +79,6 @@ public abstract class ShipBase : MonoBehaviour
 
     protected virtual void Start()
     {
-        primary = weaponMap.GetWeapon(ShootType.Primary);
         mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
 
@@ -105,24 +104,24 @@ public abstract class ShipBase : MonoBehaviour
     // Update is called once per frame
     protected virtual void FixedUpdate()
     {
-        if (target != null && !stopSearch)
-        {
-            float angle = GetAngleToTarget();
+        //if (target != null && !stopSearch)
+        //{
+        //    float angle = GetAngleToTarget();
 
-            if (Mathf.Abs(angle) <= primaryFieldofFire)
-            {
-                Vector2 posDiff = target.GetComponent<Rigidbody2D>().position - rb.position;
-                float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
+        //    if (Mathf.Abs(angle) <= primaryFieldofFire)
+        //    {
+        //        Vector2 posDiff = target.GetComponent<Rigidbody2D>().position - rb.position;
+        //        float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
 
-                targetAcceleration = GetTargetAcceleration()
-                    + (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance)); // Adding inaccuracy to prevent player skill diff
-                ShootProjectiles(targetAcceleration);
-            }
-        }
-        else if (!stopSearch)
-        {
-            target = FindTarget();
-        }
+        //        targetAcceleration = GetTargetAcceleration()
+        //            + (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance)); // Adding inaccuracy to prevent player skill diff
+        //        ShootProjectiles(targetAcceleration);
+        //    }
+        //}
+        //else if (!stopSearch)
+        //{
+        //    target = FindTarget();
+        //}
 
         Move();
     }
@@ -145,6 +144,9 @@ public abstract class ShipBase : MonoBehaviour
         shootMode = ShootType.None;
 
         weaponMap = ScriptableObject.CreateInstance<WeaponMap>();
+        weaponMap.Init(weapons);
+
+        primary = weaponMap.GetWeapon(ShootType.Primary);
 
         rb = GetComponent<Rigidbody2D>();
         

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using Unity.VisualScripting;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 
@@ -11,10 +12,13 @@ public class WeaponMap : ScriptableObject
 {
     public Dictionary<ShootType, WeaponsBase> weapons;
 
-    public WeaponMap (List<WeaponMapEntry> entries)
+    public WeaponMap ()
     {
-        this.weapons = new Dictionary<ShootType, WeaponsBase>();
+        weapons = new Dictionary<ShootType, WeaponsBase>();
+    }
 
+    public void Init(List<WeaponMapEntry> entries)
+    {
         foreach (WeaponMapEntry entry in entries)
         {
             weapons.Add(entry.type, entry.weapon);
