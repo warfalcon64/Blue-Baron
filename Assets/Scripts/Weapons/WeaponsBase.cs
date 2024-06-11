@@ -17,6 +17,7 @@ public abstract class WeaponsBase : MonoBehaviour
     [SerializeField] protected float health = 0;
     [SerializeField] protected float damage = 10;
     [SerializeField] protected float range = 100;
+    [SerializeField] protected float coolDown = 1;
 
     [Header("Lifetime")]
     [SerializeField] protected float lifetime = 5f;
@@ -26,28 +27,38 @@ public abstract class WeaponsBase : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public virtual float getSpeed()
+    public virtual float GetSpeed()
     {
         return speed;
     }
 
-    public virtual float getTurnSpeed()
+    public virtual float GetTurnSpeed()
     {
         return turnSpeed;
     }
 
-    public virtual float getHealth()
+    public virtual float GetHealth()
     {
         return health;
     }
 
-    public virtual float getDamage()
+    public virtual float GetDamage()
     {
         return damage;
     }
 
-    public virtual float getRange()
+    public virtual float GetRange()
     {
         return range;
+    }
+
+    public virtual float GetCoolDown()
+    {
+        return coolDown;
+    }
+
+    public virtual void SetCoolDown(float newCoolDown)
+    {
+        coolDown = newCoolDown;
     }
 }

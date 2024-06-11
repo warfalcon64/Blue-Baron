@@ -20,12 +20,12 @@ public abstract class ShipBase : MonoBehaviour
     [SerializeField] protected float faceEnemyAngle = 1; // The min FOV to keep enemy in
 
     [Header("Attack")]
-    [SerializeField] protected float primaryCoolDown = 0.2f;
-    [SerializeField] protected float fieldOfFire = 45; // Angle between the vertical line bisecting the craft and the line representing the edge of field
+    [SerializeField] protected float primaryCoolDown = 0.2f; // ** primaryCoolDown IN THE SHIP CLASS IS DEPRECATED, USE WEAPONMAP coolDown INSTEAD!!
+    [SerializeField] protected float primaryFieldofFire = 45; // Angle between the vertical line bisecting the craft and the line representing the edge of field
     [SerializeField] protected float plasmaInaccuracy = 0;
     [SerializeField] protected Transform leftGun;
     [SerializeField] protected Transform rightGun;
-    [SerializeField] protected WeaponsBase plasma;
+    //[SerializeField] protected WeaponsBase plasma;
 
     [Header("VFX")]
     [SerializeField] protected float lowHealth = 25;
@@ -61,6 +61,7 @@ public abstract class ShipBase : MonoBehaviour
     [Header("Weapon Slots")]
     [SerializeField] private List<WeaponMap.WeaponMapEntry> weapons;
     private WeaponMap weaponMap;
+    private WeaponsBase primary;
 
     public class ShootArgs : EventArgs
     {
@@ -73,6 +74,13 @@ public abstract class ShipBase : MonoBehaviour
     protected virtual void Awake()
     {
         Init();
+
+    }
+
+    protected virtual void Start()
+    {
+        primary = weaponMap.GetWeapon(ShootType.Primary);
+        mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
 
         // Make ship listen to enemy ships for their death events
@@ -101,7 +109,7 @@ public abstract class ShipBase : MonoBehaviour
         {
             float angle = GetAngleToTarget();
 
-            if (Mathf.Abs(angle) <= fieldOfFire)
+            if (Mathf.Abs(angle) <= primaryFieldofFire)
             {
                 Vector2 posDiff = target.GetComponent<Rigidbody2D>().position - rb.position;
                 float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
@@ -139,7 +147,8 @@ public abstract class ShipBase : MonoBehaviour
         weaponMap = ScriptableObject.CreateInstance<WeaponMap>();
 
         rb = GetComponent<Rigidbody2D>();
-        mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
+        
+
         shipEffects = smoke.GetComponent<VisualEffect>();
     }
 
@@ -160,7 +169,7 @@ public abstract class ShipBase : MonoBehaviour
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
             string type = collider.GetComponent<WeaponsBase>().damageType;
-            float damage = collider.GetComponent<WeaponsBase>().getDamage();
+            float damage = collider.GetComponent<WeaponsBase>().GetDamage();
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
             // * Move damage code into an Interface
@@ -241,7 +250,7 @@ public abstract class ShipBase : MonoBehaviour
         }
     }
 
-    public virtual void ShootPrimary(Vector2 shootDirection)
+    public virtual void ShootPrimary(Vector2 targetAcceleration)
     {
         WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Primary);
         Vector2 projectileSpawn = leftGun.position;
@@ -250,6 +259,8 @@ public abstract class ShipBase : MonoBehaviour
 
         if (!leftFire) projectileSpawn = rightGun.position;
 
+        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary.GetSpeed());
+        Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
         WeaponsBase temp = Instantiate(projectile, projectileSpawn, leftGun.rotation);
         temp.setup(shootDirection, rb.velocity);
     }
@@ -262,14 +273,14 @@ public abstract class ShipBase : MonoBehaviour
 
         if (!leftFire) plasmaSpawn = rightGun.position;
 
-        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, plasma.getSpeed());
+        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, weaponMap.GetWeapon(ShootType.Primary).GetSpeed());
         Vector2 shootDirection = (aimPos - plasmaSpawn).normalized;
 
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
 
-        if (angle <= fieldOfFire)
+        if (angle <= primaryFieldofFire)
         {
-            WeaponsBase plasmaClone = Instantiate(plasma, plasmaSpawn, leftGun.rotation);
+            WeaponsBase plasmaClone = Instantiate(weaponMap.GetWeapon(ShootType.Primary), plasmaSpawn, leftGun.rotation);
             plasmaClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
         }
     }
@@ -339,6 +350,13 @@ public abstract class ShipBase : MonoBehaviour
 
         foreach (ShipBase enemy in enemyTeam)
         {
+            if (enemy == null)
+            {
+                //print("ENEMY IS NULL");
+                continue;
+            }
+
+            //print("ENEMY IS NOT NULL");
             Vector2 posDiff = enemy.GetComponent<Rigidbody2D>().position - rb.position;
             distance = posDiff.sqrMagnitude;
 
@@ -402,7 +420,7 @@ public abstract class ShipBase : MonoBehaviour
         return targetAccelearation;
     }
 
-    // Imma be real idk how any of the math stuff works, stole it from the internet
+    // ===== Leading target calculations =====
     protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, float weaponSpeed)
     {
         targetRb = target.GetComponent<Rigidbody2D>();
@@ -462,6 +480,7 @@ public abstract class ShipBase : MonoBehaviour
         return 4f * a * t * t * t + 3f * b * t * t + 2f * c * t + d;
     }
 
+    // ====== Getters and Setters ======
     public virtual float GetShipSpeed()
     {
         return speed;
@@ -482,9 +501,14 @@ public abstract class ShipBase : MonoBehaviour
         return minSpeed;
     }
 
-    public virtual float GetFieldOfFire()
+    public virtual float GetPrimaryFieldOfFire()
     {
-        return fieldOfFire;
+        return primaryFieldofFire;
+    }
+
+    public virtual float GetPrimaryCoolDown()
+    {
+        return primaryCoolDown;
     }
 
     public virtual WeaponMap GetWeaponMap()

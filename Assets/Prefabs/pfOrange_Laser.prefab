@@ -199,3 +199,5 @@ MonoBehaviour:
   health: 0
   damage: 10
   range: 100
+  coolDown: 0.2
+  lifetime: 5

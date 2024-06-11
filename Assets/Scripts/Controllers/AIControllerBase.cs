@@ -14,17 +14,20 @@ public abstract class AIControllerBase : MonoBehaviour
     protected float nextAdjust;
     protected float maxSpeed;
     protected float minSpeed;
-    protected float fieldOfFire;
+    protected float primaryFieldofFire;
+    protected float primaryCooldown;
 
     protected List<ShipBase> enemyTeam;
     protected GameObject target;
     protected Rigidbody2D targetRb;
-    Vector2 targetAcceleration;
+    protected WeaponMap weaponMap;
+    protected WeaponsBase primary;
+    protected Vector2 targetAcceleration;
     protected Vector2 lastVelocity;
 
     [Header("Behaviors")]
     [SerializeField] protected float faceEnemyAngle = 1;
-    [SerializeField] protected float plasmaInaccuracy;
+    [SerializeField] protected float plasmaInaccuracy; // *** RENAME TO PRIMARY INACCURACCY
 
     public ShipBase ship;
 
@@ -35,15 +38,18 @@ public abstract class AIControllerBase : MonoBehaviour
     protected virtual void Awake()
     {
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
+        weaponMap = ship.GetWeaponMap();
+        primary = weaponMap.GetWeapon(ShootType.Primary);
 
         maxSpeed = ship.GetShipMaxSpeed();
         minSpeed = ship.GetShipMinSpeed();
-        fieldOfFire = ship.GetFieldOfFire();
+        primaryFieldofFire = ship.GetPrimaryFieldOfFire();
         nextTurn = Random.Range(0, 2f);
         nextAdjust = Random.Range(0, 2f);
         stopSearch = false;
 
-        ship.PrimaryReady += AttackTarget;
+        //ship.PrimaryReady += AttackTarget;
+        primaryCooldown = primary.GetCoolDown();
 
         rb = GetComponent<Rigidbody2D>();
     }
@@ -61,16 +67,16 @@ public abstract class AIControllerBase : MonoBehaviour
             float angle = GetAngleToTarget();
             targetRb = target.GetComponent<Rigidbody2D>();
 
-            if (Mathf.Abs(angle) <= fieldOfFire)
-            {
-                Vector2 posDiff = targetRb.position - rb.position;
-                float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
+            Vector2 posDiff = targetRb.position - rb.position;
+            float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
 
-                Vector2 inaccuracy = (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), 
-                    Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
+            // Adding inaccuracy because the calculations are too accurate and precise for players to dodge
+            Vector2 inaccuracy = (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), 
+            Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
 
-                targetAcceleration = CalculateTargetAcceleration() + inaccuracy;
-            }
+            targetAcceleration = CalculateTargetAcceleration() + inaccuracy;
+
+            
         }
         else if (!stopSearch)
         {
@@ -80,29 +86,45 @@ public abstract class AIControllerBase : MonoBehaviour
         Move();
     }
 
-    protected virtual void AttackTarget(object sender, ShipBase.ShootArgs e)
+    protected virtual void AttackTarget(Vector2 targetAcceleration, float angle)
     {
-        ShipBase ship = (ShipBase)sender;
-
-        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, e.primary);
-        Vector2 shootDirection = (aimPos - e.projectileSpawnPoint).normalized;
-
-        float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
-
-        if (angle <= fieldOfFire)
+        if (primaryCooldown <= 0 && angle <= primaryFieldofFire)
         {
-            switch(e.type)
-            {
-                case ShootType.Primary:
-                    ship.ShootPrimary(shootDirection);
-                    break;
-                
-                default:
-                    print("Error in AIController : AttackTarget");
-                    break;
-            }
+            ship.ShootPrimary(targetAcceleration);
+            primaryCooldown = primary.GetCoolDown();
         }
+        // *** ADD CODE FOR SECONDARY STUFF HERE
+        else
+        {
+            return;
+        }
+
+        
     }
+
+    //protected virtual void AttackTarget(object sender, ShipBase.ShootArgs e)
+    //{
+    //    ShipBase ship = (ShipBase)sender;
+
+    //    Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, e.primary);
+    //    Vector2 shootDirection = (aimPos - e.projectileSpawnPoint).normalized;
+
+    //    float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
+
+    //    if (angle <= fieldOfFire)
+    //    {
+    //        switch(e.type)
+    //        {
+    //            case ShootType.Primary:
+    //                ship.ShootPrimary(shootDirection);
+    //                break;
+                
+    //            default:
+    //                print("Error in AIController : AttackTarget");
+    //                break;
+    //        }
+    //    }
+    //}
 
     protected virtual GameObject FindTarget()
     {
@@ -175,13 +197,16 @@ public abstract class AIControllerBase : MonoBehaviour
         ship.SetShipTurn(turn);
     }
 
-    protected virtual void UpdateBehaviors()
+    protected virtual void UpdateTimers()
     {
         if (nextTurn > 0) nextTurn -= Time.deltaTime;
 
         if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
+
+        if (primaryCooldown > 0) primaryCooldown -= Time.deltaTime;
     }
 
+    // ===== Leading target calculations =====
     protected virtual float GetAngleToTarget()
     {
         Vector2 targetDirection = targetRb.position - rb.position;
@@ -197,10 +222,9 @@ public abstract class AIControllerBase : MonoBehaviour
         return targetAcceleration;
     }
 
-    // Imma be real idk how any of the math stuff works, stole it from the internet
     protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, WeaponsBase weapon)
     {
-        float s = weapon.getSpeed(); // * maybe add ship speed somehow? <-- why would I do this? can't remember...
+        float s = weapon.GetSpeed(); // * maybe add ship speed somehow? <-- why would I do this? can't remember...
         float distance = Vector2.Distance(targetRb.position, rb.position);
 
         // setup formula constants

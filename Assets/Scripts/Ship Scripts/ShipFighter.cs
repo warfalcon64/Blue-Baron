@@ -18,9 +18,9 @@ public class ShipFighter : ShipBase
        base.Awake();
     }
 
-    private void Start()
+    protected override void Start()
     {
-        //StartCoroutine(Turn());
+        base.Start();
     }
 
     protected override void Update()
@@ -106,6 +106,7 @@ public class ShipFighter : ShipBase
         return base.FindTarget();
     }
 
+    // ===== Leading target calculations =====
     protected override float GetAngleToTarget()
     {
         return base.GetAngleToTarget();
@@ -116,7 +117,6 @@ public class ShipFighter : ShipBase
         return base.GetTargetAcceleration();
     }
 
-    // Imma be real idk how any of the math stuff below works, I found it on the internet
     protected override Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, float weaponSpeed)
     {
         return base.GetTargetLeadingPosition(targetAcceleration, iterations, weaponSpeed);

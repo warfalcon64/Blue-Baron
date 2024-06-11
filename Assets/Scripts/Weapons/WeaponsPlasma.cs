@@ -34,9 +34,9 @@ public class WeaponsPlasma : WeaponsBase
         }
     }
 
-    public override float getSpeed() => base.getSpeed();
+    public override float GetSpeed() => base.GetSpeed();
 
-    public override float getDamage() => base.getDamage();
+    public override float GetDamage() => base.GetDamage();
 
-    public override float getRange() => base.getRange();
+    public override float GetRange() => base.GetRange();
 }

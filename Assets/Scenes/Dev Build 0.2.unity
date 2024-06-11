@@ -1334,6 +1334,14 @@ PrefabInstance:
       propertyPath: sceneManager
       value: 
       objectReference: {fileID: 1974449429}
+    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+      propertyPath: weapons.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+      propertyPath: weapons.Array.data[1].weapon
+      value: 
+      objectReference: {fileID: -5470632126457490998, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
     - target: {fileID: 8497475259681279302, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -1958,7 +1966,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &1747109500
 MeshCollider:
   m_ObjectHideFlags: 0

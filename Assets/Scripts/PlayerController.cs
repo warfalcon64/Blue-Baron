@@ -132,7 +132,7 @@ public class PlayerController : MonoBehaviour
             mainEffects.SendEvent("LaserHit", eventAttribute);
 
             string type = collider.GetComponent<WeaponsBase>().damageType;
-            float damage = collider.GetComponent<WeaponsBase>().getDamage();
+            float damage = collider.GetComponent<WeaponsBase>().GetDamage();
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
             switch (type)
