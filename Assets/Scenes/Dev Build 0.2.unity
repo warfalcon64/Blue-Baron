@@ -589,6 +589,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &405455674 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8497475259681279303, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+  m_PrefabInstance: {fileID: 1113241933}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &414194486 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
+  m_PrefabInstance: {fileID: 9203006773502722350}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &417115956
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,12 +1099,27 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
   m_PrefabInstance: {fileID: 1113241933}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 405455674}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2347d58a562340a49ba5b57eb277098b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &619632829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405455674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceEnemyAngle: 10
+  plasmaInaccuracy: 100
+  ship: {fileID: 619632826}
 --- !u!1001 &636803915
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1397,7 +1422,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8497475259681279303, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 619632829}
   m_SourcePrefab: {fileID: 100100000, guid: 0756d354c730517419536cf487ad61c8, type: 3}
 --- !u!4 &1385226140 stripped
 Transform:
@@ -3068,12 +3096,27 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
   m_PrefabInstance: {fileID: 9203006773502722350}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 414194486}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2347d58a562340a49ba5b57eb277098b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2002418877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 414194486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceEnemyAngle: 10
+  plasmaInaccuracy: 100
+  ship: {fileID: 2002418876}
 --- !u!1001 &2094424218
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3535,11 +3578,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -9.34
+      value: -5.32
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.52
+      value: 2.4
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3588,5 +3631,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2002418877}
   m_SourcePrefab: {fileID: 100100000, guid: 096037752844de448b3ac6b45d5ea476, type: 3}

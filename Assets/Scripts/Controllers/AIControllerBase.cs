@@ -17,6 +17,7 @@ public abstract class AIControllerBase : MonoBehaviour
     protected float primaryFieldofFire;
     protected float primaryCooldown;
 
+    protected SceneManager sceneManager;
     protected List<ShipBase> enemyTeam;
     protected GameObject target;
     protected Rigidbody2D targetRb;
@@ -27,7 +28,7 @@ public abstract class AIControllerBase : MonoBehaviour
 
     [Header("Behaviors")]
     [SerializeField] protected float faceEnemyAngle = 1;
-    [SerializeField] protected float plasmaInaccuracy; // *** RENAME TO PRIMARY INACCURACCY
+    [SerializeField] protected float plasmaInaccuracy; // *** in the future make this solely for ship script, and instead of changing calculations try changing rotation of bullet as it is instantiated
 
     public ShipBase ship;
 
@@ -35,21 +36,29 @@ public abstract class AIControllerBase : MonoBehaviour
 
     private Rigidbody2D rb;
 
-    protected virtual void Awake()
+    protected virtual void Start()
     {
-        enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
-        weaponMap = ship.GetWeaponMap();
-        primary = weaponMap.GetWeapon(ShootType.Primary);
-
+        sceneManager = SceneManager.Instance;
+        enemyTeam = sceneManager.GetLiveEnemies(tag);
+        
         maxSpeed = ship.GetShipMaxSpeed();
         minSpeed = ship.GetShipMinSpeed();
+
+        weaponMap = ship.GetWeaponMap();
+        primary = weaponMap.GetWeapon(ShootType.Primary);
+        primaryCooldown = primary.GetCoolDown();
+    }
+
+
+    protected virtual void Awake()
+    {
+        target = null;
         primaryFieldofFire = ship.GetPrimaryFieldOfFire();
         nextTurn = Random.Range(0, 2f);
         nextAdjust = Random.Range(0, 2f);
         stopSearch = false;
 
         //ship.PrimaryReady += AttackTarget;
-        primaryCooldown = primary.GetCoolDown();
 
         rb = GetComponent<Rigidbody2D>();
     }
@@ -57,14 +66,14 @@ public abstract class AIControllerBase : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        
+        UpdateTimers();
     }
 
     protected virtual void FixedUpdate()
     {
         if (target != null && !stopSearch)
         {
-            float angle = GetAngleToTarget();
+            float angle = Math.Abs(GetAngleToTarget());
             targetRb = target.GetComponent<Rigidbody2D>();
 
             Vector2 posDiff = targetRb.position - rb.position;
@@ -75,7 +84,7 @@ public abstract class AIControllerBase : MonoBehaviour
             Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
 
             targetAcceleration = CalculateTargetAcceleration() + inaccuracy;
-
+            AttackTarget(targetAcceleration, angle);
             
         }
         else if (!stopSearch)
@@ -90,7 +99,8 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         if (primaryCooldown <= 0 && angle <= primaryFieldofFire)
         {
-            ship.ShootPrimary(targetAcceleration);
+            Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary);
+            ship.ShootPrimary(aimPos);
             primaryCooldown = primary.GetCoolDown();
         }
         // *** ADD CODE FOR SECONDARY STUFF HERE
@@ -130,6 +140,7 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         float distance;
         float lowestDistance = Mathf.Infinity;
+        enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
 
         if (enemyTeam.Count == 0)
         {
@@ -165,6 +176,7 @@ public abstract class AIControllerBase : MonoBehaviour
             // Turning logic
             if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= 0)
             {
+                //print("NEXTTURN IS: " + nextTurn);
                 if (angle > 0) turn = 1f;
 
                 if (angle < 0) turn = -1f;
@@ -180,19 +192,25 @@ public abstract class AIControllerBase : MonoBehaviour
             {
                 if (Math.Abs(angle) < 90 && speed < maxSpeed)
                 {
+                    print("INCREASING SPEED");
                     speed += 0.2f;
                 }
-                if (Math.Abs(angle) >= 90 && speed > minSpeed)
+                else if (Math.Abs(angle) >= 90 && speed > minSpeed)
                 {
                     speed -= 0.2f;
                 }
+                else
+                {
+                    nextAdjust = Random.Range(0, 0.5f);
+                }
+                //print("MAX SPEED IS: " + maxSpeed + " MIN SPEED IS " + minSpeed + " FIELD OF FIRE IS: " + primaryFieldofFire);
             }
         }
-        else
-        {
-            turn = 0f;
-        }
-
+        //else
+        //{
+        //    turn = 0f;
+        //}
+        //print("TURN IS: " + turn);
         ship.SetShipSpeed(speed);
         ship.SetShipTurn(turn);
     }
@@ -209,6 +227,7 @@ public abstract class AIControllerBase : MonoBehaviour
     // ===== Leading target calculations =====
     protected virtual float GetAngleToTarget()
     {
+        targetRb = target.GetComponent<Rigidbody2D>();
         Vector2 targetDirection = targetRb.position - rb.position;
 
         return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
@@ -216,6 +235,7 @@ public abstract class AIControllerBase : MonoBehaviour
 
     protected virtual Vector2 CalculateTargetAcceleration()
     {
+        targetRb = target.GetComponent<Rigidbody2D>();
         Vector2 targetAcceleration = (targetRb.velocity - lastVelocity) / Time.fixedDeltaTime;
         lastVelocity = targetRb.velocity;
 
@@ -224,6 +244,8 @@ public abstract class AIControllerBase : MonoBehaviour
 
     protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, WeaponsBase weapon)
     {
+        targetRb = target.GetComponent<Rigidbody2D>();
+
         float s = weapon.GetSpeed(); // * maybe add ship speed somehow? <-- why would I do this? can't remember...
         float distance = Vector2.Distance(targetRb.position, rb.position);
 

@@ -252,7 +252,7 @@ public abstract class ShipBase : MonoBehaviour
         }
     }
 
-    public virtual void ShootPrimary(Vector2 targetAcceleration)
+    public virtual void ShootPrimary(Vector2 aimPos)
     {
         WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Primary);
         Vector2 projectileSpawn = leftGun.position;
@@ -261,7 +261,7 @@ public abstract class ShipBase : MonoBehaviour
 
         if (!leftFire) projectileSpawn = rightGun.position;
 
-        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary.GetSpeed());
+        //Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary.GetSpeed());
         Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
         WeaponsBase temp = Instantiate(projectile, projectileSpawn, leftGun.rotation);
         temp.setup(shootDirection, rb.velocity);
@@ -495,6 +495,7 @@ public abstract class ShipBase : MonoBehaviour
 
     public virtual float GetShipMaxSpeed()
     {
+        print("MAX SPEED IS: " + maxSpeed);
         return maxSpeed;
     }
 
