@@ -392,6 +392,7 @@ GameObject:
   - component: {fileID: 8497475259681279299}
   - component: {fileID: 8497475259681279296}
   - component: {fileID: 8497475259681279297}
+  - component: {fileID: 1798488539491713676}
   m_Layer: 7
   m_Name: Blue Fighter
   m_TagString: Blue
@@ -912,17 +913,30 @@ MonoBehaviour:
   turnSpeed: 2
   faceEnemyAngle: 10
   primaryCoolDown: 0.2
-  fieldOfFire: 45
+  primaryFieldofFire: 45
   plasmaInaccuracy: 100
   leftGun: {fileID: 1425402346873535505}
   rightGun: {fileID: 4237550023096101175}
-  plasma: {fileID: 8348708228034621631, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
   lowHealth: 25
   smoke: {fileID: 8897038711605021268}
   weapons:
   - type: 0
     weapon: {fileID: -5470632126457490998, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
-  weaponMap: {fileID: 0}
+--- !u!114 &1798488539491713676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8497475259681279303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceEnemyAngle: 10
+  plasmaInaccuracy: 100
+  ship: {fileID: 8497475259681279297}
 --- !u!1 &9045316319554966681
 GameObject:
   m_ObjectHideFlags: 0

@@ -312,6 +312,7 @@ GameObject:
   - component: {fileID: 8941532685634839918}
   - component: {fileID: 4108526075727501089}
   - component: {fileID: 6372454098448783548}
+  - component: {fileID: -2540090203102408868}
   m_Layer: 7
   m_Name: Orange Fighter
   m_TagString: Red
@@ -832,16 +833,30 @@ MonoBehaviour:
   turnSpeed: 2
   faceEnemyAngle: 10
   primaryCoolDown: 0.2
-  fieldOfFire: 45
+  primaryFieldofFire: 45
   plasmaInaccuracy: 100
   leftGun: {fileID: 7424531800947282808}
   rightGun: {fileID: 4099872298902681536}
-  plasma: {fileID: 7675769780192435603, guid: d3faccea2380520448a367ee21c88c14, type: 3}
   lowHealth: 25
   smoke: {fileID: 4119226456086350580}
   weapons:
   - type: 0
     weapon: {fileID: -3986982957232520056, guid: d3faccea2380520448a367ee21c88c14, type: 3}
+--- !u!114 &-2540090203102408868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6137092292395479709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceEnemyAngle: 10
+  plasmaInaccuracy: 100
+  ship: {fileID: 6372454098448783548}
 --- !u!1 &7180944070711932923
 GameObject:
   m_ObjectHideFlags: 0
