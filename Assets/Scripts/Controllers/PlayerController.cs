@@ -13,7 +13,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed = 10f;
     [SerializeField] private float turnSpeed = 2f;
     [SerializeField] private float fieldOfFire; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
-    [SerializeField] private float primaryCoolDown;
     [SerializeField] private Transform pfBlueLaser; // Laser gameobject for the ship to shoot
     [SerializeField] private Transform leftGun; // Positions to shoot lasers from
     [SerializeField] private Transform rightGun;
@@ -21,14 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform vfxManager;
     [SerializeField] private Transform smoke;
 
-
-    private enum shipType
-    {
-        Fighter,
-        Bomber
-    }
-
-    private shipType ship;
+    private ShipType shipType;
     private ShootType shootMode;
 
     private float lowHealth;
@@ -39,6 +31,7 @@ public class PlayerController : MonoBehaviour
     private float maxSpeed;
     private float acceleration; // Input axis for forward movement (-1 slows down, 1 speeds up)
     
+    private float primaryCoolDown;
     private float nextFire;
     private bool leftFire;
     private bool isSmoking;
@@ -51,8 +44,10 @@ public class PlayerController : MonoBehaviour
 
     SectorObjectPool objectPool;
 
-
+    private WeaponMap weaponMap;
+    private ShipBase ship;
     Rigidbody2D rb;
+
     // Start is called before the first frame update
     private void Awake()
     {
@@ -64,15 +59,23 @@ public class PlayerController : MonoBehaviour
         leftFire = false;
         isSmoking = false;
         nextFire = 0f;
-        ship = shipType.Fighter;
 
         rb = GetComponent<Rigidbody2D>();
         mainEffects = vfxManager.GetComponent<VisualEffect>();
         shipEffects = smoke.GetComponent<VisualEffect>();
 
-        switch (ship)
+    }
+
+    private void Start()
+    {
+        ship = GetComponent<ShipBase>();
+        weaponMap = ship.GetWeaponMap();
+        shipType = ship.GetShipType();
+        primaryCoolDown = ship.GetPrimaryCoolDown();
+
+        switch (shipType)
         {
-            case shipType.Fighter:
+            case ShipType.Fighter:
                 lowHealth = health * 0.25f;
                 break;
 
@@ -109,52 +112,53 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        switch (ship)
+        switch (shipType)
         {
-            case shipType.Fighter:
+            case ShipType.Fighter:
                 fighterControl();
                 break;
         }
 
     }
 
-    private void OnTriggerEnter2D(Collider2D collider)
-    {
-        if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
-        {
-            // Grab the vfx attached to whatever weapon just hit the ship, and create an attribute to send to vfx
-            VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
+    // This code is old, should already exist in ship base
+    //private void OnTriggerEnter2D(Collider2D collider)
+    //{
+    //    if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
+    //    {
+    //        // Grab the vfx attached to whatever weapon just hit the ship, and create an attribute to send to vfx
+    //        VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
 
-            // Get the ID of the property we want to modify
-            int vfxPosition = Shader.PropertyToID("Position");
-            // Set the property, and send event with the attribute carrying the info to the vfx graph
-            mainEffects.SetVector3(vfxPosition, transform.position);
-            mainEffects.SendEvent("LaserHit", eventAttribute);
+    //        // Get the ID of the property we want to modify
+    //        int vfxPosition = Shader.PropertyToID("Position");
+    //        // Set the property, and send event with the attribute carrying the info to the vfx graph
+    //        mainEffects.SetVector3(vfxPosition, transform.position);
+    //        mainEffects.SendEvent("LaserHit", eventAttribute);
 
-            string type = collider.GetComponent<WeaponsBase>().damageType;
-            float damage = collider.GetComponent<WeaponsBase>().GetDamage();
+    //        string type = collider.GetComponent<WeaponsBase>().damageType;
+    //        float damage = collider.GetComponent<WeaponsBase>().GetDamage();
 
-            // Determine the type of damage weapon deals, apply modifiers accordingly
-            switch (type)
-            {
-                case "Plasma":
-                    if (shield <= 0) damage *= 2;
-                    break;
+    //        // Determine the type of damage weapon deals, apply modifiers accordingly
+    //        switch (type)
+    //        {
+    //            case "Plasma":
+    //                if (shield <= 0) damage *= 2;
+    //                break;
 
-                default:
-                    print("DID NOT APPLY DAMAGE CORRECTLY");
-                    break;
-            }
+    //            default:
+    //                print("DID NOT APPLY DAMAGE CORRECTLY");
+    //                break;
+    //        }
 
-            health -= damage;
+    //        health -= damage;
 
-            if (health <= lowHealth && !isSmoking)
-            {
-                isSmoking = true;
-                shipEffects.SendEvent("OnDamage");
-            }
-        }
-    }
+    //        if (health <= lowHealth && !isSmoking)
+    //        {
+    //            isSmoking = true;
+    //            shipEffects.SendEvent("OnDamage");
+    //        }
+    //    }
+    //}
 
     private void fighterControl()
     {
@@ -167,7 +171,8 @@ public class PlayerController : MonoBehaviour
             {
                 turnSpeed += 0.1f;
             }
-        } else if (acceleration > 0f && speed < maxSpeed)
+        } 
+        else if (acceleration > 0f && speed < maxSpeed)
         {
             speed += 0.2f;
 
@@ -177,8 +182,10 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        rb.velocity = transform.up * speed;
-        rb.MoveRotation(rb.rotation + (turnSpeed * turn));
+        ship.SetShipSpeed(speed);
+        ship.SetShipTurn(turn);
+        //rb.velocity = transform.up * speed;
+        //rb.MoveRotation(rb.rotation + (turnSpeed * turn));
         shootProjectiles();
     }
 
@@ -190,7 +197,8 @@ public class PlayerController : MonoBehaviour
 
         if (shootMode == ShootType.Primary && angle <= fieldOfFire && nextFire <= 0)
         {
-            shootLaser();
+            //shootLaser();
+            ship.ShootPrimary(worldMousePosition);
             nextFire = primaryCoolDown;
         }
     }

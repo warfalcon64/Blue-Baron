@@ -32,9 +32,9 @@ public abstract class AIControllerBase : MonoBehaviour
 
     public ShipBase ship;
 
-    public event EventHandler OnShipDeath;
-
     private Rigidbody2D rb;
+
+    // * Can avoid infinite circling by tracking last time you fired a shot while going after a target, if above certain threshold, then do a random maneuver
 
     protected virtual void Start()
     {
@@ -90,6 +90,7 @@ public abstract class AIControllerBase : MonoBehaviour
         else if (!stopSearch)
         {
             target = FindTarget();
+            target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
         }
 
         Move();
@@ -163,6 +164,14 @@ public abstract class AIControllerBase : MonoBehaviour
         return target;
     }
 
+    protected virtual void HandleTargetDeath(object sender, EventArgs e)
+    {
+        ShipBase shipBase = (ShipBase)sender;
+        target = FindTarget();
+        target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
+
+        ship.OnShipDeath -= HandleTargetDeath;
+    }
 
     protected virtual void Move()
     {

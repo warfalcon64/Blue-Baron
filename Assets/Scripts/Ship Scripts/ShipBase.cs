@@ -52,7 +52,7 @@ public abstract class ShipBase : MonoBehaviour
     protected Vector2 lastVelocity;
     protected Vector2 targetAcceleration;
 
-    protected ShipType ship;
+    protected ShipType type;
     protected ShootType shootMode;
 
     public event EventHandler OnShipDeath;
@@ -81,12 +81,12 @@ public abstract class ShipBase : MonoBehaviour
     {
         mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
-
+        // *** MAKE SHIP LISTEN TO TARGET'S DEATH EVENTS IN THE AI CONTROLLER INSTEAD
         // Make ship listen to enemy ships for their death events
-        foreach (ShipBase ship in enemyTeam)
-        {
-            ship.OnShipDeath += OnEnemyDeath;
-        }
+        //foreach (ShipBase ship in enemyTeam)
+        //{
+        //    ship.OnShipDeath += OnEnemyDeath;
+        //}
     }
 
     protected virtual void Update()
@@ -149,8 +149,8 @@ public abstract class ShipBase : MonoBehaviour
         primary = weaponMap.GetWeapon(ShootType.Primary);
 
         rb = GetComponent<Rigidbody2D>();
-        
 
+        type = ShipType.Fighter;
         shipEffects = smoke.GetComponent<VisualEffect>();
     }
 
@@ -174,7 +174,7 @@ public abstract class ShipBase : MonoBehaviour
             float damage = collider.GetComponent<WeaponsBase>().GetDamage();
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
-            // * Move damage code into an Interface
+            // * Move damage code into the respective projectiles: they calculate damage with modifiers then tell ship the total damage, ship then applies damage to itself
             switch (type)
             {
                 case "Plasma":
@@ -205,7 +205,7 @@ public abstract class ShipBase : MonoBehaviour
         switch (type)
         {
             case "Plasma":
-                effectEvent = "LaserHit"; // ***Change the name of "LaserHit" to something more generic and not have laser in it
+                effectEvent = "LaserHit"; // * Change the name of "LaserHit" to something more generic and not have laser in it
                 break;
 
             default:
@@ -517,6 +517,11 @@ public abstract class ShipBase : MonoBehaviour
     public virtual WeaponMap GetWeaponMap()
     {
         return weaponMap;
+    }
+
+    public virtual ShipType GetShipType()
+    {
+        return type;
     }
 
     public virtual void SetShipTurn(float newTurn)
