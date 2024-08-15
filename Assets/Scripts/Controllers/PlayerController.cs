@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -6,16 +7,18 @@ using UnityEngine.UIElements;
 using UnityEngine.VFX;
 using static UnityEngine.Rendering.DebugUI;
 
+using Common;
+
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] public float health = 100f;
-    [SerializeField] public float shield = 0f;
-    [SerializeField] private float speed = 10f;
-    [SerializeField] private float turnSpeed = 2f;
-    [SerializeField] private float fieldOfFire; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
-    [SerializeField] private Transform pfBlueLaser; // Laser gameobject for the ship to shoot
-    [SerializeField] private Transform leftGun; // Positions to shoot lasers from
-    [SerializeField] private Transform rightGun;
+    //[SerializeField] public float health = 100f;
+    //[SerializeField] public float shield = 0f;
+    //[SerializeField] private float speed = 10f;
+    //[SerializeField] private float turnSpeed = 2f;
+    //[SerializeField] private float fieldOfFire; // This is the angle between the line bisecting the craft vertically and the line limiting the field of fire
+    //[SerializeField] private Transform pfBlueLaser; // Laser gameobject for the ship to shoot
+    //[SerializeField] private Transform leftGun; // Positions to shoot lasers from
+    //[SerializeField] private Transform rightGun;
 
     [SerializeField] private Transform vfxManager;
     [SerializeField] private Transform smoke;
@@ -23,7 +26,9 @@ public class PlayerController : MonoBehaviour
     private ShipType shipType;
     private ShootType shootMode;
 
-    private float lowHealth;
+    private float primaryFieldOfFire;
+    private float speed;
+    private float turnSpeed;
     private float turn; // Input axis for turning (-1 turns left, 1 turns right)
     private float minTurn; // Speeds for turning and forward movement
     private float maxTurn;
@@ -32,7 +37,7 @@ public class PlayerController : MonoBehaviour
     private float acceleration; // Input axis for forward movement (-1 slows down, 1 speeds up)
     
     private float primaryCoolDown;
-    private float nextFire;
+    private float primaryNextFire;
     private bool leftFire;
     private bool isSmoking;
    
@@ -44,21 +49,22 @@ public class PlayerController : MonoBehaviour
 
     SectorObjectPool objectPool;
 
+    private SceneManager sceneManager;
     private WeaponMap weaponMap;
     private ShipBase ship;
     Rigidbody2D rb;
 
+    public event EventHandler<KeyPressedEventArgs> SwapShip;
+
     // Start is called before the first frame update
     private void Awake()
     {
-        minSpeed = speed / 2;
-        maxSpeed = speed;
         minTurn = turnSpeed;
         maxTurn = turnSpeed + 1;
         shootMode = ShootType.None;
         leftFire = false;
         isSmoking = false;
-        nextFire = 0f;
+        primaryNextFire = 0f;
 
         rb = GetComponent<Rigidbody2D>();
         mainEffects = vfxManager.GetComponent<VisualEffect>();
@@ -68,21 +74,31 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        sceneManager = SceneManager.Instance;
+        SwapShip += sceneManager.SwapPlayerShip;
+
         ship = GetComponent<ShipBase>();
+        ship.isPlayer = true;
         weaponMap = ship.GetWeaponMap();
         shipType = ship.GetShipType();
+
+        // Get ship variables
+        speed = ship.GetShipSpeed();
+        minSpeed = ship.GetShipMinSpeed();
+        maxSpeed = ship.GetShipMaxSpeed();
         primaryCoolDown = ship.GetPrimaryCoolDown();
+        primaryFieldOfFire = ship.GetPrimaryFieldOfFire();
 
-        switch (shipType)
-        {
-            case ShipType.Fighter:
-                lowHealth = health * 0.25f;
-                break;
+        //switch (shipType)
+        //{
+        //    case ShipType.Fighter:
+        //        lowHealth = health * 0.25f;
+        //        break;
 
-            default:
-                print("Error: Player ship type is undefined!");
-                break;
-        }
+        //    default:
+        //        print("Error: Player ship type is undefined!");
+        //        break;
+        //}
     }
 
     // Update is called once per frame
@@ -92,22 +108,33 @@ public class PlayerController : MonoBehaviour
         turn = -Input.GetAxisRaw("Horizontal");
         acceleration = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetMouseButton(0))
+        if (shipType == ShipType.Spectator)
         {
-            shootMode = ShootType.Primary;
+            SpectatorMode();
         }
         else
         {
-            shootMode = ShootType.None;
+
+            if (Input.GetMouseButton(0))
+            {
+                shootMode = ShootType.Primary;
+
+            }
+            else
+            {
+                shootMode = ShootType.None;
+            }
+
+            UpdateSmoke();
+            UpdateTimers();
+
+            // Calculate mouse position on screen
+            mousePosition = Input.mousePosition;
+            mousePosition.z = Camera.main.nearClipPlane;
+            worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
         }
 
-        UpdateSmoke();
-        UpdateTimers();
 
-        // Calculate mouse position on screen
-        mousePosition = Input.mousePosition;
-        mousePosition.z = Camera.main.nearClipPlane;
-        worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
     }
 
     private void FixedUpdate()
@@ -116,6 +143,8 @@ public class PlayerController : MonoBehaviour
         {
             case ShipType.Fighter:
                 fighterControl();
+                break;
+            case ShipType.Spectator:
                 break;
         }
 
@@ -189,32 +218,60 @@ public class PlayerController : MonoBehaviour
         shootProjectiles();
     }
 
+    private void SpectatorMode()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            SwapShip?.Invoke(this, new KeyPressedEventArgs(KeyCode.A));
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            SwapShip?.Invoke(this, new KeyPressedEventArgs(KeyCode.D));
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SwapShip?.Invoke(this, new KeyPressedEventArgs(KeyCode.Space));
+        }
+    }
+
     private void shootProjectiles()
     {
         Vector2 shootDirection = (worldMousePosition - rb.position).normalized;
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
         //print(angle);
 
-        if (shootMode == ShootType.Primary && angle <= fieldOfFire && nextFire <= 0)
+        if (shootMode == ShootType.Primary && angle <= primaryFieldOfFire && primaryNextFire <= 0)
         {
             //shootLaser();
             ship.ShootPrimary(worldMousePosition);
-            nextFire = primaryCoolDown;
+            primaryNextFire = primaryCoolDown;
         }
     }
 
-    private void shootLaser()
+    public void TransferShipValues(ShipBase newShip)
     {
-        Vector2 plasmaSpawn = leftGun.position;
-        leftFire = !leftFire;
-
-        if (!leftFire) plasmaSpawn = rightGun.position;
-
-        // Create laser and call its setup function from the script attached to it
-        Vector2 shootDirection = (worldMousePosition - plasmaSpawn).normalized;
-        Transform bulletClone = Instantiate(pfBlueLaser, plasmaSpawn, leftGun.rotation);
-        bulletClone.transform.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
+        ship = newShip;
     }
+
+    public void OnPlayerDeath()
+    {
+        SwapShip?.Invoke(this, new KeyPressedEventArgs(KeyCode.None));
+    }
+
+    // * Deprecated Code
+    //private void shootLaser()
+    //{
+    //    Vector2 plasmaSpawn = leftGun.position;
+    //    leftFire = !leftFire;
+
+    //    if (!leftFire) plasmaSpawn = rightGun.position;
+
+    //    // Create laser and call its setup function from the script attached to it
+    //    Vector2 shootDirection = (worldMousePosition - plasmaSpawn).normalized;
+    //    Transform bulletClone = Instantiate(pfBlueLaser, plasmaSpawn, leftGun.rotation);
+    //    bulletClone.transform.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
+    //}
+    // *
 
     private void UpdateSmoke()
     {
@@ -242,9 +299,9 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateTimers()
     {
-        if (nextFire > 0)
+        if (primaryNextFire > 0)
         {
-            nextFire -= Time.deltaTime;
+            primaryNextFire -= Time.deltaTime;
         }
     }
 }

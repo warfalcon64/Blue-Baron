@@ -33,5 +33,6 @@ public enum ShipType
     Cruiser,
     Battlecruiser,
     Battleship,
-    Carrier
+    Carrier,
+    Spectator
 }

@@ -936,7 +936,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xOffset: 0
   yOffset: 0
-  player: {fileID: 1987034916}
+  player: {fileID: 1987034922}
 --- !u!1 &538121963
 GameObject:
   m_ObjectHideFlags: 0
@@ -2463,6 +2463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blueShips:
+  - {fileID: 1987034922}
   - {fileID: 619632826}
   - {fileID: 148926160}
   deadBlueShips: []
@@ -2473,6 +2474,7 @@ MonoBehaviour:
   deadRedShips: []
   vfxManager: {fileID: 1947919600}
   shipData: {fileID: 11400000, guid: 6cb2b35daab4fe5488cc5b43e30bd944, type: 2}
+  mainCam: {fileID: 0}
 --- !u!1 &1987034914
 GameObject:
   m_ObjectHideFlags: 0
@@ -3053,14 +3055,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ff0828d8f3a974896de608205832da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100
-  shield: 0
-  speed: 10
-  turnSpeed: 2
-  fieldOfFire: 45
-  pfBlueLaser: {fileID: 8348708228034621631, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
-  leftGun: {fileID: 1623587067}
-  rightGun: {fileID: 608164800}
   vfxManager: {fileID: 417115957}
   smoke: {fileID: 73179591}
 --- !u!114 &1987034922
@@ -3087,6 +3081,8 @@ MonoBehaviour:
   rightGun: {fileID: 608164800}
   lowHealth: 25
   smoke: {fileID: 73179591}
+  godMode: 1
+  isPlayer: 0
   weapons:
   - type: 0
     weapon: {fileID: -5470632126457490998, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}

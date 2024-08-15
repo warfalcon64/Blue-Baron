@@ -31,14 +31,19 @@ public abstract class ShipBase : MonoBehaviour
     [SerializeField] protected float lowHealth = 25;
     [SerializeField] protected Transform smoke;
 
+    public bool godMode;
+
+    [HideInInspector]
+    public bool isPlayer;
+
     protected bool stopSearch;
     protected bool isSmoking;
     protected bool leftFire;
     protected float maxSpeed;
     protected float minSpeed;
     protected float turn;
-    protected float maxTurn;
-    protected float minTurn;
+    protected float maxTurnSpeed;
+    protected float minTurnSpeed;
     protected float nextFire;
     protected float nextTurn;
     protected float nextAdjust;
@@ -128,11 +133,12 @@ public abstract class ShipBase : MonoBehaviour
 
     protected virtual void Init()
     {
+        isPlayer = false;
         maxSpeed = speed;
         minSpeed = speed / 2;
         turn = 0f;
-        maxTurn = turnSpeed + 1;
-        minTurn = turnSpeed;
+        maxTurnSpeed = turnSpeed + 1;
+        minTurnSpeed = turnSpeed;
         target = null;
         targetRb = null;
         nextFire = 0f;
@@ -158,6 +164,13 @@ public abstract class ShipBase : MonoBehaviour
     {
         PlayDeathVFX();
         //Destroy(gameObject);
+
+        if (isPlayer)
+        {
+            PlayerController pc = GetComponent<PlayerController>();
+            pc.OnPlayerDeath();
+        }
+
         gameObject.SetActive(false);
     }
 
@@ -170,6 +183,7 @@ public abstract class ShipBase : MonoBehaviour
     {
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
+            if (godMode) { return; }
             string type = collider.GetComponent<WeaponsBase>().damageType;
             float damage = collider.GetComponent<WeaponsBase>().GetDamage();
 
@@ -405,6 +419,7 @@ public abstract class ShipBase : MonoBehaviour
         if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
     }
 
+    // ===== Leading target calculations =====
     protected virtual float GetAngleToTarget()
     {
         targetRb = target.GetComponent<Rigidbody2D>();
@@ -422,7 +437,6 @@ public abstract class ShipBase : MonoBehaviour
         return targetAccelearation;
     }
 
-    // ===== Leading target calculations =====
     protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, float weaponSpeed)
     {
         targetRb = target.GetComponent<Rigidbody2D>();
@@ -495,7 +509,7 @@ public abstract class ShipBase : MonoBehaviour
 
     public virtual float GetShipMaxSpeed()
     {
-        print("MAX SPEED IS: " + maxSpeed);
+        //print("MAX SPEED IS: " + maxSpeed);
         return maxSpeed;
     }
 
@@ -527,6 +541,14 @@ public abstract class ShipBase : MonoBehaviour
     public virtual void SetShipTurn(float newTurn)
     {
         turn = newTurn;
+    }
+
+    public virtual void SetShipTurnSpeed(float newTurnSpeed)
+    {
+        if (minTurnSpeed <= newTurnSpeed && newTurnSpeed <= maxTurnSpeed)
+        {
+            turnSpeed = newTurnSpeed;
+        }
     }
 
     public virtual void SetTargetAcceleration(Vector2 acceleration)

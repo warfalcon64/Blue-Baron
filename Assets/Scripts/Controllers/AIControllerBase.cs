@@ -168,9 +168,12 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         ShipBase shipBase = (ShipBase)sender;
         target = FindTarget();
-        target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
+        if (target != null)
+        {
+            target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
+        }
 
-        ship.OnShipDeath -= HandleTargetDeath;
+        shipBase.OnShipDeath -= HandleTargetDeath;
     }
 
     protected virtual void Move()
@@ -201,7 +204,7 @@ public abstract class AIControllerBase : MonoBehaviour
             {
                 if (Math.Abs(angle) < 90 && speed < maxSpeed)
                 {
-                    print("INCREASING SPEED");
+                    //print("INCREASING SPEED");
                     speed += 0.2f;
                 }
                 else if (Math.Abs(angle) >= 90 && speed > minSpeed)

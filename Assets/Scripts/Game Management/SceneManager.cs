@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Common;
+using Unity.VisualScripting;
+using Random = UnityEngine.Random;
+
 public class SceneManager : MonoBehaviour
 {
     // Make sure that anything can read variables of this class, but variables can only be set internally
@@ -21,6 +25,18 @@ public class SceneManager : MonoBehaviour
 
     [Header("Data")]
     public ShipData shipData;
+
+    [Header("Cameras")]
+    public FollowPlayer mainCam;
+
+    private int playerIndex;
+
+    public event EventHandler<NewShipArgs> PlayerSwapped;
+
+    public class NewShipArgs : EventArgs
+    {
+        public ShipBase ship;
+    }
 
     void Awake()
     {
@@ -46,6 +62,64 @@ public class SceneManager : MonoBehaviour
         deadBlueShips = new List<ShipBase>();
         
         deadRedShips = new List<ShipBase>();
+    }
+
+    // Swap player to different ship within their own team
+    // * Note that when player dies they are randomly assigned to a ship to spectate
+    public void SwapPlayerShip(object sender, KeyPressedEventArgs k)
+    {
+        bool enablePlayerControl = false;
+        // * Might not need this
+        for (int i = 0; i < blueShips.Count; i++)
+        {
+            if (blueShips[i].isPlayer)
+            {
+                playerIndex = i;
+            }
+        }
+
+        switch (k.KeyCode)
+        {
+            case KeyCode.A:
+                if (playerIndex - 1 >= 0)
+                {
+                    playerIndex--;
+                }
+                else
+                {
+                    playerIndex = blueShips.Count - 1;
+                }
+                break;
+
+            case KeyCode.D:
+                if (playerIndex + 1 <= (blueShips.Count - 1))
+                {
+                    playerIndex++;
+                }
+                else
+                {
+                    playerIndex = 0;
+                }
+                break;
+
+            case KeyCode.Space:
+                enablePlayerControl = true;
+                break;
+
+            default:
+                playerIndex = Random.Range(0, blueShips.Count);
+                break;
+        }
+
+        ShipBase destShip = blueShips[playerIndex];
+        mainCam.player = destShip;
+
+        if (enablePlayerControl)
+        {
+            destShip.GetComponent<AIControllerBase>().enabled = false;
+            PlayerController pc = destShip.AddComponent<PlayerController>();
+            pc.TransferShipValues(destShip);
+        }
     }
 
     // Respond to ship death event

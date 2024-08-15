@@ -7,7 +7,7 @@ public class FollowPlayer : MonoBehaviour
     // Get rid of offsets if never used
     public float xOffset;
     public float yOffset;
-    public Transform player;
+    public ShipBase player;
 
     // Update is called once per frame
     private void LateUpdate()
