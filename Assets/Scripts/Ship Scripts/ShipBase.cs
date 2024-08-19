@@ -137,7 +137,7 @@ public abstract class ShipBase : MonoBehaviour
         maxSpeed = speed;
         minSpeed = speed / 2;
         turn = 0f;
-        maxTurnSpeed = turnSpeed + 1;
+        maxTurnSpeed = turnSpeed + 1.2f;
         minTurnSpeed = turnSpeed;
         target = null;
         targetRb = null;
@@ -419,6 +419,24 @@ public abstract class ShipBase : MonoBehaviour
         if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
     }
 
+    public virtual void Accelerate(float accelAmount)
+    {
+        if ((speed + accelAmount) <= maxSpeed)
+        {
+            speed += accelAmount;
+            turnSpeed -= .04f;
+        }
+    }
+
+    public virtual void Decelerate(float decelAmount)
+    {
+        if ((speed - decelAmount) >= minSpeed)
+        {
+            speed -= decelAmount;
+            turnSpeed += .04f;
+        }
+    }
+
     // ===== Leading target calculations =====
     protected virtual float GetAngleToTarget()
     {
@@ -533,6 +551,11 @@ public abstract class ShipBase : MonoBehaviour
         return weaponMap;
     }
 
+    public virtual PlayerController GetPlayerController()
+    {
+        return GetComponent<PlayerController>();
+    }
+
     public virtual ShipType GetShipType()
     {
         return type;
@@ -545,10 +568,7 @@ public abstract class ShipBase : MonoBehaviour
 
     public virtual void SetShipTurnSpeed(float newTurnSpeed)
     {
-        if (minTurnSpeed <= newTurnSpeed && newTurnSpeed <= maxTurnSpeed)
-        {
-            turnSpeed = newTurnSpeed;
-        }
+        turnSpeed = newTurnSpeed;
     }
 
     public virtual void SetTargetAcceleration(Vector2 acceleration)

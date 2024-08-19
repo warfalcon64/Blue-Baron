@@ -910,7 +910,7 @@ MonoBehaviour:
   health: 100
   shield: 0
   speed: 10
-  turnSpeed: 2
+  turnSpeed: 3
   faceEnemyAngle: 10
   primaryCoolDown: 0.2
   primaryFieldofFire: 45
@@ -919,6 +919,8 @@ MonoBehaviour:
   rightGun: {fileID: 4237550023096101175}
   lowHealth: 25
   smoke: {fileID: 8897038711605021268}
+  godMode: 0
+  isPlayer: 0
   weapons:
   - type: 0
     weapon: {fileID: -5470632126457490998, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}

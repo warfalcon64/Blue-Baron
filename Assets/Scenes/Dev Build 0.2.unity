@@ -1331,6 +1331,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+      propertyPath: godMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: sceneManager
       value: 
       objectReference: {fileID: 1974449429}
@@ -1451,7 +1455,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43e30d0323dafe479ede403ea7f2c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parallax: 1.5
+  parallax: 2.5
 --- !u!64 &1391371036
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2474,7 +2478,7 @@ MonoBehaviour:
   deadRedShips: []
   vfxManager: {fileID: 1947919600}
   shipData: {fileID: 11400000, guid: 6cb2b35daab4fe5488cc5b43e30bd944, type: 2}
-  mainCam: {fileID: 0}
+  mainCam: {fileID: 519420033}
 --- !u!1 &1987034914
 GameObject:
   m_ObjectHideFlags: 0
@@ -2556,7 +2560,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1987034914}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.21, y: -2.24, z: 0}
+  m_LocalPosition: {x: -8.21, y: 8.99, z: 0}
   m_LocalScale: {x: 0.017, y: 0.017, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3055,8 +3059,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ff0828d8f3a974896de608205832da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxManager: {fileID: 417115957}
-  smoke: {fileID: 73179591}
 --- !u!114 &1987034922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3072,7 +3074,7 @@ MonoBehaviour:
   health: 100
   shield: 0
   speed: 10
-  turnSpeed: 2
+  turnSpeed: 3
   faceEnemyAngle: 10
   primaryCoolDown: 0.2
   primaryFieldofFire: 45
@@ -3081,7 +3083,7 @@ MonoBehaviour:
   rightGun: {fileID: 608164800}
   lowHealth: 25
   smoke: {fileID: 73179591}
-  godMode: 1
+  godMode: 0
   isPlayer: 0
   weapons:
   - type: 0
@@ -3108,6 +3110,10 @@ PrefabInstance:
     - target: {fileID: 5612818256464406622, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
+      propertyPath: godMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8497475259681279302, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: m_RootOrder
@@ -3599,6 +3605,10 @@ PrefabInstance:
     - target: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_Name
       value: Orange Fighter
+      objectReference: {fileID: 0}
+    - target: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
+      propertyPath: godMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: weapons.Array.size

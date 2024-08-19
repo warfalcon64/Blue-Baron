@@ -30,6 +30,7 @@ public class SceneManager : MonoBehaviour
     public FollowPlayer mainCam;
 
     private int playerIndex;
+    private bool inSwapMode = false;
 
     public event EventHandler<NewShipArgs> PlayerSwapped;
 
@@ -60,16 +61,11 @@ public class SceneManager : MonoBehaviour
         }
 
         deadBlueShips = new List<ShipBase>();
-        
         deadRedShips = new List<ShipBase>();
     }
 
-    // Swap player to different ship within their own team
-    // * Note that when player dies they are randomly assigned to a ship to spectate
-    public void SwapPlayerShip(object sender, KeyPressedEventArgs k)
+    private void Start()
     {
-        bool enablePlayerControl = false;
-        // * Might not need this
         for (int i = 0; i < blueShips.Count; i++)
         {
             if (blueShips[i].isPlayer)
@@ -77,8 +73,36 @@ public class SceneManager : MonoBehaviour
                 playerIndex = i;
             }
         }
+        
+        ShipBase playerShip = blueShips[playerIndex];
+        PlayerController pc = playerShip.GetPlayerController();
+        pc.SwapShip += EnableShipSwapping;
+    }
 
-        switch (k.KeyCode)
+    private void Update()
+    {
+        if (inSwapMode)
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                SwapPlayerShip(KeyCode.A);
+            }
+            else if (Input.GetKeyDown(KeyCode.D))
+            {
+                SwapPlayerShip(KeyCode.D);
+            }
+            else if (Input.GetKeyDown(KeyCode.Space))
+            {
+                SwapPlayerShip(KeyCode.Space);
+            }
+        }
+    }
+
+    // Swap player to different ship within their own team
+    // * Note that when player dies they are randomly assigned to a ship to spectate
+    private void SwapPlayerShip(KeyCode k)
+    {
+        switch (k)
         {
             case KeyCode.A:
                 if (playerIndex - 1 >= 0)
@@ -103,7 +127,7 @@ public class SceneManager : MonoBehaviour
                 break;
 
             case KeyCode.Space:
-                enablePlayerControl = true;
+                inSwapMode = false;
                 break;
 
             default:
@@ -114,12 +138,19 @@ public class SceneManager : MonoBehaviour
         ShipBase destShip = blueShips[playerIndex];
         mainCam.player = destShip;
 
-        if (enablePlayerControl)
+        if (!inSwapMode)
         {
             destShip.GetComponent<AIControllerBase>().enabled = false;
             PlayerController pc = destShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
         }
+    }
+
+    private void EnableShipSwapping(object sender, EventArgs e)
+    {
+        inSwapMode = true;
+        PlayerController pc = (PlayerController)sender;
+        pc.SwapShip -= EnableShipSwapping;
     }
 
     // Respond to ship death event
@@ -140,12 +171,6 @@ public class SceneManager : MonoBehaviour
 
         // Remove scene manager as listener to ship's death event
         ship.OnShipDeath -= RecordDeadShip;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public List<ShipBase> GetLiveEnemies(string team)

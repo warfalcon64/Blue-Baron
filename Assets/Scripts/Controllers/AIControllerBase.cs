@@ -202,18 +202,20 @@ public abstract class AIControllerBase : MonoBehaviour
             // Acceleration logic
             if (nextAdjust <= 0)
             {
-                if (Math.Abs(angle) < 90 && speed < maxSpeed)
+                if (Math.Abs(angle) < 90)
                 {
                     //print("INCREASING SPEED");
-                    speed += 0.2f;
+                    //speed += 0.2f;
+                    ship.Accelerate(0.2f);
                 }
-                else if (Math.Abs(angle) >= 90 && speed > minSpeed)
+                else if (Math.Abs(angle) >= 90)
                 {
-                    speed -= 0.2f;
+                    //speed -= 0.2f;
+                    ship.Decelerate(0.2f);
                 }
                 else
                 {
-                    nextAdjust = Random.Range(0, 0.5f);
+                    nextAdjust = Random.Range(0, 0.2f);
                 }
                 //print("MAX SPEED IS: " + maxSpeed + " MIN SPEED IS " + minSpeed + " FIELD OF FIRE IS: " + primaryFieldofFire);
             }
@@ -223,7 +225,7 @@ public abstract class AIControllerBase : MonoBehaviour
         //    turn = 0f;
         //}
         //print("TURN IS: " + turn);
-        ship.SetShipSpeed(speed);
+        //ship.SetShipSpeed(speed);
         ship.SetShipTurn(turn);
     }
 
