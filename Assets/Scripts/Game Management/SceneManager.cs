@@ -137,18 +137,24 @@ public class SceneManager : MonoBehaviour
 
         ShipBase destShip = blueShips[playerIndex];
         mainCam.player = destShip;
+        vfxManager.GetComponent<FollowPlayer>().player = destShip;
 
         if (!inSwapMode)
         {
             destShip.GetComponent<AIControllerBase>().enabled = false;
             PlayerController pc = destShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
+            pc.SwapShip += EnableShipSwapping;
         }
     }
 
     private void EnableShipSwapping(object sender, EventArgs e)
     {
-        inSwapMode = true;
+        if (blueShips.Count > 0)
+        {
+            inSwapMode = true;
+        }
+
         PlayerController pc = (PlayerController)sender;
         pc.SwapShip -= EnableShipSwapping;
     }
