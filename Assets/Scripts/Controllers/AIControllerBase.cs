@@ -8,6 +8,8 @@ using Random = UnityEngine.Random;
 
 public abstract class AIControllerBase : MonoBehaviour
 {
+    public bool debug;
+
     protected bool stopSearch;
 
     protected float nextTurn;
@@ -58,8 +60,6 @@ public abstract class AIControllerBase : MonoBehaviour
         nextAdjust = Random.Range(0, 2f);
         stopSearch = false;
 
-        //ship.PrimaryReady += AttackTarget;
-
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -79,7 +79,7 @@ public abstract class AIControllerBase : MonoBehaviour
             Vector2 posDiff = targetRb.position - rb.position;
             float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
 
-            // Adding inaccuracy because the calculations are too accurate and precise for players to dodge
+            // Adding inaccuracy because the calculations are too accurate and precise for players to dodge ** <-- change this to adding randomness to the bullets created instead
             Vector2 inaccuracy = (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), 
             Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
 
@@ -104,7 +104,7 @@ public abstract class AIControllerBase : MonoBehaviour
             ship.ShootPrimary(aimPos);
             primaryCooldown = primary.GetCoolDown();
         }
-        // *** ADD CODE FOR SECONDARY STUFF HERE
+        // * ADD CODE FOR SECONDARY STUFF HERE
         else
         {
             return;
@@ -112,30 +112,6 @@ public abstract class AIControllerBase : MonoBehaviour
 
         
     }
-
-    //protected virtual void AttackTarget(object sender, ShipBase.ShootArgs e)
-    //{
-    //    ShipBase ship = (ShipBase)sender;
-
-    //    Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, e.primary);
-    //    Vector2 shootDirection = (aimPos - e.projectileSpawnPoint).normalized;
-
-    //    float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
-
-    //    if (angle <= fieldOfFire)
-    //    {
-    //        switch(e.type)
-    //        {
-    //            case ShootType.Primary:
-    //                ship.ShootPrimary(shootDirection);
-    //                break;
-                
-    //            default:
-    //                print("Error in AIController : AttackTarget");
-    //                break;
-    //        }
-    //    }
-    //}
 
     // ** Change this to target enemies in specified collider, otherwise go towards radar signature once radar is added
     protected virtual GameObject FindTarget()
@@ -203,7 +179,12 @@ public abstract class AIControllerBase : MonoBehaviour
             // Acceleration logic
             if (nextAdjust <= 0)
             {
-                if (Math.Abs(angle) < 90)
+                if (debug)
+                {
+                    print(Math.Abs(angle));
+                }
+
+                if (Math.Abs(angle) < 70)
                 {
                     //print("INCREASING SPEED");
                     //speed += 0.2f;
@@ -218,15 +199,9 @@ public abstract class AIControllerBase : MonoBehaviour
                 {
                     nextAdjust = Random.Range(0, 0.2f);
                 }
-                //print("MAX SPEED IS: " + maxSpeed + " MIN SPEED IS " + minSpeed + " FIELD OF FIRE IS: " + primaryFieldofFire);
             }
         }
-        //else
-        //{
-        //    turn = 0f;
-        //}
-        //print("TURN IS: " + turn);
-        //ship.SetShipSpeed(speed);
+
         ship.SetShipTurn(turn);
     }
 
@@ -261,7 +236,7 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         targetRb = target.GetComponent<Rigidbody2D>();
 
-        float s = weapon.GetSpeed(); // * maybe add ship speed somehow? <-- why would I do this? can't remember...
+        float s = weapon.GetSpeed(); // * maybe add ship speed somehow? <-- why does this matter?
         float distance = Vector2.Distance(targetRb.position, rb.position);
 
         // setup formula constants

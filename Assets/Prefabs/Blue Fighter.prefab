@@ -936,7 +936,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faceEnemyAngle: 10
+  debug: 0
+  faceEnemyAngle: 5
   plasmaInaccuracy: 100
   ship: {fileID: 8497475259681279297}
 --- !u!1 &9045316319554966681

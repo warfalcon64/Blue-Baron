@@ -452,8 +452,8 @@ VFXRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1990381207
+  m_SortingLayer: 1
   m_SortingOrder: 0
 --- !u!2083052967 &395163288
 VisualEffect:
@@ -559,7 +559,13 @@ VisualEffect:
         m_Name: Position
         m_Overridden: 1
     m_Vector4f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 32.052734, y: 3.1884918, z: 0.8390768, w: 1}
+        m_Name: MainColor
+        m_Overridden: 1
+      - m_Value: {x: 3.2060025, y: 1.5106817, z: 1.141404, w: 0}
+        m_Name: SmokeColor
+        m_Overridden: 1
     m_Uint:
       m_Array: []
     m_Int:
@@ -582,7 +588,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 395163286}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.169846, y: -0.71096665, z: -0.49312592}
+  m_LocalPosition: {x: -0.169846, y: -0.71096665, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3347,14 +3353,6 @@ PrefabInstance:
     - target: {fileID: 2480873774574601243, guid: 6125a9ca769edc540a02a56efd6eb074, type: 3}
       propertyPath: m_Name
       value: VFX_ExplosionSmall
-      objectReference: {fileID: 0}
-    - target: {fileID: 2480873774574601243, guid: 6125a9ca769edc540a02a56efd6eb074, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7025583532951310759, guid: 6125a9ca769edc540a02a56efd6eb074, type: 3}
-      propertyPath: m_Enabled
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
