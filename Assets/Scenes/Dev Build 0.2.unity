@@ -2392,7 +2392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xOffset: 0
   yOffset: 0
-  player: {fileID: 1987034916}
+  player: {fileID: 1987034922}
 --- !u!4 &1971873344 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
@@ -2560,7 +2560,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1987034914}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.21, y: 8.99, z: 0}
+  m_LocalPosition: {x: -5.63, y: 9.71, z: 0}
   m_LocalScale: {x: 0.017, y: 0.017, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3564,11 +3564,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.38
+      value: -1.78
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.02
+      value: 7.07
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.z

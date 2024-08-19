@@ -137,6 +137,7 @@ public abstract class AIControllerBase : MonoBehaviour
     //    }
     //}
 
+    // ** Change this to target enemies in specified collider, otherwise go towards radar signature once radar is added
     protected virtual GameObject FindTarget()
     {
         float distance;

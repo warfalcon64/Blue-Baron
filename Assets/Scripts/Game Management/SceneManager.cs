@@ -81,6 +81,7 @@ public class SceneManager : MonoBehaviour
 
     private void Update()
     {
+        // When player dies, scenemanager handles input for game to swap player to another ship
         if (inSwapMode)
         {
             if (Input.GetKeyDown(KeyCode.A))
@@ -99,7 +100,6 @@ public class SceneManager : MonoBehaviour
     }
 
     // Swap player to different ship within their own team
-    // * Note that when player dies they are randomly assigned to a ship to spectate
     private void SwapPlayerShip(KeyCode k)
     {
         switch (k)
@@ -135,10 +135,12 @@ public class SceneManager : MonoBehaviour
                 break;
         }
 
+        // Make sure that camera and vfx controller follow the ship player wants to spectate
         ShipBase destShip = blueShips[playerIndex];
         mainCam.player = destShip;
         vfxManager.GetComponent<FollowPlayer>().player = destShip;
 
+        // Once player presses space, disable AI controller and create a player controller on the ship they are spectating
         if (!inSwapMode)
         {
             destShip.GetComponent<AIControllerBase>().enabled = false;
@@ -148,6 +150,7 @@ public class SceneManager : MonoBehaviour
         }
     }
 
+    // Event called when player dies, changes to "swap mode" where scene manager handles input and spectator camera/vfx until a new player controller is created
     private void EnableShipSwapping(object sender, EventArgs e)
     {
         if (blueShips.Count > 0)
@@ -199,15 +202,5 @@ public class SceneManager : MonoBehaviour
     public GameObject GetVFXManager()
     {
         return vfxManager;
-    }
-
-    public void EnterSpectateMode()
-    {
-
-    }
-
-    public void SwapShip()
-    {
-
     }
 }
