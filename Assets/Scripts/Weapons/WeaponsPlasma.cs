@@ -15,13 +15,14 @@ public class WeaponsPlasma : WeaponsBase
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public override void setup(Vector2 shootDirection, Vector2 shipVelocity)
+    public override void setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
     {
         shootDirection = shootDirection.normalized;
         float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
 
         rb.rotation = angle;
         rb.velocity = (shootDirection * speed) + shipVelocity;
+        this.source = source;
 
         Destroy(gameObject, lifetime);
     }

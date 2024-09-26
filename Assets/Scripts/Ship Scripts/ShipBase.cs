@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.VFX;
 using Random = UnityEngine.Random;
@@ -60,6 +59,8 @@ public abstract class ShipBase : MonoBehaviour
     protected ShipType type;
     protected ShootType shootMode;
 
+    // Event parameter for OnShipDamage is the ShipBase that fired the WeaponBase which hit this ship, the "attacker"
+    public event EventHandler<ShipBase> OnShipDamage;
     public event EventHandler OnShipDeath;
     public event EventHandler<ShootArgs> PrimaryReady;
 
@@ -184,8 +185,9 @@ public abstract class ShipBase : MonoBehaviour
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
             if (godMode) { return; }
-            string type = collider.GetComponent<WeaponsBase>().damageType;
-            float damage = collider.GetComponent<WeaponsBase>().GetDamage();
+            WeaponsBase weapon = collider.GetComponent<WeaponsBase>();
+            string type = weapon.damageType;
+            float damage = weapon.GetDamage();
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
             // * Move damage code into the respective projectiles: they calculate damage with modifiers then tell ship the total damage, ship then applies damage to itself
@@ -201,6 +203,7 @@ public abstract class ShipBase : MonoBehaviour
             }
 
             health -= damage;
+            OnShipDamage?.Invoke(this, weapon.GetSource());
 
             PlayHitVFX(type);
 
@@ -249,7 +252,7 @@ public abstract class ShipBase : MonoBehaviour
     }
 
 
-    // Switch this to activate Primary/Secondary ready events
+    // Switch this to activate Primary/Secondary ready events ** DEPRECATED CODE
     protected virtual void ShootProjectiles(Vector2 targetAcceleration)
     {
         if (nextFire <= 0)
@@ -265,7 +268,7 @@ public abstract class ShipBase : MonoBehaviour
             nextFire = primaryCoolDown;
         }
     }
-
+    // ** END OF DEPRECATED CODE
     public virtual void ShootPrimary(Vector2 aimPos)
     {
         WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Primary);
@@ -278,10 +281,10 @@ public abstract class ShipBase : MonoBehaviour
         //Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary.GetSpeed());
         Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
         WeaponsBase temp = Instantiate(projectile, projectileSpawn, leftGun.rotation);
-        temp.setup(shootDirection, rb.velocity);
+        temp.setup(shootDirection, rb.velocity, this);
     }
 
-    // Come up with a generic method to shoot whatever weapon has been put into primary or secondary slots
+    // Come up with a generic method to shoot whatever weapon has been put into primary or secondary slots ** DEPRECATED CODE
     protected virtual void ShootPlasma(Vector2 targetAcceleration)
     {
         Vector2 plasmaSpawn = leftGun.position;
@@ -297,9 +300,10 @@ public abstract class ShipBase : MonoBehaviour
         if (angle <= primaryFieldofFire)
         {
             WeaponsBase plasmaClone = Instantiate(weaponMap.GetWeapon(ShootType.Primary), plasmaSpawn, leftGun.rotation);
-            plasmaClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
+            //plasmaClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
         }
     }
+    // ** END OF DEPRECATED CODE
 
     // Moves the ship to keep the specified target gameobject within the given parameters
     protected virtual void Move()

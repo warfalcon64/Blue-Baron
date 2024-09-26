@@ -5,12 +5,14 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
+using static State;
 
 public abstract class AIControllerBase : MonoBehaviour
 {
     public bool debug;
 
-    protected bool stopSearch;
+    [HideInInspector]
+    public bool stopSearch { get; private set; }
 
     protected float nextTurn;
     protected float nextAdjust;
@@ -21,12 +23,18 @@ public abstract class AIControllerBase : MonoBehaviour
 
     protected SceneManager sceneManager;
     protected List<ShipBase> enemyTeam;
+    protected List<ShipBase> attackingEnemies;
+    protected IState currentState;
     protected GameObject target;
     protected Rigidbody2D targetRb;
     protected WeaponMap weaponMap;
     protected WeaponsBase primary;
     protected Vector2 targetAcceleration;
     protected Vector2 lastVelocity;
+
+    protected AttackState attackState;
+    protected SearchState searchState;
+    protected ManeuverState maneuverState;
 
     [Header("Behaviors")]
     [SerializeField] protected float faceEnemyAngle = 1;
@@ -37,21 +45,6 @@ public abstract class AIControllerBase : MonoBehaviour
     private Rigidbody2D rb;
 
     // * Can avoid infinite circling by tracking last time you fired a shot while going after a target, if above certain threshold, then do a random maneuver
-
-    protected virtual void Start()
-    {
-        sceneManager = SceneManager.Instance;
-        enemyTeam = sceneManager.GetLiveEnemies(tag);
-        
-        maxSpeed = ship.GetShipMaxSpeed();
-        minSpeed = ship.GetShipMinSpeed();
-
-        weaponMap = ship.GetWeaponMap();
-        primary = weaponMap.GetWeapon(ShootType.Primary);
-        primaryCooldown = primary.GetCoolDown();
-    }
-
-
     protected virtual void Awake()
     {
         target = null;
@@ -59,14 +52,36 @@ public abstract class AIControllerBase : MonoBehaviour
         nextTurn = Random.Range(0, 2f);
         nextAdjust = Random.Range(0, 2f);
         stopSearch = false;
+        attackingEnemies = new List<ShipBase>();
 
         rb = GetComponent<Rigidbody2D>();
+    }
+
+    protected virtual void Start()
+    {
+        sceneManager = SceneManager.Instance;
+        enemyTeam = sceneManager.GetLiveEnemies(tag);
+
+        // Initialize states
+        attackState = new AttackState(AttackBehavior);
+        searchState = new SearchState(SearchBehavior);
+        maneuverState = new ManeuverState(ManeuverBehavior);
+        
+        maxSpeed = ship.GetShipMaxSpeed();
+        minSpeed = ship.GetShipMinSpeed();
+        ship.OnShipDamage += HandleDamageEvent;
+
+        weaponMap = ship.GetWeaponMap();
+        primary = weaponMap.GetWeapon(ShootType.Primary);
+        primaryCooldown = primary.GetCoolDown();
+
     }
 
     // Update is called once per frame
     protected virtual void Update()
     {
         UpdateTimers();
+        currentState.UpdateState(this);
     }
 
     protected virtual void FixedUpdate()
@@ -94,8 +109,78 @@ public abstract class AIControllerBase : MonoBehaviour
         }
 
         Move();
+        currentState.FixedUpdateState(this);
+        
     }
 
+    /// <summary>
+    /// Changes the current state of AI by calling the current state's exit function and callilng the new state's enter function.
+    /// </summary>
+    /// <param name="newState">The new state to transition to.</param>
+    protected virtual void ChangeState(IState newState)
+    {
+        if (newState != null)
+        {
+            currentState.OnExit(this);
+        }
+
+        currentState = newState;
+        currentState.OnEnter(this);
+    }
+
+    /// <summary>
+    /// Dictates the parameters for how the AI attempts to attack a given target.
+    /// </summary>
+    protected virtual void AttackBehavior()
+    {
+        if (target != null)
+        {
+            float angle = Math.Abs(GetAngleToTarget());
+            targetRb = target.GetComponent<Rigidbody2D>();
+
+            Vector2 posDiff = targetRb.position - rb.position;
+            float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
+
+            Vector2 inaccuracy = (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy),
+            Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
+
+            targetAcceleration = CalculateTargetAcceleration() + inaccuracy;
+            AttackTarget(targetAcceleration, angle);
+            Move();
+        }
+        else
+        {
+            ChangeState(searchState);
+        }
+    }
+
+    /// <summary>
+    /// Dictates the parameters for how the AI attempts to search for a valid target.
+    /// </summary>
+    protected virtual void SearchBehavior()
+    {
+        enemyTeam = sceneManager.GetLiveEnemies(tag);
+
+        if (enemyTeam.Count > 0)
+        {
+            target = FindTarget();
+            target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
+        }
+    }
+
+    /// <summary>
+    /// Dictates the parameters for how the AI attempts to move away from enemies
+    /// </summary>
+    protected virtual void ManeuverBehavior()
+    {
+
+    }
+
+    /// <summary>
+    /// Fires the AI's weapons at a given target by calculating the proper trajectory necessary for each weapon it attacks with.
+    /// </summary>
+    /// <param name="targetAcceleration">The acceleration vector of the target to be fired at.</param>
+    /// <param name="angle">***Unused parameter, potentially deprecated***</param>
     protected virtual void AttackTarget(Vector2 targetAcceleration, float angle)
     {
         if (primaryCooldown <= 0 && angle <= primaryFieldofFire)
@@ -114,6 +199,10 @@ public abstract class AIControllerBase : MonoBehaviour
     }
 
     // ** Change this to target enemies in specified collider, otherwise go towards radar signature once radar is added
+    /// <summary>
+    /// Attempts to find a valid target. A valid target consists of the ship closest to the AI on a different team.
+    /// </summary>
+    /// <returns>The target, if a valid target exists. Otherwise, it returns null.</returns>
     protected virtual GameObject FindTarget()
     {
         float distance;
@@ -141,6 +230,16 @@ public abstract class AIControllerBase : MonoBehaviour
         return target;
     }
 
+    protected virtual void HandleDamageEvent(object sender, ShipBase attacker)
+    {
+        currentState.OnHurt(this, (WeaponsBase)sender, attacker);
+    }
+
+    /// <summary>
+    /// Attempts to find another target when the current target is destroyed and unsubscribes from the destroyed target.
+    /// </summary>
+    /// <param name="sender">The ship sending the death event.</param>
+    /// <param name="e"></param>
     protected virtual void HandleTargetDeath(object sender, EventArgs e)
     {
         ShipBase shipBase = (ShipBase)sender;
@@ -153,6 +252,9 @@ public abstract class AIControllerBase : MonoBehaviour
         shipBase.OnShipDeath -= HandleTargetDeath;
     }
 
+    /// <summary>
+    /// Makes the AI turn and accelerate/decelerate towards the current target to place it within the ship's field of fire.
+    /// </summary>
     protected virtual void Move()
     {
         float turn = 0f;
@@ -205,6 +307,15 @@ public abstract class AIControllerBase : MonoBehaviour
         ship.SetShipTurn(turn);
     }
 
+    // *** make sure to add a distance parameter to event, so that the ship focuses on dodging the closest missile (queue system)
+    public virtual void HandleMissileLock()
+    {
+        // handle a missile lock, switch to maneuver state
+    }
+
+    /// <summary>
+    /// Updates all the timers.
+    /// </summary>
     protected virtual void UpdateTimers()
     {
         if (nextTurn > 0) nextTurn -= Time.deltaTime;
@@ -214,7 +325,16 @@ public abstract class AIControllerBase : MonoBehaviour
         if (primaryCooldown > 0) primaryCooldown -= Time.deltaTime;
     }
 
+    private void OnDisable()
+    {
+        ship.OnShipDamage -= HandleDamageEvent;
+    }
+
     // ===== Leading target calculations =====
+    /// <summary>
+    /// Gets the angle between the current ship's forward direction and the direction to the target's ship.
+    /// </summary>
+    /// <returns>A signed angle.</returns>
     protected virtual float GetAngleToTarget()
     {
         targetRb = target.GetComponent<Rigidbody2D>();
@@ -223,6 +343,10 @@ public abstract class AIControllerBase : MonoBehaviour
         return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
     }
 
+    /// <summary>
+    /// Calculates the acceleration of the target.
+    /// </summary>
+    /// <returns>A vector signifying the target's acceleration.</returns>
     protected virtual Vector2 CalculateTargetAcceleration()
     {
         targetRb = target.GetComponent<Rigidbody2D>();
@@ -232,6 +356,13 @@ public abstract class AIControllerBase : MonoBehaviour
         return targetAcceleration;
     }
 
+    /// <summary>
+    /// Calculates the proper lead for the current target with the current target's acceleration and the specified weapon's projectile speed.
+    /// </summary>
+    /// <param name="targetAcceleration">The acceleration of the current target</param>
+    /// <param name="iterations">The number of iterations to run the calculations. More iterations increase accuracy and use more resources.</param>
+    /// <param name="weapon">The weapon to shoot the current target with.</param>
+    /// <returns>A vector describing the required lead to hit the target.</returns>
     protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, WeaponsBase weapon)
     {
         targetRb = target.GetComponent<Rigidbody2D>();

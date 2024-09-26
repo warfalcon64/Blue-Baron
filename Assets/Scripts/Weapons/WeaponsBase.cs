@@ -7,7 +7,6 @@ using UnityEngine.VFX;
 
 public abstract class WeaponsBase : MonoBehaviour
 {
-
     [Header("Damage Type")]
     [SerializeField] public string damageType = "none";
 
@@ -18,11 +17,14 @@ public abstract class WeaponsBase : MonoBehaviour
     [SerializeField] protected float damage = 10;
     [SerializeField] protected float range = 100;
     [SerializeField] protected float coolDown = 1;
+    [SerializeField] protected bool isDamageable = false;
 
     [Header("Lifetime")]
     [SerializeField] protected float lifetime = 5f;
 
-    public virtual void setup(Vector2 shootDirection, Vector2 shipVelocity)
+    protected ShipBase source;
+
+    public virtual void setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
     {
         throw new NotImplementedException();
     }
@@ -55,6 +57,11 @@ public abstract class WeaponsBase : MonoBehaviour
     public virtual float GetCoolDown()
     {
         return coolDown;
+    }
+
+    public virtual ShipBase GetSource()
+    {
+        return source;
     }
 
     public virtual void SetCoolDown(float newCoolDown)
