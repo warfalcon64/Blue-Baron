@@ -25,17 +25,17 @@ public class AIControllerFighter : AIControllerBase
         base.FixedUpdate();
     }
 
-    protected override void AttackTarget(Vector2 targetAcceleration, float angle) => base.AttackTarget(targetAcceleration, angle);
+    public override void AttackTarget(Vector2 targetAcceleration, float angle) => base.AttackTarget(targetAcceleration, angle);
 
-    protected override GameObject FindTarget() => base.FindTarget();
+    public override GameObject FindTarget() => base.FindTarget();
 
-    protected override void Move() => base.Move();
+    public override void MoveToEngage(float angle) => base.MoveToEngage(angle);
 
     protected override void UpdateTimers() => base.UpdateTimers();
 
-    protected override float GetAngleToTarget() => base.GetAngleToTarget();
+    public override float GetAngleToTarget() => base.GetAngleToTarget();
 
-    protected override Vector2 CalculateTargetAcceleration() => base.CalculateTargetAcceleration();
+    public override Vector2 CalculateTargetAcceleration() => base.CalculateTargetAcceleration();
 
     protected override Vector2 GetTargetLeadingPosition(UnityEngine.Vector2 targetAcceleration, int iterations, WeaponsBase weapon) => base.GetTargetLeadingPosition(targetAcceleration, iterations, weapon);
 

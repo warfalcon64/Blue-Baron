@@ -82,7 +82,7 @@ public class SceneManager : MonoBehaviour
     private void Update()
     {
         // When player dies, scenemanager handles input for game to swap player to another ship
-        if (inSwapMode)
+        if (inSwapMode && blueShips.Count > 0)
         {
             if (Input.GetKeyDown(KeyCode.A))
             {
