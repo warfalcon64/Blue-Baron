@@ -90,32 +90,7 @@ public abstract class AIControllerBase : MonoBehaviour
     protected virtual void FixedUpdate()
     {
         enemyTeam = sceneManager.GetLiveEnemies(tag);
-
-        //if (target != null && !stopSearch)
-        //{
-        //    float angle = Math.Abs(GetAngleToTarget());
-        //    targetRb = target.GetComponent<Rigidbody2D>();
-
-        //    Vector2 posDiff = targetRb.position - rb.position;
-        //    float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
-
-        //    // Adding inaccuracy because the calculations are too accurate and precise for players to dodge ** <-- change this to adding randomness to the bullets created instead
-        //    Vector2 inaccuracy = (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), 
-        //    Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
-
-        //    targetAcceleration = CalculateTargetAcceleration() + inaccuracy;
-        //    AttackTarget(targetAcceleration, angle);
-            
-        //}
-        //else if (!stopSearch)
-        //{
-        //    target = FindTarget();
-        //    target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
-        //}
-
-        //Move();
         currentState.FixedUpdateState(this);
-        
     }
 
     /// <summary>
@@ -132,42 +107,6 @@ public abstract class AIControllerBase : MonoBehaviour
         currentState = newState;
         if (debug) print(currentState);
         currentState.OnEnter(this);
-    }
-
-    /// <summary>
-    /// Dictates the parameters for how the AI attempts to attack a given target. (DEPRECATED)
-    /// </summary>
-    protected virtual void AttackBehavior()
-    {
-        if (target != null)
-        {
-            float angle = Math.Abs(GetAngleToTarget());
-            targetRb = target.GetComponent<Rigidbody2D>();
-
-            Vector2 posDiff = targetRb.position - rb.position;
-            float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
-
-            Vector2 inaccuracy = (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy),
-            Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance));
-
-            targetAcceleration = CalculateTargetAcceleration() + inaccuracy;
-            AttackTarget(targetAcceleration, angle);
-            //Move();
-        }
-    }
-
-    /// <summary>
-    /// Dictates the parameters for how the AI attempts to search for a valid target. (DEPRECATED)
-    /// </summary>
-    protected virtual void SearchBehavior()
-    {
-        enemyTeam = sceneManager.GetLiveEnemies(tag);
-
-        if (enemyTeam.Count > 0)
-        {
-            target = FindTarget();
-            target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
-        }
     }
 
     /// <summary>

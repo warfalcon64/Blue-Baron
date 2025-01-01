@@ -50,17 +50,6 @@ public class PlayerController : MonoBehaviour
         // Get ship variables
         primaryCoolDown = ship.GetPrimaryCoolDown();
         primaryFieldOfFire = ship.GetPrimaryFieldOfFire();
-
-        //switch (shipType)
-        //{
-        //    case ShipType.Fighter:
-        //        lowHealth = health * 0.25f;
-        //        break;
-
-        //    default:
-        //        print("Error: Player ship type is undefined!");
-        //        break;
-        //}
     }
 
     // Update is called once per frame
@@ -70,30 +59,24 @@ public class PlayerController : MonoBehaviour
         turn = -Input.GetAxisRaw("Horizontal");
         acceleration = Input.GetAxisRaw("Vertical");
 
-        if (shipType == ShipType.Spectator)
+
+        if (Input.GetMouseButton(0))
         {
-            SpectatorMode();
+            shootMode = ShootType.Primary;
+
         }
         else
         {
-
-            if (Input.GetMouseButton(0))
-            {
-                shootMode = ShootType.Primary;
-
-            }
-            else
-            {
-                shootMode = ShootType.None;
-            }
-
-            UpdateTimers();
-
-            // Calculate mouse position on screen
-            mousePosition = Input.mousePosition;
-            mousePosition.z = Camera.main.nearClipPlane;
-            worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            shootMode = ShootType.None;
         }
+
+        UpdateTimers();
+
+        // Calculate mouse position on screen
+        mousePosition = Input.mousePosition;
+        mousePosition.z = Camera.main.nearClipPlane;
+        worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+        
     }
 
     private void FixedUpdate()
@@ -106,12 +89,10 @@ public class PlayerController : MonoBehaviour
             case ShipType.Spectator:
                 break;
         }
-
     }
 
     private void fighterControl()
     {
-
         if (acceleration < 0f)
         {
             ship.Decelerate(0.2f);
@@ -122,26 +103,7 @@ public class PlayerController : MonoBehaviour
         }
 
         ship.SetShipTurn(turn);
-        //rb.velocity = transform.up * speed;
-        //rb.MoveRotation(rb.rotation + (turnSpeed * turn));
         shootProjectiles();
-    }
-
-    // *** THIS DOESN'T ACTUALLY WORK, SEND EVENT TO SCENE MANAGER TO HANDLE SHIP SWAPPING INPUT
-    private void SpectatorMode()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            SwapShip?.Invoke(this, new KeyPressedEventArgs(KeyCode.A));
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            SwapShip?.Invoke(this, new KeyPressedEventArgs(KeyCode.D));
-        }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SwapShip?.Invoke(this, new KeyPressedEventArgs(KeyCode.Space));
-        }
     }
 
     private void shootProjectiles()

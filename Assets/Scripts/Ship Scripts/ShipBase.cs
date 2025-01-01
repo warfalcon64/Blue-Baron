@@ -80,19 +80,12 @@ public abstract class ShipBase : MonoBehaviour
     protected virtual void Awake()
     {
         Init();
-
     }
 
     protected virtual void Start()
     {
         mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
-        // *** MAKE SHIP LISTEN TO TARGET'S DEATH EVENTS IN THE AI CONTROLLER INSTEAD
-        // Make ship listen to enemy ships for their death events
-        //foreach (ShipBase ship in enemyTeam)
-        //{
-        //    ship.OnShipDeath += OnEnemyDeath;
-        //}
     }
 
     protected virtual void Update()
@@ -104,31 +97,11 @@ public abstract class ShipBase : MonoBehaviour
         }
 
         UpdateSmoke();
-        UpdateTimers();
     }
 
     // Update is called once per frame
     protected virtual void FixedUpdate()
     {
-        //if (target != null && !stopSearch)
-        //{
-        //    float angle = GetAngleToTarget();
-
-        //    if (Mathf.Abs(angle) <= primaryFieldofFire)
-        //    {
-        //        Vector2 posDiff = target.GetComponent<Rigidbody2D>().position - rb.position;
-        //        float distance = Mathf.Sqrt(posDiff.sqrMagnitude);
-
-        //        targetAcceleration = GetTargetAcceleration()
-        //            + (new Vector2(Random.Range(-plasmaInaccuracy, plasmaInaccuracy), Random.Range(-plasmaInaccuracy, plasmaInaccuracy)) * (1 / distance)); // Adding inaccuracy to prevent player skill diff
-        //        ShootProjectiles(targetAcceleration);
-        //    }
-        //}
-        //else if (!stopSearch)
-        //{
-        //    target = FindTarget();
-        //}
-
         Move();
     }
 
@@ -173,11 +146,6 @@ public abstract class ShipBase : MonoBehaviour
         }
 
         gameObject.SetActive(false);
-    }
-
-    private void OnEnemyDeath(object sender, EventArgs e)
-    {
-        target = FindTarget();
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collider)
@@ -251,24 +219,6 @@ public abstract class ShipBase : MonoBehaviour
         mainEffects.SendEvent("OnDeath", eventAttribute);
     }
 
-
-    // Switch this to activate Primary/Secondary ready events ** DEPRECATED CODE
-    protected virtual void ShootProjectiles(Vector2 targetAcceleration)
-    {
-        if (nextFire <= 0)
-        {
-            //ShootPlasma(targetAcceleration);
-            PrimaryReady?.Invoke(this, 
-                new ShootArgs() { 
-                    type = ShootType.Primary, 
-                    primary = weaponMap.GetWeapon(ShootType.Primary), 
-                    projectileSpawnPoint = leftGun.position 
-                });
-            // *** rename nextFire before adding secondary weapons!!!
-            nextFire = primaryCoolDown;
-        }
-    }
-    // ** END OF DEPRECATED CODE
     public virtual void ShootPrimary(Vector2 aimPos)
     {
         WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Primary);
@@ -284,110 +234,11 @@ public abstract class ShipBase : MonoBehaviour
         temp.setup(shootDirection, rb.velocity, this);
     }
 
-    // Come up with a generic method to shoot whatever weapon has been put into primary or secondary slots ** DEPRECATED CODE
-    protected virtual void ShootPlasma(Vector2 targetAcceleration)
-    {
-        Vector2 plasmaSpawn = leftGun.position;
-        leftFire = !leftFire;
-
-        if (!leftFire) plasmaSpawn = rightGun.position;
-
-        Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, weaponMap.GetWeapon(ShootType.Primary).GetSpeed());
-        Vector2 shootDirection = (aimPos - plasmaSpawn).normalized;
-
-        float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
-
-        if (angle <= primaryFieldofFire)
-        {
-            WeaponsBase plasmaClone = Instantiate(weaponMap.GetWeapon(ShootType.Primary), plasmaSpawn, leftGun.rotation);
-            //plasmaClone.GetComponent<WeaponsPlasma>().setup(shootDirection, rb.velocity);
-        }
-    }
-    // ** END OF DEPRECATED CODE
-
     // Moves the ship to keep the specified target gameobject within the given parameters
     protected virtual void Move()
     {
-
-        //if (target != null && !stopSearch)
-        //{
-        //    float angle = GetAngleToTarget();
-
-        //    // Turning logic
-        //    if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= 0)
-        //    {
-        //        if (angle > 0)
-        //        {
-        //            turn = 1f;
-        //        }
-        //        if (angle < 0)
-        //        {
-        //            turn = -1f;
-        //        }
-        //    }
-        //    else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= 0)
-        //    {
-        //        Random.Range(0, 0.5f);
-        //    }
-
-        //    // Acceleration logic
-        //    if (nextAdjust <= 0)
-        //    {
-        //        if (Math.Abs(angle) < 90 && speed < maxSpeed)
-        //        {
-        //            speed += 0.2f;
-        //        }
-        //        if (Math.Abs(angle) >= 90 && speed > minSpeed)
-        //        {
-        //            speed -= 0.2f;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        nextAdjust = Random.Range(0, 0.5f);
-        //    }
-        //}
-        //else
-        //{
-        //    turn = 0f;
-        //}
-
-        // keep this
         rb.velocity = transform.up * speed;
         rb.MoveRotation(rb.rotation + (turnSpeed * turn));
-    }
-
-    protected virtual GameObject FindTarget()
-    {
-        float distance;
-        float lowestDistance = Mathf.Infinity;
-
-        if (enemyTeam.Count == 0)
-        {
-            stopSearch = true;
-            return null;
-        }
-
-        foreach (ShipBase enemy in enemyTeam)
-        {
-            if (enemy == null)
-            {
-                //print("ENEMY IS NULL");
-                continue;
-            }
-
-            //print("ENEMY IS NOT NULL");
-            Vector2 posDiff = enemy.GetComponent<Rigidbody2D>().position - rb.position;
-            distance = posDiff.sqrMagnitude;
-
-            if (distance < lowestDistance)
-            {
-                lowestDistance = distance;
-                target = enemy.gameObject;
-            }
-        }
-
-        return target;
     }
 
     protected virtual void UpdateSmoke()
@@ -414,15 +265,6 @@ public abstract class ShipBase : MonoBehaviour
         }
     }
 
-    protected virtual void UpdateTimers()
-    {
-        if (nextFire > 0) nextFire -= Time.deltaTime;
-
-        if (nextTurn > 0) nextTurn -= Time.deltaTime;
-
-        if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
-    }
-
     public virtual void Accelerate(float accelAmount)
     {
         if ((speed + accelAmount) <= maxSpeed)
@@ -439,83 +281,6 @@ public abstract class ShipBase : MonoBehaviour
             speed -= decelAmount;
             turnSpeed += .04f;
         }
-    }
-
-    // ===== Leading target calculations =====
-    protected virtual float GetAngleToTarget()
-    {
-        targetRb = target.GetComponent<Rigidbody2D>();
-        Vector2 targetDirection = targetRb.position - rb.position;
-
-        return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
-    }
-
-    protected virtual Vector2 GetTargetAcceleration()
-    {
-        targetRb = target.GetComponent<Rigidbody2D>();
-        Vector2 targetAccelearation = (targetRb.velocity - lastVelocity) / Time.fixedDeltaTime;
-        lastVelocity = targetRb.velocity;
-
-        return targetAccelearation;
-    }
-
-    protected virtual Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations, float weaponSpeed)
-    {
-        targetRb = target.GetComponent<Rigidbody2D>();
-
-        float s = weaponSpeed; // *maybe add ship speed somehow?
-        float distance = Vector2.Distance(targetRb.position, rb.position);
-
-        Vector2 pT = targetRb.position - rb.position;
-        Vector2 vT = targetRb.velocity - rb.velocity;
-        Vector2 aT = targetAcceleration;
-        Vector2 aP = Vector2.zero;
-
-        Vector2 accel = aT - aP;
-
-        // Guess the time to target
-        float guess = distance / s;
-
-        if (iterations > 0)
-        {
-            // Quartic coefficients
-            float a = Vector2.Dot(accel, accel) * 0.25f;
-            float b = Vector2.Dot(accel, vT);
-            float c = Vector2.Dot(accel, pT) + Vector2.Dot(vT, vT) - s * s;
-            float d = 2f * Vector2.Dot(vT, vT);
-            float e = Vector3.Dot(pT, pT);
-
-            // Solve with Newton's equation
-            float finalGuess = SolveQuarticNewton(guess, iterations, a, b, c, d, e);
-
-            // Use the first guess if negative or zero
-            if (finalGuess > 0f)
-            {
-                guess = finalGuess;
-            }
-        }
-
-        Vector2 travel = pT + vT * guess + 0.5f * aT * guess * guess;
-        return rb.position + travel;
-    }
-
-    protected virtual float SolveQuarticNewton(float guess, int iterations, float a, float b, float c, float d, float e)
-    {
-        for (int i = 0; i < iterations; i++)
-        {
-            guess = guess - EvalQuartic(guess, a, b, c, d, e) / EvalQuarticDerivative(guess, a, b, c, d);
-        }
-        return guess;
-    }
-
-    protected virtual float EvalQuartic(float t, float a, float b, float c, float d, float e)
-    {
-        return a * t * t * t * t + b * t * t * t + c * t * t + d * t + e;
-    }
-
-    protected virtual float EvalQuarticDerivative(float t, float a, float b, float c, float d)
-    {
-        return 4f * a * t * t * t + 3f * b * t * t + 2f * c * t + d;
     }
 
     // ====== Getters and Setters ======
