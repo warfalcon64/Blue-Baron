@@ -24,12 +24,12 @@ public class PlayerController : MonoBehaviour
     private Vector2 worldMousePosition;
     private Vector3 mousePosition;
 
-
     private WeaponMap weaponMap;
     private ShipBase ship;
     Rigidbody2D rb;
 
     public event EventHandler SwapShip;
+    public event EventHandler ToggleRadarLock;
 
     // Start is called before the first frame update
     private void Awake()
@@ -68,6 +68,11 @@ public class PlayerController : MonoBehaviour
         else
         {
             shootMode = ShootType.None;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ToggleRadarLock?.Invoke(this, EventArgs.Empty);
         }
 
         UpdateTimers();

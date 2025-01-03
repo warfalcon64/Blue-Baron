@@ -21,6 +21,7 @@ public class SceneManager : MonoBehaviour
     public List<ShipBase> deadRedShips;
 
     [Header("Managers")]
+    public GameObject playerManager;
     public GameObject vfxManager;
 
     [Header("Data")]
@@ -31,6 +32,8 @@ public class SceneManager : MonoBehaviour
 
     private int playerIndex;
     private bool inSwapMode = false;
+    private PlayerController pc;
+    private PlayerLockOnSystem playerLockOnSystem;
 
     public event EventHandler<NewShipArgs> PlayerSwapped;
 
@@ -75,8 +78,10 @@ public class SceneManager : MonoBehaviour
         }
         
         ShipBase playerShip = blueShips[playerIndex];
-        PlayerController pc = playerShip.GetPlayerController();
-        pc.SwapShip += EnableShipSwapping;
+        pc = playerShip.GetPlayerController();
+        playerLockOnSystem = playerManager.GetComponent<PlayerLockOnSystem>();
+        pc.SwapShip += EnableShipSwapping; // * make a method for connecting player controller to other scripts via events if necessary
+        pc.ToggleRadarLock += playerLockOnSystem.ToggleRadarLock;
     }
 
     private void Update()
@@ -144,9 +149,10 @@ public class SceneManager : MonoBehaviour
         if (!inSwapMode)
         {
             destShip.GetComponent<AIControllerBase>().enabled = false;
-            PlayerController pc = destShip.AddComponent<PlayerController>();
+            pc = destShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;
+            pc.ToggleRadarLock += playerLockOnSystem.ToggleRadarLock;
         }
     }
 
@@ -160,6 +166,7 @@ public class SceneManager : MonoBehaviour
 
         PlayerController pc = (PlayerController)sender;
         pc.SwapShip -= EnableShipSwapping;
+        pc.ToggleRadarLock -= playerLockOnSystem.ToggleRadarLock;
     }
 
     // Respond to ship death event
@@ -202,5 +209,10 @@ public class SceneManager : MonoBehaviour
     public GameObject GetVFXManager()
     {
         return vfxManager;
+    }
+
+    public PlayerController GetPlayerController()
+    {
+        return pc;
     }
 }

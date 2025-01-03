@@ -118,7 +118,10 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         if (primaryCooldown <= 0 && angle <= primaryFieldofFire)
         {
-            Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary);
+            //Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary);
+            Tuple<Transform, Transform> gunPositions = ship.GetPrimaryFirePositions();
+            Vector2 avgGunPos = (gunPositions.Item1.position + gunPositions.Item2.position) / 2;
+            Vector2 aimPos = WorseTargetLeadingPosition(primary, avgGunPos);
             ship.ShootPrimary(aimPos);
             primaryCooldown = primary.GetCoolDown();
         }
@@ -284,6 +287,16 @@ public abstract class AIControllerBase : MonoBehaviour
     }
 
     // ===== Leading target calculations =====
+    public virtual Vector2 WorseTargetLeadingPosition(WeaponsBase weapon, Vector2 gunPosition)
+    {
+        targetRb = target.GetComponent<Rigidbody2D>();
+        float speed = weapon.GetSpeed();
+        float distance = Vector2.Distance(gunPosition, targetRb.position);
+        float travelTime = distance / speed;
+        return targetRb.position + targetRb.velocity * travelTime;
+    }
+
+
     /// <summary>
     /// Gets the angle between the current ship's forward direction and the direction to the target's ship.
     /// </summary>

@@ -226,7 +226,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4679384737767403969}
   - component: {fileID: 4801569920985668928}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -857,8 +857,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 0
+  canHover: 0
   faceEnemyAngle: 5
-  plasmaInaccuracy: 100
+  angularError: 5
   ship: {fileID: 6372454098448783548}
 --- !u!1 &7180944070711932923
 GameObject:

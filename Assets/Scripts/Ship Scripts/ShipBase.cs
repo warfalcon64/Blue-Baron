@@ -315,6 +315,11 @@ public abstract class ShipBase : MonoBehaviour
         return primaryCoolDown;
     }
 
+    public virtual WeaponsBase GetPrimaryWeapon()
+    {
+        return primary;
+    }
+
     public virtual WeaponMap GetWeaponMap()
     {
         return weaponMap;
@@ -328,6 +333,11 @@ public abstract class ShipBase : MonoBehaviour
     public virtual ShipType GetShipType()
     {
         return type;
+    }
+
+    public virtual Tuple<Transform, Transform> GetPrimaryFirePositions()
+    {
+        return new Tuple<Transform, Transform>(leftGun, rightGun);
     }
 
     public virtual void SetShipTurn(float newTurn)
