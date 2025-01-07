@@ -17,17 +17,19 @@ public class PlayerLockOnSystem : MonoBehaviour
     private PlayerController pc;
     private Dictionary<GameObject, float> enemyLockTimers = new Dictionary<GameObject, float>();
 
+    // *** THIS SCRIPT NEEDS TO SUBSCRIBE TO PLAYER DEATH EVENT: NULL LOCKED ENEMY UPON PLAYER DEATH
+
     private void Start()
     {
         lead = Vector2.zero;
         lockedEnemy = null;
-        sceneManager = SceneManager.Instance;
+        sceneManager = SceneManager.Instance; 
         pc = sceneManager.GetPlayerController();
     }
 
     private void Update()
     {
-        if (lockedEnemy == null)
+        if (lockedEnemy == null || !lockedEnemy.activeSelf)
         {
             UpdateHoverState();
         }
@@ -40,7 +42,7 @@ public class PlayerLockOnSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (lockedEnemy != null)
+        if (lockedEnemy != null && lockedEnemy.activeSelf)
         {
             CalculateLead();
         }
