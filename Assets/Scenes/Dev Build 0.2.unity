@@ -4274,7 +4274,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: godMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6372454098448783548, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: weapons.Array.size
