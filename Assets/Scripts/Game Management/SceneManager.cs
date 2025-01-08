@@ -35,6 +35,8 @@ public class SceneManager : MonoBehaviour
     private PlayerController pc;
     private PlayerLockOnSystem playerLockOnSystem;
 
+    public event EventHandler PlayerDeath;
+    public event EventHandler PlayerRebirth;
     public event EventHandler<NewShipArgs> PlayerSwapped;
 
     public class NewShipArgs : EventArgs
@@ -153,6 +155,7 @@ public class SceneManager : MonoBehaviour
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;
             pc.ToggleRadarLock += playerLockOnSystem.ToggleRadarLock;
+            PlayerRebirth?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -167,6 +170,7 @@ public class SceneManager : MonoBehaviour
         PlayerController pc = (PlayerController)sender;
         pc.SwapShip -= EnableShipSwapping;
         pc.ToggleRadarLock -= playerLockOnSystem.ToggleRadarLock;
+        PlayerDeath?.Invoke(this, EventArgs.Empty);
     }
 
     // Respond to ship death event

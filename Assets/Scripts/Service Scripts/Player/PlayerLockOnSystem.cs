@@ -11,6 +11,7 @@ public class PlayerLockOnSystem : MonoBehaviour
     public LayerMask enemyLayer;
     public Color gizmoColor = Color.green;
 
+    private bool lockingEnabled;
     private Vector2 lead;
     private GameObject lockedEnemy;
     private SceneManager sceneManager;
@@ -22,8 +23,11 @@ public class PlayerLockOnSystem : MonoBehaviour
     private void Start()
     {
         lead = Vector2.zero;
+        lockingEnabled = true;
         lockedEnemy = null;
-        sceneManager = SceneManager.Instance; 
+        sceneManager = SceneManager.Instance;
+        sceneManager.PlayerDeath += DisableLocking;
+        sceneManager.PlayerRebirth += EnableLocking;
         pc = sceneManager.GetPlayerController();
     }
 
@@ -42,7 +46,7 @@ public class PlayerLockOnSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (lockedEnemy != null && lockedEnemy.activeSelf)
+        if (lockedEnemy != null && lockedEnemy.activeSelf && lockingEnabled)
         {
             CalculateLead();
         }
@@ -74,7 +78,7 @@ public class PlayerLockOnSystem : MonoBehaviour
             {
                 lockedEnemy = enemy;
                 enemyLockTimers.Clear();
-                print($"Locked onto {lockedEnemy.name}");
+                //print($"Locked onto {lockedEnemy.name}");
             }
         }
     }
@@ -98,6 +102,16 @@ public class PlayerLockOnSystem : MonoBehaviour
         lead = Vector2.zero;
     }
 
+    private void DisableLocking(object sender, EventArgs e)
+    {
+        lockingEnabled = false;
+    }
+
+    private void EnableLocking(object sender, EventArgs e)
+    {
+        lockingEnabled = true;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = gizmoColor;
@@ -118,5 +132,10 @@ public class PlayerLockOnSystem : MonoBehaviour
     public Vector2 GetLead()
     {
         return lead;
+    }
+
+    public bool IsLockingEnabled()
+    {
+        return lockingEnabled;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class CursorTargetLead : MonoBehaviour
     public RectTransform leadIndicator;
     public float size;
 
+    private bool leadEnabled;
     private SceneManager sceneManager;
     private PlayerLockOnSystem lockOnSystem;
     private GameObject lockedEnemy;
@@ -20,6 +22,7 @@ public class CursorTargetLead : MonoBehaviour
         lockOnSystem = sceneManager.playerManager.GetComponent<PlayerLockOnSystem>();
         lead = Vector2.zero;
         leadIndicator.sizeDelta = new Vector2(size, size);
+        leadEnabled = true;
     }
 
     // Update is called once per frame
@@ -27,10 +30,11 @@ public class CursorTargetLead : MonoBehaviour
     {
         lead = lockOnSystem.GetLead();
         lockedEnemy = lockOnSystem.GetLockedEnemy();
+        leadEnabled = lockOnSystem.IsLockingEnabled();
 
         if (lead != null)
         {
-            if (lockedEnemy != null && lockedEnemy.activeSelf)
+            if (lockedEnemy != null && lockedEnemy.activeSelf && leadEnabled)
             {
                 if (!leadIndicator.gameObject.activeSelf)
                 {
