@@ -33,7 +33,7 @@ public class PlayerLockOnSystem : MonoBehaviour
 
     private void Update()
     {
-        if (lockedEnemy == null || !lockedEnemy.activeSelf)
+        if ((lockedEnemy == null || !lockedEnemy.activeSelf) && lockingEnabled)
         {
             UpdateHoverState();
         }
@@ -96,7 +96,7 @@ public class PlayerLockOnSystem : MonoBehaviour
         lead = targetRb.position + targetRb.velocity * travelTime;
     }
 
-    public void ToggleRadarLock(object sender, EventArgs e)
+    public void ToggleRadarLock()
     {
         lockedEnemy = null;
         lead = Vector2.zero;

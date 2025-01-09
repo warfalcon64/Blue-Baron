@@ -83,7 +83,7 @@ public class SceneManager : MonoBehaviour
         pc = playerShip.GetPlayerController();
         playerLockOnSystem = playerManager.GetComponent<PlayerLockOnSystem>();
         pc.SwapShip += EnableShipSwapping; // * make a method for connecting player controller to other scripts via events if necessary
-        pc.ToggleRadarLock += playerLockOnSystem.ToggleRadarLock;
+
     }
 
     private void Update()
@@ -154,7 +154,6 @@ public class SceneManager : MonoBehaviour
             pc = destShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;
-            pc.ToggleRadarLock += playerLockOnSystem.ToggleRadarLock;
             PlayerRebirth?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -169,7 +168,6 @@ public class SceneManager : MonoBehaviour
 
         PlayerController pc = (PlayerController)sender;
         pc.SwapShip -= EnableShipSwapping;
-        pc.ToggleRadarLock -= playerLockOnSystem.ToggleRadarLock;
         PlayerDeath?.Invoke(this, EventArgs.Empty);
     }
 

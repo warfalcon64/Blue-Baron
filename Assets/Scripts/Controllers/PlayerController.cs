@@ -24,12 +24,13 @@ public class PlayerController : MonoBehaviour
     private Vector2 worldMousePosition;
     private Vector3 mousePosition;
 
+    private SceneManager sceneManager;
+    private PlayerLockOnSystem playerLockOnSystem;
     private WeaponMap weaponMap;
     private ShipBase ship;
     Rigidbody2D rb;
 
     public event EventHandler SwapShip;
-    public event EventHandler ToggleRadarLock;
 
     // Start is called before the first frame update
     private void Awake()
@@ -50,6 +51,9 @@ public class PlayerController : MonoBehaviour
         // Get ship variables
         primaryCoolDown = ship.GetPrimaryCoolDown();
         primaryFieldOfFire = ship.GetPrimaryFieldOfFire();
+
+        sceneManager = SceneManager.Instance;
+        playerLockOnSystem = sceneManager.playerManager.GetComponent<PlayerLockOnSystem>();
     }
 
     // Update is called once per frame
@@ -72,7 +76,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            ToggleRadarLock?.Invoke(this, EventArgs.Empty);
+            playerLockOnSystem.ToggleRadarLock();
         }
 
         UpdateTimers();
@@ -113,14 +117,26 @@ public class PlayerController : MonoBehaviour
 
     private void shootProjectiles()
     {
-        Vector2 shootDirection = (worldMousePosition - rb.position).normalized;
+        GameObject lockedEnemy = playerLockOnSystem.GetLockedEnemy();
+        Vector2 aimPos;
+
+        if (lockedEnemy != null && lockedEnemy.activeSelf)
+        {
+            aimPos = playerLockOnSystem.GetLead();
+        }
+        else
+        {
+            aimPos = worldMousePosition;
+        }
+        
+        Vector2 shootDirection = (aimPos - rb.position).normalized;
         float angle = Vector2.Angle((Vector2)transform.up, shootDirection);
         //print(angle);
 
         if (shootMode == ShootType.Primary && angle <= primaryFieldOfFire && primaryNextFire <= 0)
         {
             //shootLaser();
-            ship.ShootPrimary(worldMousePosition);
+            ship.ShootPrimary(aimPos);
             primaryNextFire = primaryCoolDown;
         }
     }
