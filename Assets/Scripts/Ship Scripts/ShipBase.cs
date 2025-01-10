@@ -24,6 +24,7 @@ public abstract class ShipBase : MonoBehaviour
     [SerializeField] protected float plasmaInaccuracy = 0;
     [SerializeField] protected Transform leftGun;
     [SerializeField] protected Transform rightGun;
+    [SerializeField] protected Transform missileSpawn;
     //[SerializeField] protected WeaponsBase plasma;
 
     [Header("VFX")]
@@ -62,6 +63,7 @@ public abstract class ShipBase : MonoBehaviour
     // Event parameter for OnShipDamage is the ShipBase that fired the WeaponBase which hit this ship, the "attacker"
     public event EventHandler<ShipBase> OnShipDamage;
     public event EventHandler OnShipDeath;
+    public event EventHandler<SeekerArgs> OnSeekerFired;
     public event EventHandler<ShootArgs> PrimaryReady;
 
     [Header("Weapon Slots")]
@@ -74,6 +76,11 @@ public abstract class ShipBase : MonoBehaviour
         public ShootType type;
         public WeaponsBase primary;
         public Vector2 projectileSpawnPoint;
+    }
+
+    public class SeekerArgs : EventArgs
+    {
+        public WeaponsBase seeker;
     }
 
     // Start is called before the first frame update
@@ -231,7 +238,34 @@ public abstract class ShipBase : MonoBehaviour
         //Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary.GetSpeed());
         Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
         WeaponsBase temp = Instantiate(projectile, projectileSpawn, leftGun.rotation);
-        temp.setup(shootDirection, rb.velocity, this);
+        temp.Setup(shootDirection, rb.velocity, this);
+    }
+
+    public virtual void ShootSecondary(Vector2 aimPos)
+    {
+        WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Secondary);
+        Vector2 projectileSpawn = missileSpawn.position;
+        Vector2 aimingPos;
+
+        if (!projectile.IsSeeker())
+        {
+            aimingPos = aimPos;
+        }
+        else
+        {
+            aimingPos = transform.up;
+        }
+
+        Vector2 shootDirection = (aimingPos - projectileSpawn).normalized;
+        WeaponsBase temp = Instantiate(projectile, projectileSpawn, missileSpawn.rotation);
+
+        if (projectile.IsSeeker())
+        {
+            OnSeekerFired?.Invoke(this, new SeekerArgs { seeker = temp });
+        }
+
+        temp.Setup(shootDirection, rb.velocity, this);
+
     }
 
     // Moves the ship to keep the specified target gameobject within the given parameters

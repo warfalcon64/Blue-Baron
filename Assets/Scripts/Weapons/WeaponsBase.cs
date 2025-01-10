@@ -18,13 +18,15 @@ public abstract class WeaponsBase : MonoBehaviour
     [SerializeField] protected float range = 100;
     [SerializeField] protected float coolDown = 1;
     [SerializeField] protected bool isDamageable = false;
+    [SerializeField] protected bool isSeeker = false;
 
     [Header("Lifetime")]
     [SerializeField] protected float lifetime = 5f;
 
+    protected GameObject target;
     protected ShipBase source;
 
-    public virtual void setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
+    public virtual void Setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
     {
         throw new NotImplementedException();
     }
@@ -64,8 +66,18 @@ public abstract class WeaponsBase : MonoBehaviour
         return source;
     }
 
+    public virtual bool IsSeeker()
+    {
+        return isSeeker;
+    }
+
     public virtual void SetCoolDown(float newCoolDown)
     {
         coolDown = newCoolDown;
+    }
+
+    public virtual void SetTarget(GameObject newTarget)
+    {
+        target = newTarget;
     }
 }

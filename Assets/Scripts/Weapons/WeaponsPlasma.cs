@@ -15,7 +15,7 @@ public class WeaponsPlasma : WeaponsBase
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public override void setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
+    public override void Setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
     {
         shootDirection = shootDirection.normalized;
         float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
