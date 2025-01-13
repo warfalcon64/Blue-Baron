@@ -69,6 +69,10 @@ public class PlayerController : MonoBehaviour
             shootMode = ShootType.Primary;
 
         }
+        else if (Input.GetMouseButton(1))
+        {
+            shootMode = ShootType.Secondary;
+        }
         else
         {
             shootMode = ShootType.None;
@@ -138,6 +142,10 @@ public class PlayerController : MonoBehaviour
             //shootLaser();
             ship.ShootPrimary(aimPos);
             primaryNextFire = primaryCoolDown;
+        }
+        else if (shootMode == ShootType.Secondary)
+        {
+            ship.ShootSecondary(aimPos);
         }
     }
 

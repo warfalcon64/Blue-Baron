@@ -16,6 +16,7 @@ public class PlayerLockOnSystem : MonoBehaviour
     private GameObject lockedEnemy;
     private SceneManager sceneManager;
     private PlayerController pc;
+    private ShipBase playerShip;
     private Dictionary<GameObject, float> enemyLockTimers = new Dictionary<GameObject, float>();
 
     // *** THIS SCRIPT NEEDS TO SUBSCRIBE TO PLAYER DEATH EVENT: NULL LOCKED ENEMY UPON PLAYER DEATH
@@ -28,7 +29,6 @@ public class PlayerLockOnSystem : MonoBehaviour
         sceneManager = SceneManager.Instance;
         sceneManager.PlayerDeath += DisableLocking;
         sceneManager.PlayerRebirth += EnableLocking;
-        pc = sceneManager.GetPlayerController();
     }
 
     private void Update()
@@ -38,9 +38,10 @@ public class PlayerLockOnSystem : MonoBehaviour
             UpdateHoverState();
         }
 
-        if (pc == null)
+        if (pc != null)
         {
-            pc = sceneManager.GetPlayerController();
+            playerShip = pc.gameObject.GetComponent<ShipBase>();
+            playerShip.OnSeekerFired += HandleSeekerFired;
         }
     }
 
@@ -50,6 +51,11 @@ public class PlayerLockOnSystem : MonoBehaviour
         {
             CalculateLead();
         }
+    }
+
+    public void HandleSeekerFired(object source, WeaponsBase seeker)
+    {
+        seeker.SetTarget(lockedEnemy);
     }
 
     private void UpdateHoverState()
@@ -110,6 +116,7 @@ public class PlayerLockOnSystem : MonoBehaviour
     private void EnableLocking(object sender, EventArgs e)
     {
         lockingEnabled = true;
+        pc = sceneManager.GetPlayerController();
     }
 
     private void OnDrawGizmos()
@@ -137,5 +144,10 @@ public class PlayerLockOnSystem : MonoBehaviour
     public bool IsLockingEnabled()
     {
         return lockingEnabled;
+    }
+
+    public void SetPlayerController(PlayerController newPc)
+    {
+        pc = newPc;
     }
 }

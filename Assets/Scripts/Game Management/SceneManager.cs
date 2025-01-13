@@ -81,9 +81,10 @@ public class SceneManager : MonoBehaviour
         
         ShipBase playerShip = blueShips[playerIndex];
         pc = playerShip.GetPlayerController();
-        playerLockOnSystem = playerManager.GetComponent<PlayerLockOnSystem>();
         pc.SwapShip += EnableShipSwapping; // * make a method for connecting player controller to other scripts via events if necessary
-
+        playerLockOnSystem = playerManager.GetComponent<PlayerLockOnSystem>();
+        playerShip.OnSeekerFired += playerLockOnSystem.HandleSeekerFired;
+        playerLockOnSystem.SetPlayerController(pc);
     }
 
     private void Update()

@@ -63,7 +63,7 @@ public abstract class ShipBase : MonoBehaviour
     // Event parameter for OnShipDamage is the ShipBase that fired the WeaponBase which hit this ship, the "attacker"
     public event EventHandler<ShipBase> OnShipDamage;
     public event EventHandler OnShipDeath;
-    public event EventHandler<SeekerArgs> OnSeekerFired;
+    public event EventHandler<WeaponsBase> OnSeekerFired;
     public event EventHandler<ShootArgs> PrimaryReady;
 
     [Header("Weapon Slots")]
@@ -76,11 +76,6 @@ public abstract class ShipBase : MonoBehaviour
         public ShootType type;
         public WeaponsBase primary;
         public Vector2 projectileSpawnPoint;
-    }
-
-    public class SeekerArgs : EventArgs
-    {
-        public WeaponsBase seeker;
     }
 
     // Start is called before the first frame update
@@ -216,6 +211,7 @@ public abstract class ShipBase : MonoBehaviour
         mainEffects.SendEvent(effectEvent, eventAttribute);
     }
 
+    // *** IMPORTANT: DEATH VFX MUST BE SEPARATED FROM SHIP GAMEOBJECT WHEN IT DIES, OTHERWISE THEY ARE CUT OFF
     protected virtual void PlayDeathVFX()
     {
         VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
@@ -245,27 +241,16 @@ public abstract class ShipBase : MonoBehaviour
     {
         WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Secondary);
         Vector2 projectileSpawn = missileSpawn.position;
-        Vector2 aimingPos;
 
-        if (!projectile.IsSeeker())
-        {
-            aimingPos = aimPos;
-        }
-        else
-        {
-            aimingPos = transform.up;
-        }
-
-        Vector2 shootDirection = (aimingPos - projectileSpawn).normalized;
+        Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
         WeaponsBase temp = Instantiate(projectile, projectileSpawn, missileSpawn.rotation);
 
         if (projectile.IsSeeker())
         {
-            OnSeekerFired?.Invoke(this, new SeekerArgs { seeker = temp });
+            OnSeekerFired?.Invoke(this, temp);
         }
 
         temp.Setup(shootDirection, rb.velocity, this);
-
     }
 
     // Moves the ship to keep the specified target gameobject within the given parameters

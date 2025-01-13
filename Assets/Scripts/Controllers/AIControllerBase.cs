@@ -73,6 +73,7 @@ public abstract class AIControllerBase : MonoBehaviour
         maxSpeed = ship.GetShipMaxSpeed();
         minSpeed = ship.GetShipMinSpeed();
         ship.OnShipDamage += HandleDamageEvent;
+        ship.OnSeekerFired += HandleSeekerFired;
 
         weaponMap = ship.GetWeaponMap();
         primary = weaponMap.GetWeapon(ShootType.Primary);
@@ -130,8 +131,6 @@ public abstract class AIControllerBase : MonoBehaviour
         {
             return;
         }
-
-        
     }
 
     // ** Change this to target enemies in specified collider, otherwise go towards radar signature once radar is added
@@ -170,6 +169,11 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         this.attacker = attacker.gameObject;
         currentState.OnHurt(this);
+    }
+
+    protected virtual void HandleSeekerFired(object sender, WeaponsBase seeker)
+    {
+        seeker.SetTarget(target);
     }
 
     /// <summary>
@@ -276,6 +280,7 @@ public abstract class AIControllerBase : MonoBehaviour
     private void OnDisable()
     {
         ship.OnShipDamage -= HandleDamageEvent;
+        ship.OnSeekerFired -= HandleSeekerFired;
     }
 
     public void SetTarget(GameObject newTarget)
