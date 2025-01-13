@@ -317,7 +317,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8761973139800477723}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -350,7 +350,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageType: High Explosive
   speed: 15
-  turnSpeed: 100000
+  turnSpeed: 200
   health: 50
   damage: 10
   range: 100
@@ -358,5 +358,3 @@ MonoBehaviour:
   isDamageable: 1
   isSeeker: 1
   lifetime: 5
-  leadTimePercentage: 1
-  maxTimePrediction: 0.1

@@ -2423,6 +2423,37 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1848023872
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1848023873}
+  m_Layer: 7
+  m_Name: MissileSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1848023873
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848023872}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1987034916}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1848262851
 GameObject:
   m_ObjectHideFlags: 0
@@ -3124,6 +3155,7 @@ Transform:
   - {fileID: 1421119157}
   - {fileID: 951736828}
   - {fileID: 73179591}
+  - {fileID: 1848023873}
   m_Father: {fileID: 1562954570}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3635,9 +3667,10 @@ MonoBehaviour:
   plasmaInaccuracy: 0
   leftGun: {fileID: 1623587067}
   rightGun: {fileID: 608164800}
+  missileSpawn: {fileID: 1848023873}
   lowHealth: 25
   smoke: {fileID: 73179591}
-  godMode: 0
+  godMode: 1
   isPlayer: 0
   weapons:
   - type: 0
@@ -4150,28 +4183,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8648891910070768207, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].inSlope
-      value: 0.27202445
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648891910070768207, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outSlope
-      value: 0.27202445
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648891910070768207, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outWeight
-      value: 0.3235975
-      objectReference: {fileID: 0}
     - target: {fileID: 8761973139800477723, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
       propertyPath: m_Name
       value: pfAnti_Air_Missile
       objectReference: {fileID: 0}
     - target: {fileID: 8761973139800477723, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 345712359531896095, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
