@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8224319434500871138}
   - component: {fileID: 6741342370520390362}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anti-Air Missile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1984638298853073983}
   - component: {fileID: 8648891910070768207}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: EngineVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,7 +250,7 @@ GameObject:
   - component: {fileID: 2838237014284185025}
   - component: {fileID: 5698693470047509285}
   - component: {fileID: 3018362006425249580}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: pfAnti_Air_Missile
   m_TagString: Blue
   m_Icon: {fileID: 0}
@@ -352,7 +352,7 @@ MonoBehaviour:
   speed: 15
   turnSpeed: 200
   health: 50
-  damage: 10
+  damage: 25
   range: 100
   coolDown: 1
   isDamageable: 1

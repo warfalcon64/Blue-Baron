@@ -155,9 +155,10 @@ public abstract class ShipBase : MonoBehaviour
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
             if (godMode) { return; }
-            WeaponsBase weapon = collider.GetComponent<WeaponsBase>();
+            WeaponsBase weapon = collider.gameObject.GetComponent<WeaponsBase>();
             string type = weapon.damageType;
             float damage = weapon.GetDamage();
+            if (!type.Equals("Plasma")) { print(type); }
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
             // * Move damage code into the respective projectiles: they calculate damage with modifiers then tell ship the total damage, ship then applies damage to itself
@@ -167,8 +168,12 @@ public abstract class ShipBase : MonoBehaviour
                     if (shield <= 0) damage *= 2;
                     break;
 
+                case "High Explosive":
+                    damage *= 2;
+                    break;
+
                 default:
-                    print("DID NOT APPLY DAMAGE CORRECTLY");
+                    print("MISC DAMAGE APPLIED:" + type);
                     break;
             }
 
@@ -187,6 +192,7 @@ public abstract class ShipBase : MonoBehaviour
 
     protected virtual void PlayHitVFX(string type)
     {
+
         string effectEvent = "null";
 
         switch (type)

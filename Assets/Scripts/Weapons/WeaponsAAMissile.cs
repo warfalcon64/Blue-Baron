@@ -44,12 +44,16 @@ public class WeaponsAAMissile : WeaponsBase
 
     public override void Setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
     {
+        this.source = source;
         relativeVelocity = shipVelocity;
-        //Destroy(gameObject, lifetime);
+        Destroy(gameObject, lifetime);
     }
 
-    //private Vector2 GetTargetLeadingPosition(Vector2 targetAcceleration, int iterations)
-    //{
-
-    //}
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.GetComponent<Rigidbody2D>() != null && !collision.CompareTag(tag))
+        {
+            Destroy(gameObject);
+        }
+    }
 }
