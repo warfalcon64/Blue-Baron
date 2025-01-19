@@ -56,6 +56,7 @@ public abstract class ShipBase : MonoBehaviour
     protected Rigidbody2D targetRb;
     protected Vector2 lastVelocity;
     protected Vector2 targetAcceleration;
+    protected VFXManager vfxManager;
 
     protected ShipType type;
     protected ShootType shootMode;
@@ -64,19 +65,11 @@ public abstract class ShipBase : MonoBehaviour
     public event EventHandler<ShipBase> OnShipDamage;
     public event EventHandler OnShipDeath;
     public event EventHandler<WeaponsBase> OnSeekerFired;
-    public event EventHandler<ShootArgs> PrimaryReady;
 
     [Header("Weapon Slots")]
     [SerializeField] private List<WeaponMap.WeaponMapEntry> weapons;
     private WeaponMap weaponMap;
     private WeaponsBase primary;
-
-    public class ShootArgs : EventArgs
-    {
-        public ShootType type;
-        public WeaponsBase primary;
-        public Vector2 projectileSpawnPoint;
-    }
 
     // Start is called before the first frame update
     protected virtual void Awake()
@@ -88,6 +81,7 @@ public abstract class ShipBase : MonoBehaviour
     {
         mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
+        vfxManager = SceneManager.Instance.vfxManager.GetComponent<VFXManager>();
     }
 
     protected virtual void Update()
@@ -136,10 +130,9 @@ public abstract class ShipBase : MonoBehaviour
         shipEffects = smoke.GetComponent<VisualEffect>();
     }
 
-    protected virtual void OnDeath() // *** UNSUBSCRIBE FROM ONSHIPDEATH EVENT!!!
+    protected virtual void OnDeath()
     {
-        PlayDeathVFX();
-        //Destroy(gameObject);
+        vfxManager.PlayVFX(VFXManager.VFXType.Explosion, transform.position);
 
         if (isPlayer)
         {
@@ -150,6 +143,7 @@ public abstract class ShipBase : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // move vfx code from here and playvfx to vfx manager
     protected virtual void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
@@ -158,7 +152,7 @@ public abstract class ShipBase : MonoBehaviour
             WeaponsBase weapon = collider.gameObject.GetComponent<WeaponsBase>();
             string type = weapon.damageType;
             float damage = weapon.GetDamage();
-            if (!type.Equals("Plasma")) { print(type); }
+            
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
             // * Move damage code into the respective projectiles: they calculate damage with modifiers then tell ship the total damage, ship then applies damage to itself
@@ -180,7 +174,6 @@ public abstract class ShipBase : MonoBehaviour
             health -= damage;
             OnShipDamage?.Invoke(this, weapon.GetSource());
 
-            PlayHitVFX(type);
 
             if (health <= lowHealth && !isSmoking)
             {
@@ -188,44 +181,6 @@ public abstract class ShipBase : MonoBehaviour
                 shipEffects.SendEvent("OnDamage");
             }
         }
-    }
-
-    protected virtual void PlayHitVFX(string type)
-    {
-
-        string effectEvent = "null";
-
-        switch (type)
-        {
-            case "Plasma":
-                effectEvent = "LaserHit"; // * Change the name of "LaserHit" to something more generic and not have laser in it
-                break;
-
-            default:
-                print("COULD NOT GET DAMAGE TYPE OF WEAPON");
-                break;
-
-        }
-
-        VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
-
-        // Get the ID of the property we want to modify
-        int vfxPosition = Shader.PropertyToID("Position");
-
-        // Set the property, and send event with the attribute carrying the info to the vfx graph
-        mainEffects.SetVector3(vfxPosition, transform.position);
-        mainEffects.SendEvent(effectEvent, eventAttribute);
-    }
-
-    // *** IMPORTANT: DEATH VFX MUST BE SEPARATED FROM SHIP GAMEOBJECT WHEN IT DIES, OTHERWISE THEY ARE CUT OFF
-    protected virtual void PlayDeathVFX()
-    {
-        VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
-
-        int vfxPosition = Shader.PropertyToID("Position");
-
-        mainEffects.SetVector3(vfxPosition, transform.position);
-        mainEffects.SendEvent("OnDeath", eventAttribute);
     }
 
     public virtual void ShootPrimary(Vector2 aimPos)

@@ -48,10 +48,10 @@ public class ShipFighter : ShipBase
         base.UpdateSmoke();
     }
 
-    protected override void PlayHitVFX(string type)
-    {
-        base.PlayHitVFX(type);
-    }
+    //protected override void PlayHitVFX(string type)
+    //{
+    //    base.PlayHitVFX(type);
+    //}
 
     // Moves the ship to face the specified target gameobject
     protected override void Move()

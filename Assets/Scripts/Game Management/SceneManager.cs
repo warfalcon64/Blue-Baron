@@ -37,7 +37,6 @@ public class SceneManager : MonoBehaviour
 
     public event EventHandler PlayerDeath;
     public event EventHandler PlayerRebirth;
-    public event EventHandler<NewShipArgs> PlayerSwapped;
 
     public class NewShipArgs : EventArgs
     {

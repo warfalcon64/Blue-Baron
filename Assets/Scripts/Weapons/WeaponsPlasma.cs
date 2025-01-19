@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,11 +9,17 @@ using UnityEngine.VFX;
 
 public class WeaponsPlasma : WeaponsBase
 {
-    Rigidbody2D rb;
+    private VFXManager vfxManager;
+    private Rigidbody2D rb;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        vfxManager = SceneManager.Instance.vfxManager.GetComponent<VFXManager>();
+    }
+
+    private void Start()
+    {
     }
 
     public override void Setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
@@ -31,6 +38,8 @@ public class WeaponsPlasma : WeaponsBase
     {
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
+            Vector3 hitPos = transform.position;
+            vfxManager.PlayVFX(VFXManager.VFXType.Spark, hitPos);
             Destroy(gameObject);
         }
     }
