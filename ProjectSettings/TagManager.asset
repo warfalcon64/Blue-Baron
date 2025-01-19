@@ -19,7 +19,7 @@ TagManager:
   - Bullets
   - Ships
   - Missiles
-  - 
+  - HUD
   - 
   - 
   - 
@@ -54,4 +54,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 718458835
+    locked: 0
+  - name: UI
+    uniqueID: 3590665387
     locked: 0
