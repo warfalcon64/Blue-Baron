@@ -4028,6 +4028,7 @@ MonoBehaviour:
   faceEnemyAngle: 10
   primaryCoolDown: 0.2
   primaryFieldofFire: 45
+  secondaryCoolDown: 1.5
   plasmaInaccuracy: 0
   leftGun: {fileID: 1623587067}
   rightGun: {fileID: 608164800}

@@ -21,6 +21,7 @@ public abstract class ShipBase : MonoBehaviour
     [Header("Attack")]
     [SerializeField] protected float primaryCoolDown = 0.2f; // ** primaryCoolDown IN THE SHIP CLASS IS DEPRECATED, USE WEAPONMAP coolDown INSTEAD!!
     [SerializeField] protected float primaryFieldofFire = 45; // Angle between the vertical line bisecting the craft and the line representing the edge of field
+    [SerializeField] protected float secondaryCoolDown = 1.5f;
     [SerializeField] protected float plasmaInaccuracy = 0;
     [SerializeField] protected Transform leftGun;
     [SerializeField] protected Transform rightGun;
@@ -293,6 +294,11 @@ public abstract class ShipBase : MonoBehaviour
     public virtual float GetPrimaryCoolDown()
     {
         return primaryCoolDown;
+    }
+
+    public virtual float GetSecondaryCoolDown()
+    {
+        return secondaryCoolDown;
     }
 
     public virtual WeaponsBase GetPrimaryWeapon()

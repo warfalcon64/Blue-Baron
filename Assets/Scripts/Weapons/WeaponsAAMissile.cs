@@ -9,11 +9,13 @@ public class WeaponsAAMissile : WeaponsBase
     private Vector2 velocity;
     private Vector2 relativeVelocity;
 
+    private VFXManager vfxManager;
     private Rigidbody2D rb;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        vfxManager = SceneManager.Instance.vfxManager.GetComponent<VFXManager>();
     }
 
     private void FixedUpdate()
@@ -53,6 +55,8 @@ public class WeaponsAAMissile : WeaponsBase
     {
         if (collision.GetComponent<Rigidbody2D>() != null && !collision.CompareTag(tag))
         {
+            Vector3 hitPos = transform.position;
+            vfxManager.PlayVFX(VFXManager.VFXType.Explosion, hitPos);
             Destroy(gameObject);
         }
     }

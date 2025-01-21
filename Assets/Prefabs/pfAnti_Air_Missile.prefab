@@ -352,7 +352,7 @@ MonoBehaviour:
   speed: 15
   turnSpeed: 200
   health: 50
-  damage: 25
+  damage: 35
   range: 100
   coolDown: 1
   isDamageable: 1

@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     
     private float primaryCoolDown;
     private float primaryNextFire;
+    private float secondaryCoolDown;
+    private float secondaryNextFire;
    
     private Vector2 worldMousePosition;
     private Vector3 mousePosition;
@@ -51,6 +53,7 @@ public class PlayerController : MonoBehaviour
         // Get ship variables
         primaryCoolDown = ship.GetPrimaryCoolDown();
         primaryFieldOfFire = ship.GetPrimaryFieldOfFire();
+        secondaryCoolDown = ship.GetSecondaryCoolDown();
 
         sceneManager = SceneManager.Instance;
         playerLockOnSystem = sceneManager.playerManager.GetComponent<PlayerLockOnSystem>();
@@ -143,9 +146,10 @@ public class PlayerController : MonoBehaviour
             ship.ShootPrimary(aimPos);
             primaryNextFire = primaryCoolDown;
         }
-        else if (shootMode == ShootType.Secondary)
+        else if (shootMode == ShootType.Secondary && secondaryNextFire <= 0)
         {
             ship.ShootSecondary(aimPos);
+            secondaryNextFire = secondaryCoolDown;
         }
     }
 
@@ -164,6 +168,11 @@ public class PlayerController : MonoBehaviour
         if (primaryNextFire > 0)
         {
             primaryNextFire -= Time.deltaTime;
+        }
+
+        if (secondaryNextFire > 0)
+        {
+            secondaryNextFire -= Time.deltaTime;
         }
     }
 }
