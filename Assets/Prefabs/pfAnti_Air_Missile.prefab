@@ -350,9 +350,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageType: High Explosive
   speed: 15
-  turnSpeed: 200
+  turnSpeed: 250
   health: 50
-  damage: 35
+  damage: 40
   range: 100
   coolDown: 1
   isDamageable: 1
