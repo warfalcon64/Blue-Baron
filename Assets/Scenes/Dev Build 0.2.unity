@@ -210,8 +210,8 @@ GameObject:
   - component: {fileID: 52107538}
   - component: {fileID: 52107540}
   - component: {fileID: 52107539}
-  m_Layer: 0
-  m_Name: Image
+  m_Layer: 9
+  m_Name: RadarSweep
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -234,7 +234,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 931.9, y: -376.1}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1776, y: 1776}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &52107539
@@ -257,7 +257,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90e0835194a76a24a9511db59302d671, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d549b443519aa284f9f6b85d014771d4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -450,7 +450,8 @@ GameObject:
   - component: {fileID: 91112016}
   - component: {fileID: 91112015}
   - component: {fileID: 91112014}
-  m_Layer: 0
+  - component: {fileID: 91112017}
+  m_Layer: 9
   m_Name: Radar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -464,9 +465,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 91112012}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 286968109}
@@ -478,8 +479,8 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
+  m_SizeDelta: {x: 2560, y: 1440}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &91112014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,7 +520,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &91112016
 Canvas:
   m_ObjectHideFlags: 0
@@ -529,8 +530,8 @@ Canvas:
   m_GameObject: {fileID: 91112012}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 2
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -543,6 +544,21 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &91112017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 91112012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc8e5819610d5ef48ad2c4a2c108f5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radarSweep: {fileID: 52107538}
+  rotateSpeed: 250
+  radarDistance: 1776
 --- !u!4 &142656874 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
@@ -586,7 +602,7 @@ GameObject:
   - component: {fileID: 286968109}
   - component: {fileID: 286968111}
   - component: {fileID: 286968110}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -610,7 +626,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 931.9, y: -376.1}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 4267, y: 4267}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &286968110
@@ -1110,11 +1126,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7224475410352486718, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1564,11 +1580,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7224475410352486718, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1662,7 +1678,7 @@ GameObject:
   - component: {fileID: 844730012}
   - component: {fileID: 844730014}
   - component: {fileID: 844730013}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Radar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1686,7 +1702,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 931.9, y: -376.1}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 4127, y: 4127}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &844730013
@@ -2164,7 +2180,7 @@ MonoBehaviour:
   outerCrosshair: {fileID: 20908854}
   innerCrosshair: {fileID: 774171762}
   dot: {fileID: 1117138154}
-  speed: -250
+  speed: 250
 --- !u!1001 &1113241933
 PrefabInstance:
   m_ObjectHideFlags: 0

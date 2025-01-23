@@ -39,7 +39,7 @@ public class CursorCrosshair : MonoBehaviour
 
         RectTransformUtility.ScreenPointToWorldPointInRectangle(innerCrosshair, pos, Camera.main, out innerPos);
         innerCrosshair.position = innerPos;
-        innerCrosshair.Rotate(0, 0, speed * Time.deltaTime);
+        innerCrosshair.Rotate(0, 0, -speed * Time.deltaTime);
 
         RectTransformUtility.ScreenPointToWorldPointInRectangle(dot, pos, Camera.main, out dotPos);
         dot.position = dotPos;
