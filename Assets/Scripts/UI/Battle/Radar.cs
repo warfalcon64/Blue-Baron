@@ -5,12 +5,15 @@ using UnityEngine;
 public class Radar : MonoBehaviour
 {
     public RectTransform radarSweep;
+    public RadarPing ping;
 
     [Header("Radar Settings")]
     public float rotateSpeed = 100f;
 
     private float radarDistance;
     private List<Collider2D> colliders;
+    //private Dictionary<ShipBase, >
+
 
     private void Awake()
     {
@@ -23,7 +26,6 @@ public class Radar : MonoBehaviour
     {
         radarDistance = radarSweep.sizeDelta.x;
         // *** FOR LARGER SHIP CLASSES IN FUTURE, MAY HAVE TO SCALE UP RADAR!
-        print(radarDistance);
     }
 
     // Update is called once per frame
@@ -40,7 +42,8 @@ public class Radar : MonoBehaviour
             if (!colliders.Contains(raycastHit.collider))
             {
                 colliders.Add(raycastHit.collider);
-                print(raycastHit.collider.gameObject);
+                //print(raycastHit.collider.gameObject);
+                Instantiate(ping, raycastHit.point, Quaternion.identity);
             }
         }
     }
