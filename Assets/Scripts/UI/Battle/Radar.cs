@@ -8,19 +8,20 @@ public class Radar : MonoBehaviour
 
     [Header("Radar Settings")]
     public float rotateSpeed = 100f;
-    public float radarDistance = 1776f;
 
+    private float radarDistance;
     private List<Collider2D> colliders;
 
     private void Awake()
     {
         colliders = new List<Collider2D>();
-        radarDistance = radarSweep.sizeDelta.x;
+        //radarDistance = radarSweep.sizeDelta.x;
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        radarDistance = radarSweep.sizeDelta.x;
         // *** FOR LARGER SHIP CLASSES IN FUTURE, MAY HAVE TO SCALE UP RADAR!
         print(radarDistance);
     }

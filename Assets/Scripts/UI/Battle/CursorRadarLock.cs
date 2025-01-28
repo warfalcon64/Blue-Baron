@@ -14,7 +14,7 @@ public class CursorRadarLock : MonoBehaviour
         sceneManager = SceneManager.Instance;
         lockRadius = sceneManager.playerManager.GetComponent<PlayerLockOnSystem>().GetLockRadius();
         float pixelsPerUnit = Screen.height / (Camera.main.orthographicSize * 2);
-        float circleDiameterInPixels = lockRadius * 2 * pixelsPerUnit;
+        float circleDiameterInPixels = lockRadius * 2 * pixelsPerUnit; // ** REPLACE CONSTANT WITH VARIABLE THAT ADJUSTS TO SCREEN RESOLUTION IN FUTURE
         radarRangeIndicator.sizeDelta = new Vector2(circleDiameterInPixels, circleDiameterInPixels);
     }
 
