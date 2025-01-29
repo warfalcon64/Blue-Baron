@@ -316,6 +316,11 @@ public abstract class ShipBase : MonoBehaviour
         return GetComponent<PlayerController>();
     }
 
+    public Rigidbody2D GetRigidBody()
+    {
+        return rb;
+    }
+
     public virtual ShipType GetShipType()
     {
         return type;

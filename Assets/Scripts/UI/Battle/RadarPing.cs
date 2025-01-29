@@ -8,7 +8,7 @@ public class RadarPing : MonoBehaviour
 
     public RectTransform blip;
     [Header("Radar Ping Attributes")]
-    public float fadeTime;
+    [SerializeField] private float fadeTime;
 
     private float fadeTimer;
     private Color color;
@@ -42,5 +42,10 @@ public class RadarPing : MonoBehaviour
     public void SetFadeTimer(float time)
     {
         fadeTimer = time;
+    }
+
+    public void SetFadeTime(float time)
+    {
+        fadeTime = time;
     }
 }

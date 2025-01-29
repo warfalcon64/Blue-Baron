@@ -21,6 +21,7 @@ public class SceneManager : MonoBehaviour
     public List<ShipBase> deadRedShips;
 
     [Header("Managers")]
+    public UIManager uiManager;
     public GameObject playerManager;
     public GameObject vfxManager;
 
@@ -33,6 +34,7 @@ public class SceneManager : MonoBehaviour
     private int playerIndex;
     private bool inSwapMode = false;
     private PlayerController pc;
+    private ShipBase playerShip;
     private PlayerLockOnSystem playerLockOnSystem;
 
     public event EventHandler PlayerDeath;
@@ -78,7 +80,7 @@ public class SceneManager : MonoBehaviour
             }
         }
         
-        ShipBase playerShip = blueShips[playerIndex];
+        playerShip = blueShips[playerIndex];
         pc = playerShip.GetPlayerController();
         pc.SwapShip += EnableShipSwapping; // * make a method for connecting player controller to other scripts via events if necessary
         playerLockOnSystem = playerManager.GetComponent<PlayerLockOnSystem>();
@@ -150,11 +152,13 @@ public class SceneManager : MonoBehaviour
         // Once player presses space, disable AI controller and create a player controller on the ship they are spectating
         if (!inSwapMode)
         {
-            destShip.GetComponent<AIControllerBase>().enabled = false;
-            pc = destShip.AddComponent<PlayerController>();
+            playerShip = destShip;
+            playerShip.GetComponent<AIControllerBase>().enabled = false;
+            pc = playerShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;
             PlayerRebirth?.Invoke(this, EventArgs.Empty);
+            uiManager.SetPlayerShip(playerShip);
         }
     }
 
@@ -168,6 +172,7 @@ public class SceneManager : MonoBehaviour
 
         PlayerController pc = (PlayerController)sender;
         pc.SwapShip -= EnableShipSwapping;
+        playerShip = null;
         PlayerDeath?.Invoke(this, EventArgs.Empty);
     }
 
@@ -216,5 +221,10 @@ public class SceneManager : MonoBehaviour
     public PlayerController GetPlayerController()
     {
         return pc;
+    }
+
+    public ShipBase GetPlayerShip()
+    {
+        return playerShip;
     }
 }

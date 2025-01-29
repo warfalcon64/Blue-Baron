@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2604684430001212474}
   - component: {fileID: 9086009316883814135}
   - component: {fileID: 8131698225275703199}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: pfRadarPing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,7 +34,7 @@ RectTransform:
   m_Children:
   - {fileID: 2971999392885101806}
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 2971999392885101806}
   - component: {fileID: 8379165127530061412}
   - component: {fileID: 5351117878496615387}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: Ping
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -153,8 +153,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.8, y: 0}
-  m_SizeDelta: {x: 2134, y: 2134}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 2000, y: 2000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8379165127530061412
 CanvasRenderer:
