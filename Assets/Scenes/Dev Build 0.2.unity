@@ -558,7 +558,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radarSweep: {fileID: 52107538}
   ping: {fileID: 8131698225275703199, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
-  rotateSpeed: 90
+  rotateSpeed: 180
 --- !u!4 &142656874 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
@@ -3292,7 +3292,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1912462209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4857,6 +4857,10 @@ PrefabInstance:
     - target: {fileID: 1906593310819766644, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
       propertyPath: m_Name
       value: pfRadarPing
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906593310819766644, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6949193570850722933, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
       propertyPath: m_Pivot.x

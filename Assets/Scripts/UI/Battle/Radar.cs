@@ -10,14 +10,14 @@ public class Radar : MonoBehaviour
     [Header("Radar Settings")]
     public float rotateSpeed = 100f;
 
+    private RadarPing tmpPing;
     private float radarDistance;
-    private List<Collider2D> colliders;
-    //private Dictionary<ShipBase, >
+    private Dictionary<ShipBase, RadarPing> shipPingPairs;
 
 
     private void Awake()
     {
-        colliders = new List<Collider2D>();
+        shipPingPairs = new Dictionary<ShipBase, RadarPing>();
         //radarDistance = radarSweep.sizeDelta.x;
     }
 
@@ -39,12 +39,19 @@ public class Radar : MonoBehaviour
         // * Hardcoded tag comparison, may need to remove in future
         if (raycastHit.collider != null && !raycastHit.collider.CompareTag("Blue") && raycastHit.collider.GetComponent<ShipBase>())
         {
-            if (!colliders.Contains(raycastHit.collider))
+            ShipBase ship = raycastHit.collider.GetComponent<ShipBase>();
+
+            if (shipPingPairs.ContainsKey(ship) && shipPingPairs[ship] != null)
             {
-                colliders.Add(raycastHit.collider);
-                //print(raycastHit.collider.gameObject);
-                Instantiate(ping, raycastHit.point, Quaternion.identity);
+                tmpPing = shipPingPairs[ship];
+                tmpPing.blip.position = raycastHit.point;
+                tmpPing.SetFadeTimer(0);
             }
+            else
+            {
+                shipPingPairs[ship] = Instantiate(ping, raycastHit.point, Quaternion.identity);
+            }
+            
         }
     }
 
