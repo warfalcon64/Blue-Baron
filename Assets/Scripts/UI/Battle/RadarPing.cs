@@ -35,7 +35,7 @@ public class RadarPing : MonoBehaviour
 
         if (fadeTimer >= fadeTime)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
         }
     }
 
