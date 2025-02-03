@@ -32,6 +32,8 @@ public class PlayerController : MonoBehaviour
     private ShipBase ship;
     Rigidbody2D rb;
 
+    public event EventHandler OnRadarSelectionEnabled;
+    public event EventHandler OnRadarSelectionDisabled;
     public event EventHandler SwapShip;
 
     // Start is called before the first frame update
@@ -67,12 +69,23 @@ public class PlayerController : MonoBehaviour
         acceleration = Input.GetAxisRaw("Vertical");
 
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            OnRadarSelectionEnabled?.Invoke(this, EventArgs.Empty);
+            shootMode = ShootType.None;
+            playerLockOnSystem.DisableLocking();
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            OnRadarSelectionDisabled?.Invoke(this, EventArgs.Empty);
+            playerLockOnSystem.EnableLocking();
+        }
+        else if (Input.GetMouseButton(0))
         {
             shootMode = ShootType.Primary;
 
         }
-        else if (Input.GetMouseButton(1))
+        else if (Input.GetMouseButton(1)) // * Maybe make it possible to shoot both primary and secondary weapons at same time in the future
         {
             shootMode = ShootType.Secondary;
         }
@@ -83,7 +96,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            playerLockOnSystem.ToggleRadarLock();
+            playerLockOnSystem.ToggleRadarLock(); // * Switch to event instead of direct reference
         }
 
         UpdateTimers();

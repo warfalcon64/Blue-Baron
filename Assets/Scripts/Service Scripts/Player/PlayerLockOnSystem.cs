@@ -66,7 +66,7 @@ public class PlayerLockOnSystem : MonoBehaviour
 
         foreach (Collider2D ship in detectedShips)
         {
-            if (ship.gameObject.CompareTag(sceneManager.shipData.blueTag))
+            if (ship.gameObject.CompareTag(sceneManager.shipData.blueTag) || !ship.IsTouchingLayers(enemyLayer))
             {
                 continue;
             }
@@ -84,7 +84,6 @@ public class PlayerLockOnSystem : MonoBehaviour
             {
                 lockedEnemy = enemy;
                 enemyLockTimers.Clear();
-                //print($"Locked onto {lockedEnemy.name}");
             }
         }
     }
@@ -108,12 +107,12 @@ public class PlayerLockOnSystem : MonoBehaviour
         lead = Vector2.zero;
     }
 
-    private void DisableLocking(object sender, EventArgs e)
+    private void DisableLocking(object sender, ShipBase ship)
     {
         lockingEnabled = false;
     }
 
-    private void EnableLocking(object sender, EventArgs e)
+    private void EnableLocking(object sender, ShipBase ship)
     {
         lockingEnabled = true;
         pc = sceneManager.GetPlayerController();
@@ -149,5 +148,15 @@ public class PlayerLockOnSystem : MonoBehaviour
     public void SetPlayerController(PlayerController newPc)
     {
         pc = newPc;
+    }
+
+    public void DisableLocking()
+    {
+        lockingEnabled = false;
+    }
+
+    public void EnableLocking()
+    {
+        lockingEnabled = true;
     }
 }

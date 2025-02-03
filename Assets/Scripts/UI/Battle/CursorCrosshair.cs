@@ -34,19 +34,14 @@ public class CursorCrosshair : MonoBehaviour
     void Update()
     {
         pos = Input.mousePosition;
-        //RectTransformUtility.ScreenPointToWorldPointInRectangle(outerCrosshair, pos, Camera.main, out outerPos);
-        //outerCrosshair.position = outerPos;
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(outerCrosshair, pos, Camera.main, out outerPos);
+        outerCrosshair.position = outerPos;
 
-        //RectTransformUtility.ScreenPointToWorldPointInRectangle(innerCrosshair, pos, Camera.main, out innerPos);
-        //innerCrosshair.position = innerPos;
-        //innerCrosshair.Rotate(0, 0, -speed * Time.deltaTime);
-
-        //RectTransformUtility.ScreenPointToWorldPointInRectangle(dot, pos, Camera.main, out dotPos);
-        //dot.position = dotPos;
-
-        outerCrosshair.position = pos;
-        innerCrosshair.position = pos;
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(innerCrosshair, pos, Camera.main, out innerPos);
+        innerCrosshair.position = innerPos;
         innerCrosshair.Rotate(0, 0, -speed * Time.deltaTime);
-        dot.position = pos;
+
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(dot, pos, Camera.main, out dotPos);
+        dot.position = dotPos;
     }
 }

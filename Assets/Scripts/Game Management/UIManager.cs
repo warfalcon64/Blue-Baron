@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,15 +6,22 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     [Header("Player UI")]
-    [SerializeField] private RectTransform playerRadar;
+    [SerializeField] private RadarMinimapUI radarMinimapUI;
+
+    [Header("Scene UI Objects")]
+    [SerializeField] private RectTransform playerSceneRadar;
 
 
     [SerializeField] private ShipBase playerShip;
+    private PlayerController pc;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        SceneManager.Instance.PlayerDeath += HandlePlayerDeath;
+        SceneManager.Instance.PlayerRebirth += HandlePlayerRebirth;
+        pc = playerShip.GetPlayerController();
+        radarMinimapUI.SubscribeToPlayerController(pc);
     }
 
     // Update is called once per frame
@@ -21,8 +29,20 @@ public class UIManager : MonoBehaviour
     {
         if (playerShip != null)
         {
-            playerRadar.position = playerShip.transform.position;
+            playerSceneRadar.position = playerShip.transform.position;
         }
+    }
+
+    private void HandlePlayerDeath(object sender, ShipBase ship)
+    {
+        radarMinimapUI.UnsubscribeToPlayerController(ship.GetPlayerController());
+        playerShip = null;
+    }
+
+    private void HandlePlayerRebirth(object sender, ShipBase ship)
+    {
+        playerShip = ship;
+        radarMinimapUI.SubscribeToPlayerController(ship.GetPlayerController());
     }
 
     public void SetPlayerShip(ShipBase playerShip)

@@ -37,8 +37,8 @@ public class SceneManager : MonoBehaviour
     private ShipBase playerShip;
     private PlayerLockOnSystem playerLockOnSystem;
 
-    public event EventHandler PlayerDeath;
-    public event EventHandler PlayerRebirth;
+    public event EventHandler<ShipBase> PlayerDeath;
+    public event EventHandler<ShipBase> PlayerRebirth;
 
     public class NewShipArgs : EventArgs
     {
@@ -157,9 +157,18 @@ public class SceneManager : MonoBehaviour
             pc = playerShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;
-            PlayerRebirth?.Invoke(this, EventArgs.Empty);
-            uiManager.SetPlayerShip(playerShip);
+            PlayerRebirth?.Invoke(this, playerShip);
         }
+    }
+
+    private void SetPlayerSubscriptions()
+    {
+        
+    }
+
+    private void SetPlayerReferences()
+    {
+        uiManager.SetPlayerShip(playerShip);
     }
 
     // Event called when player dies, changes to "swap mode" where scene manager handles input and spectator camera/vfx until a new player controller is created
@@ -172,8 +181,8 @@ public class SceneManager : MonoBehaviour
 
         PlayerController pc = (PlayerController)sender;
         pc.SwapShip -= EnableShipSwapping;
+        PlayerDeath?.Invoke(this, playerShip);
         playerShip = null;
-        PlayerDeath?.Invoke(this, EventArgs.Empty);
     }
 
     // Respond to ship death event
