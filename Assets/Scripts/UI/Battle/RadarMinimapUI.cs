@@ -4,16 +4,21 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class RadarMinimapUI : MonoBehaviour, IPointerClickHandler
 {
-    private CircleCollider2D collider;
+    [SerializeField] float alphaThreshold = 0.1f;
+
     private bool isRadarSelectionEnabled;
+    private Image radarImage;
+
     // Start is called before the first frame update
     void Start()
     {
         isRadarSelectionEnabled = false;
-        collider = GetComponent<CircleCollider2D>();
+        radarImage = GetComponentInChildren<Image>();
+        radarImage.alphaHitTestMinimumThreshold = alphaThreshold;
     }
 
     // Update is called once per frame
