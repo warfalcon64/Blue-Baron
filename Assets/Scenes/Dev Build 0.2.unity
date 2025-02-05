@@ -1262,7 +1262,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radarMinimapUI: {fileID: 772471240}
   playerSceneRadar: {fileID: 91112013}
-  playerShip: {fileID: 1987034922}
 --- !u!4 &496189972
 Transform:
   m_ObjectHideFlags: 0
@@ -2385,7 +2384,7 @@ GameObject:
   - component: {fileID: 1096590107}
   m_Layer: 0
   m_Name: Minimap Camera
-  m_TagString: Untagged
+  m_TagString: MinimapCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4095,11 +4094,12 @@ MonoBehaviour:
   - {fileID: 142656875}
   - {fileID: 1971873345}
   deadRedShips: []
-  uiManager: {fileID: 0}
+  uiManager: {fileID: 496189971}
   playerManager: {fileID: 1030809736}
   vfxManager: {fileID: 1947919600}
   shipData: {fileID: 11400000, guid: 6cb2b35daab4fe5488cc5b43e30bd944, type: 2}
   mainCam: {fileID: 519420033}
+  minimapCam: {fileID: 1096590109}
 --- !u!1 &1987034914
 GameObject:
   m_ObjectHideFlags: 0

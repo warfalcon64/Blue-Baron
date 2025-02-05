@@ -30,6 +30,7 @@ public class SceneManager : MonoBehaviour
 
     [Header("Cameras")]
     public FollowPlayer mainCam;
+    public Camera minimapCam;
 
     private int playerIndex;
     private bool inSwapMode = false;
@@ -56,6 +57,7 @@ public class SceneManager : MonoBehaviour
         Instance = this;
 
         // Add scene manager as a listener to ship death events
+        // ** Consider having static ship death event instead to avoid looping
         foreach (ShipBase ship in blueShips)
         {
             ship.OnShipDeath += RecordDeadShip;
@@ -86,6 +88,7 @@ public class SceneManager : MonoBehaviour
         playerLockOnSystem = playerManager.GetComponent<PlayerLockOnSystem>();
         playerShip.OnSeekerFired += playerLockOnSystem.HandleSeekerFired;
         playerLockOnSystem.SetPlayerController(pc);
+        SetPlayerReferences();
     }
 
     private void Update()
@@ -169,6 +172,7 @@ public class SceneManager : MonoBehaviour
     private void SetPlayerReferences()
     {
         uiManager.SetPlayerShip(playerShip);
+        uiManager.SetPlayerController(pc);
     }
 
     // Event called when player dies, changes to "swap mode" where scene manager handles input and spectator camera/vfx until a new player controller is created

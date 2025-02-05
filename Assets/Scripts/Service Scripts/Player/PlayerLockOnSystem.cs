@@ -66,7 +66,7 @@ public class PlayerLockOnSystem : MonoBehaviour
 
         foreach (Collider2D ship in detectedShips)
         {
-            if (ship.gameObject.CompareTag(sceneManager.shipData.blueTag) || !ship.IsTouchingLayers(enemyLayer))
+            if (ship.gameObject.CompareTag(sceneManager.shipData.blueTag) || (enemyLayer & (1 << ship.gameObject.layer)) == 0)
             {
                 continue;
             }

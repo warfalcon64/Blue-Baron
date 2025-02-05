@@ -69,4 +69,9 @@ public class Radar : MonoBehaviour
         float angleRad = (angle + 90) * (Mathf.PI / 180f);
         return new Vector3(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
     }
+
+    public float GetRadarRange()
+    {
+        return radarDistance;
+    }
 }

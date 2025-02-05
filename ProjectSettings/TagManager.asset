@@ -9,6 +9,7 @@ TagManager:
   - Red Team
   - Red
   - VFX Manager
+  - MinimapCamera
   layers:
   - Default
   - TransparentFX

@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private RectTransform playerSceneRadar;
 
 
-    [SerializeField] private ShipBase playerShip;
+    private ShipBase playerShip;
     private PlayerController pc;
 
     // Start is called before the first frame update
@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
     {
         SceneManager.Instance.PlayerDeath += HandlePlayerDeath;
         SceneManager.Instance.PlayerRebirth += HandlePlayerRebirth;
-        pc = playerShip.GetPlayerController();
+
         radarMinimapUI.SubscribeToPlayerController(pc);
     }
 
@@ -48,5 +48,10 @@ public class UIManager : MonoBehaviour
     public void SetPlayerShip(ShipBase playerShip)
     {
         this.playerShip = playerShip;
+    }
+
+    public void SetPlayerController(PlayerController pc)
+    {
+        this.pc = pc;
     }
 }
