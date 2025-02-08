@@ -13,12 +13,11 @@ public class Radar : MonoBehaviour
 
     private float radarDistance;
     private RadarPing tmpPing;
-    private Dictionary<ShipBase, RadarPing> shipPingPairs;
-
+    private Dictionary<ShipBase, RadarPing> shipToPing;
 
     private void Awake()
     {
-        shipPingPairs = new Dictionary<ShipBase, RadarPing>();
+        shipToPing = new Dictionary<ShipBase, RadarPing>();
     }
 
     // Start is called before the first frame update
@@ -48,18 +47,18 @@ public class Radar : MonoBehaviour
             {
                 ShipBase ship = raycastHit.collider.GetComponent<ShipBase>();
 
-                if (shipPingPairs.ContainsKey(ship) && shipPingPairs[ship] != null)
+                if (shipToPing.ContainsKey(ship) && shipToPing[ship] != null)
                 {
-                    tmpPing = shipPingPairs[ship];
+                    tmpPing = shipToPing[ship];
                     tmpPing.blip.position = raycastHit.point;
                     tmpPing.SetFadeTimer(0);
                 }
                 else
                 {
-                    shipPingPairs[ship] = Instantiate(ping, raycastHit.point, Quaternion.identity, this.transform);
-                    shipPingPairs[ship].SetFadeTime(360f / rotateSpeed);
+                    shipToPing[ship] = Instantiate(ping, raycastHit.point, Quaternion.identity, this.transform);
+                    shipToPing[ship].SetFadeTime(360f / rotateSpeed);
+                    shipToPing[ship].SetShip(ship);
                 }
-
             }
         }
     }

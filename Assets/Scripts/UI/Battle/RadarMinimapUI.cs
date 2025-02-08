@@ -8,15 +8,17 @@ using UnityEngine.UI;
 
 public class RadarMinimapUI : MonoBehaviour, IPointerClickHandler
 {
-    public GameObject testSprite;
     [SerializeField] float alphaThreshold = 0.1f;
     [SerializeField] private Radar radar;
+    [SerializeField] private LayerMask pingSelectionLayer;
 
     private bool isRadarSelectionEnabled;
     private float radarRange;
     private Image radarImage;
     private RectTransform radarRect;
     private Camera minimapCam;
+
+    public EventHandler<ShipBase> OnRadarPingSelect;
 
     // Start is called before the first frame update
     void Start()
@@ -43,9 +45,20 @@ public class RadarMinimapUI : MonoBehaviour, IPointerClickHandler
         Vector2 normalizedClick = new Vector2(localClick.x / (radarRect.rect.width / 2), localClick.y / (radarRect.rect.height / 2));
         Vector2 radarCamPos = minimapCam.transform.position;
         Vector2 worldClick = radarCamPos + new Vector2(normalizedClick.x * radarRange, normalizedClick.y * radarRange);
-        print(worldClick);
+
+        if (isRadarSelectionEnabled)
+        {
+            Collider2D[] radarPings = Physics2D.OverlapPointAll(worldClick, pingSelectionLayer);
+
+            if (radarPings.Length > 0)
+            {
+                ShipBase selectedShip = radarPings[0].gameObject.GetComponent<RadarPing>().GetShip();
+                OnRadarPingSelect?.Invoke(this, selectedShip);
+            }
+        }
     }
 
+    // * Can merge these two funcions into one that subscribes based on boolean parameter
     public void SubscribeToPlayerController(PlayerController pc)
     {
         pc.OnRadarSelectionEnabled += HandleRadarSelectionEnabled;

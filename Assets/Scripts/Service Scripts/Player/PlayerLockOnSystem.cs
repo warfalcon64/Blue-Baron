@@ -61,12 +61,11 @@ public class PlayerLockOnSystem : MonoBehaviour
     private void UpdateHoverState()
     {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Collider2D[] detectedShips = Physics2D.OverlapCircleAll(mousePos, lockRadius);
-        //print(detectedShips.Length);
+        Collider2D[] detectedShips = Physics2D.OverlapCircleAll(mousePos, lockRadius, enemyLayer);
 
         foreach (Collider2D ship in detectedShips)
         {
-            if (ship.gameObject.CompareTag(sceneManager.shipData.blueTag) || (enemyLayer & (1 << ship.gameObject.layer)) == 0)
+            if (ship.gameObject.CompareTag(sceneManager.shipData.blueTag))
             {
                 continue;
             }
@@ -101,10 +100,9 @@ public class PlayerLockOnSystem : MonoBehaviour
         lead = targetRb.position + targetRb.velocity * travelTime;
     }
 
-    public void ToggleRadarLock()
+    public void HandleRadarPingSelect(object sender, ShipBase ship)
     {
-        lockedEnemy = null;
-        lead = Vector2.zero;
+        lockedEnemy = ship.gameObject;
     }
 
     private void DisableLocking(object sender, ShipBase ship)
@@ -116,6 +114,11 @@ public class PlayerLockOnSystem : MonoBehaviour
     {
         lockingEnabled = true;
         pc = sceneManager.GetPlayerController();
+    }
+    public void ToggleRadarLock()
+    {
+        lockedEnemy = null;
+        lead = Vector2.zero;
     }
 
     private void OnDrawGizmos()

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2604684430001212474}
   - component: {fileID: 9086009316883814135}
   - component: {fileID: 8131698225275703199}
+  - component: {fileID: 3384147404363767902}
   m_Layer: 10
   m_Name: pfRadarPing
   m_TagString: Untagged
@@ -34,7 +35,7 @@ RectTransform:
   m_Children:
   - {fileID: 2971999392885101806}
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -118,6 +119,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blip: {fileID: 2971999392885101806}
   fadeTime: 1
+  testColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!58 &3384147404363767902
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906593310819766644}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 9
 --- !u!1 &7677963574580714989
 GameObject:
   m_ObjectHideFlags: 0

@@ -1819,9 +1819,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4fd288beaf1b8e4e9a03734517e3d91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testSprite: {fileID: 8346532670765015256, guid: 9fec7a42802b8ae4191f8b60acac528c, type: 3}
   alphaThreshold: 0.1
   radar: {fileID: 91112017}
+  pingSelectionLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1 &774171761
 GameObject:
   m_ObjectHideFlags: 0
@@ -5177,7 +5179,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6949193570850722933, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 15.71
+      value: 224
       objectReference: {fileID: 0}
     - target: {fileID: 6949193570850722933, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -5199,6 +5201,18 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 8131698225275703199, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
+      propertyPath: testColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8131698225275703199, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
+      propertyPath: testColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8131698225275703199, guid: 4ba450265756edd4aa163e258d77e780, type: 3}
+      propertyPath: testColor.r
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

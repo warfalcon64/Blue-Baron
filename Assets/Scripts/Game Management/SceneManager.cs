@@ -231,6 +231,11 @@ public class SceneManager : MonoBehaviour
         return vfxManager;
     }
 
+    public GameObject GetPlayerManager()
+    {
+        return playerManager;
+    }
+
     public PlayerController GetPlayerController()
     {
         return pc;

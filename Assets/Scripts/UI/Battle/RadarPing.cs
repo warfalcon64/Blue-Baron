@@ -13,11 +13,13 @@ public class RadarPing : MonoBehaviour
     private float fadeTimer;
     private Color color;
     private Image blipSprite;
+    private ShipBase ship;
 
     private void Awake()
     {
         fadeTimer = 0f;
-        color = new Color(1, 1, 1, 1f);
+        color = new Color(1, 1f, 1, 1f);
+        ship = null;
     }
     // Start is called before the first frame update
     void Start()
@@ -35,8 +37,13 @@ public class RadarPing : MonoBehaviour
 
         if (fadeTimer >= fadeTime)
         {
-            //Destroy(gameObject);
+            Destroy(gameObject);
         }
+    }
+
+    public ShipBase GetShip()
+    {
+        return ship;
     }
 
     public void SetFadeTimer(float time)
@@ -47,5 +54,10 @@ public class RadarPing : MonoBehaviour
     public void SetFadeTime(float time)
     {
         fadeTime = time;
+    }
+
+    public void SetShip(ShipBase ship)
+    {
+        this.ship = ship;
     }
 }

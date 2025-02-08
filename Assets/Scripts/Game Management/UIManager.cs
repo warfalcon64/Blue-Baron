@@ -14,14 +14,19 @@ public class UIManager : MonoBehaviour
 
     private ShipBase playerShip;
     private PlayerController pc;
+    private SceneManager sceneManager;
 
     // Start is called before the first frame update
     void Start()
     {
-        SceneManager.Instance.PlayerDeath += HandlePlayerDeath;
-        SceneManager.Instance.PlayerRebirth += HandlePlayerRebirth;
+        sceneManager = SceneManager.Instance;
+        sceneManager.PlayerDeath += HandlePlayerDeath;
+        sceneManager.PlayerRebirth += HandlePlayerRebirth;
+        PlayerLockOnSystem lockOnSystem = sceneManager.GetPlayerManager().GetComponent<PlayerLockOnSystem>();
 
+        radarMinimapUI.OnRadarPingSelect += lockOnSystem.HandleRadarPingSelect;
         radarMinimapUI.SubscribeToPlayerController(pc);
+        
     }
 
     // Update is called once per frame
