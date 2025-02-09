@@ -18,7 +18,7 @@ public class RadarPing : MonoBehaviour
     private void Awake()
     {
         fadeTimer = 0f;
-        color = new Color(1, 1f, 1, 1f);
+        color = new Color(0, 1, 0, 1f);
         ship = null;
     }
     // Start is called before the first frame update
