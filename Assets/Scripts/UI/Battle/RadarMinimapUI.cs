@@ -52,8 +52,10 @@ public class RadarMinimapUI : MonoBehaviour, IPointerClickHandler
 
             if (radarPings.Length > 0)
             {
-                ShipBase selectedShip = radarPings[0].gameObject.GetComponent<RadarPing>().GetShip();
+                RadarPing ping = radarPings[0].gameObject.GetComponent<RadarPing>();
+                ShipBase selectedShip = ping.GetShip();
                 OnRadarPingSelect?.Invoke(this, selectedShip);
+                ping.SetColor(new Color(1f, 0, 0));
             }
         }
     }

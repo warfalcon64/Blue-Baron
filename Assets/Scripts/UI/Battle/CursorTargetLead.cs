@@ -11,6 +11,7 @@ public class CursorTargetLead : MonoBehaviour
 
     private bool leadEnabled;
     private SceneManager sceneManager;
+    private PlayerManager playerManager;
     private PlayerLockOnSystem lockOnSystem;
     private GameObject lockedEnemy;
     private Vector2 lead;
@@ -19,7 +20,8 @@ public class CursorTargetLead : MonoBehaviour
     void Start()
     {
         sceneManager = SceneManager.Instance;
-        lockOnSystem = sceneManager.playerManager.GetComponent<PlayerLockOnSystem>();
+        playerManager = sceneManager.playerManager;
+        lockOnSystem = sceneManager.playerManager.GetPlayerLockOnSystem();
         lead = Vector2.zero;
         leadIndicator.sizeDelta = new Vector2(size, size);
         leadEnabled = true;
@@ -29,8 +31,8 @@ public class CursorTargetLead : MonoBehaviour
     void Update()
     {
         lead = lockOnSystem.GetLead();
-        lockedEnemy = lockOnSystem.GetLockedEnemy();
         leadEnabled = lockOnSystem.IsLockingEnabled();
+        lockedEnemy = playerManager.GetLockedEnemy();
 
         if (lead != null)
         {

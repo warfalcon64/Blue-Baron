@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
 
     private SceneManager sceneManager;
     private PlayerLockOnSystem playerLockOnSystem;
+    private PlayerManager playerManager;
     private WeaponMap weaponMap;
     private ShipBase ship;
     Rigidbody2D rb;
@@ -58,7 +59,7 @@ public class PlayerController : MonoBehaviour
         secondaryCoolDown = ship.GetSecondaryCoolDown();
 
         sceneManager = SceneManager.Instance;
-        playerLockOnSystem = sceneManager.playerManager.GetComponent<PlayerLockOnSystem>();
+        playerLockOnSystem = sceneManager.playerManager.GetPlayerLockOnSystem();
     }
 
     // Update is called once per frame

@@ -22,7 +22,7 @@ public class SceneManager : MonoBehaviour
 
     [Header("Managers")]
     public UIManager uiManager;
-    public GameObject playerManager;
+    public PlayerManager playerManager;
     public GameObject vfxManager;
 
     [Header("Data")]
@@ -85,7 +85,7 @@ public class SceneManager : MonoBehaviour
         playerShip = blueShips[playerIndex];
         pc = playerShip.GetPlayerController();
         pc.SwapShip += EnableShipSwapping; // * make a method for connecting player controller to other scripts via events if necessary
-        playerLockOnSystem = playerManager.GetComponent<PlayerLockOnSystem>();
+        playerLockOnSystem = playerManager.GetPlayerLockOnSystem();
         playerShip.OnSeekerFired += playerLockOnSystem.HandleSeekerFired;
         playerLockOnSystem.SetPlayerController(pc);
         SetPlayerReferences();
@@ -231,7 +231,7 @@ public class SceneManager : MonoBehaviour
         return vfxManager;
     }
 
-    public GameObject GetPlayerManager()
+    public PlayerManager GetPlayerManager()
     {
         return playerManager;
     }

@@ -22,7 +22,7 @@ public class UIManager : MonoBehaviour
         sceneManager = SceneManager.Instance;
         sceneManager.PlayerDeath += HandlePlayerDeath;
         sceneManager.PlayerRebirth += HandlePlayerRebirth;
-        PlayerLockOnSystem lockOnSystem = sceneManager.GetPlayerManager().GetComponent<PlayerLockOnSystem>();
+        PlayerLockOnSystem lockOnSystem = sceneManager.playerManager.GetPlayerLockOnSystem();
 
         radarMinimapUI.OnRadarPingSelect += lockOnSystem.HandleRadarPingSelect;
         radarMinimapUI.SubscribeToPlayerController(pc);

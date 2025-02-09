@@ -12,8 +12,8 @@ public class Radar : MonoBehaviour
     [SerializeField] private float rotateSpeed = 100f;
 
     private float radarDistance;
-    private RadarPing tmpPing;
     private Dictionary<ShipBase, RadarPing> shipToPing;
+    private PlayerManager playerManager;
 
     private void Awake()
     {
@@ -24,6 +24,8 @@ public class Radar : MonoBehaviour
     void Start()
     {
         radarDistance = radarSweep.sizeDelta.x;
+
+        playerManager = SceneManager.Instance.playerManager;
     }
 
     // Update is called once per frame
@@ -49,15 +51,25 @@ public class Radar : MonoBehaviour
 
                 if (shipToPing.ContainsKey(ship) && shipToPing[ship] != null)
                 {
-                    tmpPing = shipToPing[ship];
+                    RadarPing tmpPing = shipToPing[ship];
                     tmpPing.blip.position = raycastHit.point;
                     tmpPing.SetFadeTimer(0);
                 }
                 else
                 {
                     shipToPing[ship] = Instantiate(ping, raycastHit.point, Quaternion.identity, this.transform);
-                    shipToPing[ship].SetFadeTime(360f / rotateSpeed);
-                    shipToPing[ship].SetShip(ship);
+                    RadarPing tmpPing = shipToPing[ship];
+                    tmpPing.SetFadeTime(360f / rotateSpeed);
+                    tmpPing.SetShip(ship);
+
+                    if (playerManager.GetLockedEnemy() == ship.gameObject)
+                    {
+                        tmpPing.SetColor(new Color(1f, 0, 0));
+                    }
+                    else
+                    {
+                        tmpPing.SetColor(new Color(0, 1f, 0));
+                    }
                 }
             }
         }

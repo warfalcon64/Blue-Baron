@@ -23,7 +23,7 @@ public class CursorCrosshair : MonoBehaviour
     {
         Cursor.visible = false;
         sceneManager = SceneManager.Instance;
-        lockRadius = sceneManager.playerManager.GetComponent<PlayerLockOnSystem>().GetLockRadius();
+        lockRadius = sceneManager.playerManager.GetPlayerLockOnSystem().GetLockRadius();
         float pixelsPerUnit = Screen.height / (Camera.main.orthographicSize * 2);
         float circleDiameterInPixels = lockRadius * 2 * pixelsPerUnit; // ** REPLACE CONSTANT WITH VARIABLE THAT ADJUSTS TO SCREEN RESOLUTION IN FUTURE
         outerCrosshair.sizeDelta = new Vector2(circleDiameterInPixels, circleDiameterInPixels);
