@@ -10,4 +10,4 @@ I plan on building more types of ships and mechanics on top of this and removing
 I have created all of the current art myself using Photoshop, and all of the current VFX is based on Unity's Shader Graph and Visual Effect Graph.
 
 ## Sound:
-I plan on making my own music for this project using the DAW Reaper. I have not yet reached the point of developing sound effects, but will plan on using software to assist in creating my own.
+I plan on making my own music for this project using the DAW FL Studio. I have not yet reached the point of developing sound effects, but will plan on using software to assist in creating my own.
