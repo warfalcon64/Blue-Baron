@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour
         PlayerLockOnSystem lockOnSystem = sceneManager.playerManager.GetPlayerLockOnSystem();
 
         radarMinimapUI.OnRadarPingSelect += lockOnSystem.HandleRadarPingSelect;
+        radarMinimapUI.OnRadarPingSelect += playerSceneRadar.GetComponent<Radar>().HandleRadarPingSelect;
         radarMinimapUI.SubscribeToPlayerController(pc);
         
     }

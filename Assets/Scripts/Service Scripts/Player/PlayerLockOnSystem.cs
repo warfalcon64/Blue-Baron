@@ -103,6 +103,7 @@ public class PlayerLockOnSystem : MonoBehaviour
     public void HandleRadarPingSelect(object sender, ShipBase ship)
     {
         lockedEnemy = ship.gameObject;
+        print("New ship locked");
     }
 
     private void DisableLocking(object sender, ShipBase ship)

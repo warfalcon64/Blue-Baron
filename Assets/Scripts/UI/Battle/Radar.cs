@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,10 +15,12 @@ public class Radar : MonoBehaviour
     private float radarDistance;
     private Dictionary<ShipBase, RadarPing> shipToPing;
     private PlayerManager playerManager;
+    private RadarPing selectedPing;
 
     private void Awake()
     {
         shipToPing = new Dictionary<ShipBase, RadarPing>();
+        selectedPing = null;
     }
 
     // Start is called before the first frame update
@@ -72,6 +75,16 @@ public class Radar : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    public void HandleRadarPingSelect(object sender, ShipBase ship)
+    {
+        if (selectedPing != null)
+        {
+            selectedPing.SetColor(new Color(0, 1f, 0));
+            shipToPing[ship].SetColor(new Color(1f, 0, 0));
+            selectedPing = shipToPing[ship];
         }
     }
 
