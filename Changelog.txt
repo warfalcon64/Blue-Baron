@@ -1,0 +1,8 @@
+Things to implement:
+- Bomber craft with a turret
+- Make AI attempt to dodge missiles
+- Add flares/chaff to distract missiles
+- Make missile tracking more complex (ie give it cone of sight for locking on, once target moves past cone it just goes forward until finding another target in cone)
+
+Things to fix:
+- Radar blip issues when selecting enemies through radar UI (potentially just forgo this feature and have 'select nearest enemy' button instead)
