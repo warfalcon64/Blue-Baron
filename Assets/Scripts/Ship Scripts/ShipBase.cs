@@ -16,13 +16,10 @@ public abstract class ShipBase : MonoBehaviour
     [Header("Movement")]
     [SerializeField] protected float speed = 10;
     [SerializeField] protected float turnSpeed = 100f;
-    [SerializeField] protected float faceEnemyAngle = 1; // The min FOV to keep enemy in
-
     [Header("Attack")]
     [SerializeField] protected float primaryCoolDown = 0.2f; // ** primaryCoolDown IN THE SHIP CLASS IS DEPRECATED, USE WEAPONMAP coolDown INSTEAD!!
     [SerializeField] protected float primaryFieldofFire = 45; // Angle between the vertical line bisecting the craft and the line representing the edge of field
     [SerializeField] protected float secondaryCoolDown = 1.5f;
-    [SerializeField] protected float plasmaInaccuracy = 0;
     [SerializeField] protected Transform leftGun;
     [SerializeField] protected Transform rightGun;
     [SerializeField] protected Transform missileSpawn;
@@ -37,7 +34,6 @@ public abstract class ShipBase : MonoBehaviour
     [HideInInspector]
     public bool isPlayer;
 
-    protected bool stopSearch;
     protected bool isSmoking;
     protected bool leftFire;
     protected float maxSpeed;
@@ -45,22 +41,13 @@ public abstract class ShipBase : MonoBehaviour
     protected float turn;
     protected float maxTurnSpeed;
     protected float minTurnSpeed;
-    protected float nextFire;
-    protected float nextTurn;
-    protected float nextAdjust;
 
-    protected List<ShipBase> enemyTeam;
     protected VisualEffect mainEffects;
     protected VisualEffect shipEffects;
-    protected GameObject target;
     protected Rigidbody2D rb;
-    protected Rigidbody2D targetRb;
-    protected Vector2 lastVelocity;
-    protected Vector2 targetAcceleration;
     protected VFXManager vfxManager;
 
     protected ShipType type;
-    protected ShootType shootMode;
 
     // Event parameter for OnShipDamage is the ShipBase that fired the WeaponBase which hit this ship, the "attacker"
     public event EventHandler<ShipBase> OnShipDamage;
@@ -81,7 +68,6 @@ public abstract class ShipBase : MonoBehaviour
     protected virtual void Start()
     {
         mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
-        enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
         vfxManager = SceneManager.Instance.vfxManager.GetComponent<VFXManager>();
     }
 
@@ -110,15 +96,8 @@ public abstract class ShipBase : MonoBehaviour
         turn = 0f;
         maxTurnSpeed = turnSpeed + 60f;
         minTurnSpeed = turnSpeed;
-        target = null;
-        targetRb = null;
-        nextFire = 0f;
-        nextTurn = Random.Range(0, 2f);
-        nextAdjust = Random.Range(0, 2f);
-        stopSearch = false;
         leftFire = false;
         isSmoking = false;
-        shootMode = ShootType.None;
 
         weaponMap = ScriptableObject.CreateInstance<WeaponMap>();
         weaponMap.Init(weapons);
@@ -341,13 +320,4 @@ public abstract class ShipBase : MonoBehaviour
         turnSpeed = newTurnSpeed;
     }
 
-    public virtual void SetTargetAcceleration(Vector2 acceleration)
-    {
-        targetAcceleration = acceleration;
-    }
-
-    public virtual void SetShootType(ShootType type)
-    {
-        shootMode = type;
-    }
 }

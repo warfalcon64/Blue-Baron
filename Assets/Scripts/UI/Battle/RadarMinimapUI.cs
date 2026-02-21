@@ -49,7 +49,7 @@ public class RadarMinimapUI : MonoBehaviour, IPointerClickHandler
         if (isRadarSelectionEnabled)
         {
             //Collider2D[] radarPings = Physics2D.OverlapPointAll(worldClick, pingSelectionLayer);
-            Collider2D[] radarPings = Physics2D.OverlapCircleAll(worldClick, 10.0f, pingSelectionLayer);
+            Collider2D[] radarPings = Physics2D.OverlapCircleAll(worldClick, 20.0f, pingSelectionLayer);
 
             if (radarPings.Length > 0)
             {

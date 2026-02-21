@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
-using UnityEngine.SceneManagement;
 
 public class SearchState : State.IState
 {
@@ -24,18 +22,6 @@ public class SearchState : State.IState
 
     public void UpdateState(AIControllerBase c)
     {
-        if (duration <= 0 || !c.stopSearch)
-        {
-            // change state
-        }
-        else if (c.stopSearch)
-        {
-            // change state
-        }
-        else
-        {
-            duration -= Time.deltaTime;
-        }
     }
 
     public void OnHurt(AIControllerBase c)
@@ -46,11 +32,11 @@ public class SearchState : State.IState
     {
         if (c.enemyTeam.Count > 0)
         {
-            c.SetTarget(c.FindTarget());
-            c.target.GetComponent<ShipBase>().OnShipDeath += c.HandleTargetDeath;
-
-            if (c.target != null)
+            GameObject found = c.FindTarget();
+            if (found != null)
             {
+                c.SetTarget(found);
+                c.target.GetComponent<ShipBase>().OnShipDeath += c.HandleTargetDeath;
                 c.ChangeState(c.attackState);
             }
         }
