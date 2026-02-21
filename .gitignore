@@ -59,3 +59,5 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# CoPlay MCP editor plugin (local tool, not project code)
+/[Pp]ackages/Coplay/

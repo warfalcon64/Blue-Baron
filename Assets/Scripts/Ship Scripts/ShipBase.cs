@@ -15,7 +15,7 @@ public abstract class ShipBase : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField] protected float speed = 10;
-    [SerializeField] protected float turnSpeed = 2f;
+    [SerializeField] protected float turnSpeed = 100f;
     [SerializeField] protected float faceEnemyAngle = 1; // The min FOV to keep enemy in
 
     [Header("Attack")]
@@ -108,7 +108,7 @@ public abstract class ShipBase : MonoBehaviour
         maxSpeed = speed;
         minSpeed = speed / 2;
         turn = 0f;
-        maxTurnSpeed = turnSpeed + 1.2f;
+        maxTurnSpeed = turnSpeed + 60f;
         minTurnSpeed = turnSpeed;
         target = null;
         targetRb = null;
@@ -219,7 +219,7 @@ public abstract class ShipBase : MonoBehaviour
     protected virtual void Move()
     {
         rb.velocity = transform.up * speed;
-        rb.MoveRotation(rb.rotation + (turnSpeed * turn));
+        rb.MoveRotation(rb.rotation + (turnSpeed * turn * Time.fixedDeltaTime));
     }
 
     protected virtual void UpdateSmoke()
@@ -251,7 +251,7 @@ public abstract class ShipBase : MonoBehaviour
         if ((speed + accelAmount) <= maxSpeed)
         {
             speed += accelAmount;
-            turnSpeed -= .04f;
+            turnSpeed -= 2f;
         }
     }
 
@@ -260,7 +260,7 @@ public abstract class ShipBase : MonoBehaviour
         if ((speed - decelAmount) >= minSpeed)
         {
             speed -= decelAmount;
-            turnSpeed += .04f;
+            turnSpeed += 2f;
         }
     }
 

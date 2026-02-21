@@ -350,11 +350,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageType: High Explosive
   speed: 15
-  turnSpeed: 250
+  turnSpeed: 200
   health: 50
   damage: 40
   range: 100
   coolDown: 1
   isDamageable: 1
   isSeeker: 1
-  lifetime: 5
+  lifetime: 1000
+  navigationGain: 4
+  boostAcceleration: 30
+  totalFuel: 100
+  thrustFuelRate: 20
+  rcsFuelRate: 2

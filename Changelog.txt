@@ -1,8 +1,12 @@
-Things to implement:
+Planned Implementation:
 - Bomber craft with a turret
 - Make AI attempt to dodge missiles
 - Add flares/chaff to distract missiles
-- Make missile tracking more complex (ie give it cone of sight for locking on, once target moves past cone it just goes forward until finding another target in cone)
+
+Future Implementation:
+- Moving mouse to edge of screen pulls camera in that direction up till some arbitrary limit
+- Zooming in and out without making background look tiled
 
 Things to fix:
-- Radar blip issues when selecting enemies through radar UI (potentially just forgo this feature and have 'select nearest enemy' button instead)
+- Explosion vfx not rendering fully when ship is destroyed
+- Enemy ping selection on radar?
