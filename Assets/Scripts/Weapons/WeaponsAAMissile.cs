@@ -8,6 +8,11 @@ public class WeaponsAAMissile : WeaponsBase
     [SerializeField] private float navigationGain = 4f;
     [SerializeField] private float boostAcceleration = 30f;
 
+    [Header("One Turn")]
+    [SerializeField] private float oneTurnDelay = 1f;
+    [SerializeField] private float oneTurnAngleThreshold = 10f;
+    [SerializeField] private float turnAcceleration = 50f;
+
     [Header("Fuel")]
     [SerializeField] private float totalFuel = 100f;
     [SerializeField] private float thrustFuelRate = 20f;
@@ -18,6 +23,9 @@ public class WeaponsAAMissile : WeaponsBase
     private float currentSpeed;
     private float fuelRemaining;
     private bool hasLock;
+    private bool oneTurnComplete;
+    private float oneTurnTimer;
+    private float currentTurnSpeed;
     private Vector2 missileVelocity;
 
     private VFXManager vfxManager;
@@ -44,17 +52,17 @@ public class WeaponsAAMissile : WeaponsBase
         // Motor thrust — burn fuel while motor has fuel
         if (fuelRemaining > 0f)
         {
-            float fuelCost = thrustFuelRate * dt;
-            if (fuelCost > fuelRemaining)
-                fuelCost = fuelRemaining;
+            float fuelCost = Mathf.Min(thrustFuelRate * dt, fuelRemaining);
 
-            // Only accelerate if below max speed
+            // Accelerate toward max speed (don't clamp down inherited velocity)
             if (currentSpeed < speed)
             {
-                float fuelFraction = fuelCost / (thrustFuelRate * dt);
-                currentSpeed += boostAcceleration * fuelFraction * dt;
-                if (currentSpeed > speed)
-                    currentSpeed = speed;
+                currentSpeed = Mathf.MoveTowards(currentSpeed, speed, boostAcceleration * dt);
+            }
+            else
+            {
+                // Inherited velocity above max speed — let it decay toward max
+                currentSpeed = Mathf.MoveTowards(currentSpeed, speed, boostAcceleration * dt);
             }
 
             fuelRemaining -= fuelCost;
@@ -66,7 +74,7 @@ public class WeaponsAAMissile : WeaponsBase
             engineTrail.emitting = false;
         }
 
-        // PN guidance
+        // Guidance
         if (hasLock && target != null)
         {
             Vector2 targetPos = target.transform.position;
@@ -74,8 +82,64 @@ public class WeaponsAAMissile : WeaponsBase
             Vector2 los = targetPos - missilePos;
             float losAngle = Mathf.Atan2(los.y, los.x);
 
-            if (hasPreviousLOS)
+            // Initiate One Turn phase after specified delay
+            if (!oneTurnComplete)
             {
+                oneTurnTimer += dt;
+                if (oneTurnTimer < oneTurnDelay)
+                {
+                    // Coast during delay before one-turn begins
+                    missileVelocity = missileVelocity.normalized * currentSpeed;
+                }
+                else
+                {
+                    // Check if one-turn phase is complete
+                    float velAngle = Mathf.Atan2(missileVelocity.y, missileVelocity.x) * Mathf.Rad2Deg;
+                    float losAngleDeg = losAngle * Mathf.Rad2Deg;
+                    float angleDiff = Mathf.Abs(Mathf.DeltaAngle(velAngle, losAngleDeg));
+
+                    if (angleDiff <= oneTurnAngleThreshold)
+                    {
+                        oneTurnComplete = true;
+                    }
+                    else
+                    {
+                        // One-turn phase: direct pursuit — ramp up turn rate
+                        currentTurnSpeed = Mathf.MoveTowards(currentTurnSpeed, turnSpeed, turnAcceleration * dt);
+
+                        Vector2 velDir = missileVelocity.normalized;
+                        Vector2 losDir = los.normalized;
+                        Vector2 perpDir = new Vector2(-velDir.y, velDir.x);
+
+                        // Project LOS onto perpendicular to get turn direction
+                        // Scale lateral acceleration by speed ratio so angular turn rate is consistent
+                        float turnDirection = Vector2.Dot(losDir, perpDir);
+                        float speedRatio = speed > 0f ? currentSpeed / speed : 0f;
+                        float clampedAccel = Mathf.Sign(turnDirection) * currentTurnSpeed * speedRatio;
+
+                        // RCS fuel cost
+                        float absAccel = Mathf.Abs(clampedAccel);
+                        float rcsCost = rcsFuelRate * absAccel * dt;
+                        if (rcsCost > fuelRemaining)
+                        {
+                            float scaleFactor = fuelRemaining / rcsCost;
+                            clampedAccel *= scaleFactor;
+                            rcsCost = fuelRemaining;
+                        }
+
+                        fuelRemaining -= rcsCost;
+
+                        missileVelocity += perpDir * clampedAccel * dt;
+                        missileVelocity = missileVelocity.normalized * currentSpeed;
+
+                        // Reset PN state so it starts fresh after one-turn completes
+                        hasPreviousLOS = false;
+                    }
+                }
+            }
+            else if (hasPreviousLOS)
+            {
+                // PN guidance
                 float losRate = Mathf.DeltaAngle(previousLOSAngle * Mathf.Rad2Deg, losAngle * Mathf.Rad2Deg) * Mathf.Deg2Rad / dt;
 
                 // Closing speed (positive when closing)
@@ -143,6 +207,9 @@ public class WeaponsAAMissile : WeaponsBase
         fuelRemaining = totalFuel;
         hasLock = true;
         hasPreviousLOS = false;
+        oneTurnComplete = false;
+        oneTurnTimer = 0f;
+        currentTurnSpeed = 0f;
         Destroy(gameObject, lifetime);
     }
 

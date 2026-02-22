@@ -350,7 +350,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageType: High Explosive
   speed: 15
-  turnSpeed: 200
+  turnSpeed: 180
   health: 50
   damage: 40
   range: 100
@@ -359,7 +359,10 @@ MonoBehaviour:
   isSeeker: 1
   lifetime: 1000
   navigationGain: 4
-  boostAcceleration: 30
+  boostAcceleration: 5
+  oneTurnDelay: 0.5
+  oneTurnAngleThreshold: 10
+  turnAcceleration: 100
   totalFuel: 100
   thrustFuelRate: 20
   rcsFuelRate: 2

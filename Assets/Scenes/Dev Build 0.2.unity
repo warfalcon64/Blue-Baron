@@ -1406,6 +1406,11 @@ MonoBehaviour:
   xOffset: 0
   yOffset: 0
   player: {fileID: 1987034922}
+  debugEnabled: 1
+  toggleMissileFollowKey: 109
+  zoomSpeed: 5
+  minZoom: 2
+  maxZoom: 200
 --- !u!114 &519420034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3966,6 +3971,11 @@ MonoBehaviour:
   xOffset: 0
   yOffset: 0
   player: {fileID: 1987034922}
+  debugEnabled: 1
+  toggleMissileFollowKey: 109
+  zoomSpeed: 5
+  minZoom: 2
+  maxZoom: 200
 --- !u!114 &1947919603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4663,12 +4673,10 @@ MonoBehaviour:
   health: 100
   shield: 0
   speed: 10
-  turnSpeed: 3
-  faceEnemyAngle: 10
+  turnSpeed: 150
   primaryCoolDown: 0.2
   primaryFieldofFire: 45
   secondaryCoolDown: 1.5
-  plasmaInaccuracy: 0
   leftGun: {fileID: 1623587067}
   rightGun: {fileID: 608164800}
   missileSpawn: {fileID: 1848023873}

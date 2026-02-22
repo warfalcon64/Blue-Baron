@@ -831,11 +831,9 @@ MonoBehaviour:
   shield: 0
   speed: 10
   turnSpeed: 150
-  faceEnemyAngle: 10
   primaryCoolDown: 0.2
   primaryFieldofFire: 45
   secondaryCoolDown: 1.5
-  plasmaInaccuracy: 100
   leftGun: {fileID: 7424531800947282808}
   rightGun: {fileID: 4099872298902681536}
   missileSpawn: {fileID: 0}
