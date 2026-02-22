@@ -61,3 +61,9 @@ crashlytics-build.properties
 
 # CoPlay MCP editor plugin (local tool, not project code)
 /[Pp]ackages/Coplay/
+
+# Claude Code local settings
+.claude/
+
+# Unimported source art files
+Unimported Images/
