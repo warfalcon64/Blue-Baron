@@ -120,6 +120,15 @@ public abstract class ShipBase : MonoBehaviour
             pc.OnPlayerDeath();
         }
 
+        // Detach smoke trail so it can fade out after the ship is deactivated
+        if (isSmoking)
+        {
+            smoke.SetParent(null);
+            shipEffects.Stop();
+            float maxLifetime = shipEffects.GetFloat(Shader.PropertyToID("SmokeLifetime"));
+            Destroy(smoke.gameObject, maxLifetime);
+        }
+
         gameObject.SetActive(false);
     }
 

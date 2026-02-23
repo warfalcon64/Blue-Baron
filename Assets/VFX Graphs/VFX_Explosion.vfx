@@ -198,8 +198,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 364
     y: -600
-    width: 3212
-    height: 2493
+    width: 3213
+    height: 2483
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4086,7 +4086,7 @@ MonoBehaviour:
   uvMode: 0
   flipbookLayout: 0
   useSoftParticle: 0
-  vfxSystemSortPriority: 2
+  vfxSystemSortPriority: 0
   sort: 0
   sortMode: 0
   revertSorting: 0
@@ -5195,7 +5195,7 @@ MonoBehaviour:
   uvMode: 0
   flipbookLayout: 0
   useSoftParticle: 0
-  vfxSystemSortPriority: 3
+  vfxSystemSortPriority: 2
   sort: 0
   sortMode: 0
   revertSorting: 0
@@ -5554,7 +5554,7 @@ MonoBehaviour:
   - {fileID: 8926484042661614805}
   m_OutputSlots:
   - {fileID: 8926484042661614807}
-  seed: 0
+  seed: 1
   constant: 0
 --- !u!114 &8926484042661614804
 MonoBehaviour:
@@ -8637,7 +8637,7 @@ MonoBehaviour:
   uvMode: 0
   flipbookLayout: 0
   useSoftParticle: 0
-  vfxSystemSortPriority: 0
+  vfxSystemSortPriority: 3
   sort: 0
   sortMode: 0
   revertSorting: 0
@@ -9198,7 +9198,7 @@ MonoBehaviour:
   - {fileID: 8926484042661615059}
   m_OutputSlots:
   - {fileID: 8926484042661615060}
-  seed: 0
+  seed: 1
   constant: 0
 --- !u!114 &8926484042661615058
 MonoBehaviour:
@@ -12457,13 +12457,13 @@ MonoBehaviour:
   - link: []
   m_OutputFlowSlot:
   - link:
+    - context: {fileID: 8926484042661614965}
+      slotIndex: 0
     - context: {fileID: 8926484042661614555}
       slotIndex: 0
     - context: {fileID: 8926484042661614669}
       slotIndex: 0
     - context: {fileID: 8926484042661614750}
-      slotIndex: 0
-    - context: {fileID: 8926484042661614965}
       slotIndex: 0
   eventName: OnDeath
 --- !u!114 &8926484042661615282

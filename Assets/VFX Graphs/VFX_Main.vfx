@@ -681,7 +681,7 @@ MonoBehaviour:
   m_OutputFlowSlot:
   - link:
     - context: {fileID: 8926484042661614640}
-      slotIndex: 1
+      slotIndex: 2
   eventName: OnDeath
 --- !u!114 &8926484042661614639
 MonoBehaviour:
@@ -757,6 +757,7 @@ MonoBehaviour:
   m_Data: {fileID: 0}
   m_InputFlowSlot:
   - link: []
+  - link: []
   - link:
     - context: {fileID: 8926484042661614638}
       slotIndex: 0
@@ -764,6 +765,7 @@ MonoBehaviour:
   - link: []
   m_Subgraph: {fileID: 8926484042661614526, guid: 57568bbba6d65ee48b0d6180e3d6bb33, type: 3}
   m_InputFlowNames:
+  - OnPlay
   - OnStop
   - OnDeath
 --- !u!114 &8926484042661614641

@@ -4953,6 +4953,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6859297636276002237, guid: 6125a9ca769edc540a02a56efd6eb074, type: 3}
+      propertyPath: m_InitialEventNameOverriden
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7025583532951310759, guid: 6125a9ca769edc540a02a56efd6eb074, type: 3}
       propertyPath: m_Enabled
       value: 0
