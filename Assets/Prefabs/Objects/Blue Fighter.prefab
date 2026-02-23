@@ -185,6 +185,37 @@ Transform:
   m_Father: {fileID: 8497475259681279302}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3886226955260343256
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5776678085440923657}
+  m_Layer: 0
+  m_Name: MissileSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5776678085440923657
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3886226955260343256}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8497475259681279302}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6077098498697285035
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,6 +446,7 @@ Transform:
   - {fileID: 7862101490455230542}
   - {fileID: 1425402346873535505}
   - {fileID: 4237550023096101175}
+  - {fileID: 5776678085440923657}
   - {fileID: 6332484119773087195}
   - {fileID: 5088211741827659985}
   - {fileID: 8897038711605021268}
@@ -916,7 +948,7 @@ MonoBehaviour:
   secondaryCoolDown: 1.5
   leftGun: {fileID: 1425402346873535505}
   rightGun: {fileID: 4237550023096101175}
-  missileSpawn: {fileID: 0}
+  missileSpawn: {fileID: 5776678085440923657}
   lowHealth: 25
   smoke: {fileID: 8897038711605021268}
   godMode: 0
@@ -924,6 +956,8 @@ MonoBehaviour:
   weapons:
   - type: 0
     weapon: {fileID: -5470632126457490998, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
+  - type: 1
+    weapon: {fileID: 3018362006425249580, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
 --- !u!114 &1798488539491713676
 MonoBehaviour:
   m_ObjectHideFlags: 0

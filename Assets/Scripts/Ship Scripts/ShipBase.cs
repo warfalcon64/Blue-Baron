@@ -319,6 +319,11 @@ public abstract class ShipBase : MonoBehaviour
         return new Tuple<Transform, Transform>(leftGun, rightGun);
     }
 
+    public virtual Transform GetSecondaryFirePosition()
+    {
+        return missileSpawn;
+    }
+
     public virtual void SetShipTurn(float newTurn)
     {
         turn = newTurn;

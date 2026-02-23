@@ -20,6 +20,7 @@ public abstract class AIControllerBase : MonoBehaviour
     protected float minSpeed;
     protected float primaryFieldofFire;
     protected float primaryCooldown;
+    protected float secondaryCooldown;
 
     protected SceneManager sceneManager;
     protected List<ShipBase> attackingEnemies;
@@ -27,6 +28,7 @@ public abstract class AIControllerBase : MonoBehaviour
     protected Rigidbody2D targetRb;
     protected WeaponMap weaponMap;
     protected WeaponsBase primary;
+    protected WeaponsBase secondary;
     protected Vector2 targetAcceleration;
     protected Vector2 lastVelocity;
 
@@ -78,6 +80,8 @@ public abstract class AIControllerBase : MonoBehaviour
         weaponMap = ship.GetWeaponMap();
         primary = weaponMap.GetWeapon(ShootType.Primary);
         primaryCooldown = primary.GetCoolDown();
+        secondary = weaponMap.GetWeapon(ShootType.Secondary);
+        secondaryCooldown = secondary.GetCoolDown();
         currentState = searchState;
     }
 
@@ -126,7 +130,15 @@ public abstract class AIControllerBase : MonoBehaviour
             ship.ShootPrimary(aimPos);
             primaryCooldown = primary.GetCoolDown();
         }
-        // * ADD CODE FOR SECONDARY STUFF HERE
+
+        if (secondaryCooldown <= 0)
+        {
+            Transform missilePosition = ship.GetSecondaryFirePosition();
+            Vector2 aimPos = targetRb.position;
+            ship.ShootSecondary(aimPos);
+            secondaryCooldown = secondary.GetCoolDown();
+        }
+        // * ADD CODE FOR OTHER WEAPONS HERE
         else
         {
             return;
@@ -275,6 +287,8 @@ public abstract class AIControllerBase : MonoBehaviour
         if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
 
         if (primaryCooldown > 0) primaryCooldown -= Time.deltaTime;
+
+        if (secondaryCooldown > 0) secondaryCooldown -= Time.deltaTime;
     }
 
     private void OnDisable()
