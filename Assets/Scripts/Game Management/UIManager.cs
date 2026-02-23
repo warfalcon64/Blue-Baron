@@ -43,12 +43,14 @@ public class UIManager : MonoBehaviour
     {
         radarMinimapUI.UnsubscribeToPlayerController(ship.GetPlayerController());
         playerShip = null;
+        playerSceneRadar.gameObject.SetActive(false);
     }
 
     private void HandlePlayerRebirth(object sender, ShipBase ship)
     {
         playerShip = ship;
         radarMinimapUI.SubscribeToPlayerController(ship.GetPlayerController());
+        playerSceneRadar.gameObject.SetActive(true);
     }
 
     public void SetPlayerShip(ShipBase playerShip)

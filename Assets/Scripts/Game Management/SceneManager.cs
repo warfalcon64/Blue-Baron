@@ -139,7 +139,10 @@ public class SceneManager : MonoBehaviour
                 break;
 
             case KeyCode.Space:
-                inSwapMode = false;
+                if (blueShips.Count > 0)
+                {
+                    inSwapMode = false;
+                }
                 break;
 
             default:

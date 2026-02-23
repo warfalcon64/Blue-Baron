@@ -718,7 +718,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.69
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4455,7 +4455,7 @@ MonoBehaviour:
   missileSpawn: {fileID: 1848023873}
   lowHealth: 25
   smoke: {fileID: 73179591}
-  godMode: 0
+  godMode: 1
   isPlayer: 0
   weapons:
   - type: 0
