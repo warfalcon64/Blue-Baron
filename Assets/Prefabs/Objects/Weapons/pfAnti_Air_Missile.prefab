@@ -350,7 +350,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageType: High Explosive
   speed: 15
-  turnSpeed: 130
+  turnSpeed: 50
   health: 50
   damage: 40
   range: 100
@@ -363,7 +363,7 @@ MonoBehaviour:
   oneTurnDelay: 0.5
   oneTurnAngleThreshold: 10
   turnAcceleration: 100
-  totalFuel: 100
+  totalFuel: 200
   thrustFuelRate: 20
   rcsFuelRate: 2
   blueTeamTrailStart: {r: 0.1, g: 0.73, b: 1, a: 1}
