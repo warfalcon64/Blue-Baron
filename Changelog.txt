@@ -8,6 +8,7 @@ Future Implementation:
 - Zooming in and out without making background look tiled
 - Rehaul weaponmap so that it allows for overriding base weapon stats in inspector
 - Missile warning system + UI indicators for missiles
+- Make death explosions for fighters bigger
 
 Things to fix:
 - Enemy ping selection on radar?

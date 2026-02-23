@@ -52,6 +52,34 @@ public class PlayerLockOnSystem : MonoBehaviour
             CalculateLead();
         }
     }
+    public void LockClosestEnemy()
+    {
+        if (pc == null) return;
+
+        Vector2 playerPos = pc.transform.position;
+        List<ShipBase> enemies = sceneManager.GetLiveEnemies(sceneManager.shipData.blueTag);
+
+        GameObject closest = null;
+        float closestDist = float.MaxValue;
+
+        foreach (ShipBase enemy in enemies)
+        {
+            if (!enemy.gameObject.activeSelf) continue;
+            float dist = Vector2.Distance(playerPos, enemy.transform.position);
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                closest = enemy.gameObject;
+            }
+        }
+
+        if (closest != null)
+        {
+            lockedEnemy = closest;
+            enemyLockTimers.Clear();
+            CalculateLead();
+        }
+    }
 
     public void HandleSeekerFired(object source, WeaponsBase seeker)
     {
@@ -83,6 +111,7 @@ public class PlayerLockOnSystem : MonoBehaviour
             {
                 lockedEnemy = enemy;
                 enemyLockTimers.Clear();
+                CalculateLead();
             }
         }
     }
@@ -103,6 +132,7 @@ public class PlayerLockOnSystem : MonoBehaviour
     public void HandleRadarPingSelect(object sender, ShipBase ship)
     {
         lockedEnemy = ship.gameObject;
+        CalculateLead();
         print("New ship locked:" + ship);
     }
 
@@ -116,6 +146,7 @@ public class PlayerLockOnSystem : MonoBehaviour
         lockingEnabled = true;
         pc = sceneManager.GetPlayerController();
     }
+
     public void ToggleRadarLock()
     {
         lockedEnemy = null;

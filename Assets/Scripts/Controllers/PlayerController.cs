@@ -97,7 +97,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            playerLockOnSystem.ToggleRadarLock(); // * Switch to event instead of direct reference
+            playerLockOnSystem.LockClosestEnemy();
         }
 
         UpdateTimers();

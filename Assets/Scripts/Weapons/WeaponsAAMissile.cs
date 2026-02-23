@@ -13,16 +13,16 @@ public class WeaponsAAMissile : WeaponsBase
     [SerializeField] private float oneTurnAngleThreshold = 10f;
     [SerializeField] private float turnAcceleration = 50f;
 
+    [Header("Fuel")]
+    [SerializeField] private float totalFuel = 100f;
+    [SerializeField] private float thrustFuelRate = 20f;
+    [SerializeField] private float rcsFuelRate = 15f;
+    
     [Header("Team Trail Colors")]
     [SerializeField] private Color blueTeamTrailStart = new Color(0.1f, 0.73f, 1f, 1f);
     [SerializeField] private Color blueTeamTrailEnd = new Color(0.35f, 0.68f, 0.82f, 1f);
     [SerializeField] private Color redTeamTrailStart = new Color(1f, 0.5f, 0.1f, 1f);
     [SerializeField] private Color redTeamTrailEnd = new Color(0.82f, 0.45f, 0.2f, 1f);
-
-    [Header("Fuel")]
-    [SerializeField] private float totalFuel = 100f;
-    [SerializeField] private float thrustFuelRate = 20f;
-    [SerializeField] private float rcsFuelRate = 15f;
 
     private float previousLOSAngle;
     private bool hasPreviousLOS;
