@@ -35,6 +35,7 @@ public abstract class AIControllerBase : MonoBehaviour
     public List<ShipBase> enemyTeam { get; private set; }
     public GameObject attacker { get; private set; }
     public GameObject target { get; private set; }
+    public List<WeaponsAAMissile> incomingMissiles { get; private set; }
 
     public AttackState attackState;
     public SearchState searchState;
@@ -58,6 +59,7 @@ public abstract class AIControllerBase : MonoBehaviour
         nextAdjust = Random.Range(0, 2f);
         stopSearch = false;
         attackingEnemies = new List<ShipBase>();
+        incomingMissiles = new List<WeaponsAAMissile>();
 
         rb = GetComponent<Rigidbody2D>();
     }
@@ -89,6 +91,13 @@ public abstract class AIControllerBase : MonoBehaviour
     protected virtual void Update()
     {
         UpdateTimers();
+
+        // Transition to ManeuverState when missiles are incoming
+        if (incomingMissiles.Count > 0 && currentState != maneuverState)
+        {
+            ChangeState(maneuverState);
+        }
+
         currentState.UpdateState(this);
     }
 
@@ -271,10 +280,17 @@ public abstract class AIControllerBase : MonoBehaviour
         ship.SetShipTurn(turn);
     }
 
-    // *** make sure to add a distance parameter to event, so that the ship focuses on dodging the closest missile (queue system)
-    public virtual void HandleMissileLock()
+    public void AddIncomingMissile(WeaponsAAMissile missile)
     {
-        // handle a missile lock, switch to maneuver state
+        if (!incomingMissiles.Contains(missile))
+        {
+            incomingMissiles.Add(missile);
+        }
+    }
+
+    public void RemoveIncomingMissile(WeaponsAAMissile missile)
+    {
+        incomingMissiles.Remove(missile);
     }
 
     /// <summary>

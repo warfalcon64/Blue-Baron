@@ -34,6 +34,8 @@ public class WeaponsAAMissile : WeaponsBase
     private float currentTurnSpeed;
     private Vector2 missileVelocity;
 
+    private GameObject previousTarget;
+
     private VFXManager vfxManager;
     private Rigidbody2D rb;
     private TrailRenderer engineTrail;
@@ -50,9 +52,14 @@ public class WeaponsAAMissile : WeaponsBase
         float dt = Time.fixedDeltaTime;
 
         // Source ship check — lose lock permanently if source is destroyed
-        if (source == null)
+        if (source == null && hasLock)
         {
             hasLock = false;
+            if (previousTarget != null)
+            {
+                previousTarget.GetComponent<AIControllerBase>()?.RemoveIncomingMissile(this);
+                previousTarget = null;
+            }
         }
 
         // Motor thrust — burn fuel while motor has fuel
@@ -239,6 +246,24 @@ public class WeaponsAAMissile : WeaponsBase
         return currentSpeed;
     }
 
+    public override void SetTarget(GameObject newTarget)
+    {
+        // Remove self from previous target's incoming list
+        if (previousTarget != null)
+        {
+            previousTarget.GetComponent<AIControllerBase>()?.RemoveIncomingMissile(this);
+        }
+
+        base.SetTarget(newTarget);
+        previousTarget = newTarget;
+
+        // Notify new target's AI that a missile is tracking it
+        if (target != null)
+        {
+            target.GetComponent<AIControllerBase>()?.AddIncomingMissile(this);
+        }
+    }
+
     public GameObject GetTarget()
     {
         return target;
@@ -247,6 +272,14 @@ public class WeaponsAAMissile : WeaponsBase
     public float GetFuelFraction()
     {
         return totalFuel > 0f ? fuelRemaining / totalFuel : 0f;
+    }
+
+    private void OnDestroy()
+    {
+        if (previousTarget != null)
+        {
+            previousTarget.GetComponent<AIControllerBase>()?.RemoveIncomingMissile(this);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

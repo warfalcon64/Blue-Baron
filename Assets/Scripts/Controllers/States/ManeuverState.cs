@@ -10,6 +10,10 @@ public class ManeuverState : State.IState
     private float duration;
     private float maneuverTime;
 
+    // Jink fields for missile evasion
+    private float jinkOffset;
+    private float jinkTimer;
+
     public ManeuverState(float duration = 15f)
     {
         this.duration = duration;
@@ -18,13 +22,17 @@ public class ManeuverState : State.IState
     public void OnEnter(AIControllerBase c)
     {
         maneuverTime = Random.Range(1, duration);
+        RollJink();
     }
 
     public void UpdateState(AIControllerBase c)
     {
+        // Don't exit ManeuverState while missiles are incoming
+        if (c.incomingMissiles.Count > 0)
+            return;
+
         if (maneuverTime <= 0)
         {
-            // change state
             c.ChangeState(c.searchState);
         }
         else
@@ -33,22 +41,25 @@ public class ManeuverState : State.IState
         }
     }
 
-    public void OnHurt(AIControllerBase c) // <-- keep lists inside aicontroller instead, state use aicontroller methods to acess list
+    public void OnHurt(AIControllerBase c)
     {
-        // if missile, add to missile queue. if other projectile, add shipbase to attacker queue
     }
 
     public void FixedUpdateState(AIControllerBase c)
     {
-        if (c.target != null)
+        if (c.incomingMissiles.Count > 0)
         {
+            EvadeMissiles(c);
+        }
+        else if (c.target != null)
+        {
+            // Existing behavior: run away from attack target
             Vector2 tPos = c.target.GetComponent<Rigidbody2D>().position;
             Vector2 myPos = c.rb.position;
             Vector2 moveDirection = -(tPos - myPos).normalized;
 
             float angle = c.GetAngleToDestination(moveDirection);
             c.MoveToEvade(angle);
-
         }
         else
         {
@@ -56,8 +67,61 @@ public class ManeuverState : State.IState
         }
     }
 
+    private void EvadeMissiles(AIControllerBase c)
+    {
+        float dt = Time.fixedDeltaTime;
+
+        // Update jink timer
+        jinkTimer -= dt;
+        if (jinkTimer <= 0f)
+        {
+            RollJink();
+        }
+
+        // Compute weighted threat direction (closer missiles = heavier weight)
+        Vector2 myPos = c.rb.position;
+        Vector2 evadeDir = Vector2.zero;
+
+        for (int i = c.incomingMissiles.Count - 1; i >= 0; i--)
+        {
+            WeaponsAAMissile missile = c.incomingMissiles[i];
+            if (missile == null || !missile.gameObject.activeInHierarchy)
+            {
+                c.incomingMissiles.RemoveAt(i);
+                continue;
+            }
+
+            Vector2 toShip = myPos - (Vector2)missile.transform.position;
+            float dist = toShip.magnitude;
+            if (dist < 0.01f) continue;
+
+            float weight = 1f / dist;
+            evadeDir += toShip.normalized * weight;
+        }
+
+        if (evadeDir.sqrMagnitude < 0.0001f)
+            return;
+
+        evadeDir.Normalize();
+
+        // Apply jink offset to evade direction
+        float evadeAngle = Mathf.Atan2(evadeDir.y, evadeDir.x) * Mathf.Rad2Deg;
+        float jinkedAngle = evadeAngle + jinkOffset;
+        float jinkedRad = jinkedAngle * Mathf.Deg2Rad;
+        Vector2 jinkedDir = new Vector2(Mathf.Cos(jinkedRad), Mathf.Sin(jinkedRad));
+
+        // Turn toward jinked direction and accelerate to max
+        float angle = c.GetAngleToDestination(jinkedDir);
+        c.MoveToEvade(angle);
+    }
+
+    private void RollJink()
+    {
+        jinkOffset = Random.Range(-1f, 1f) * 60f;
+        jinkTimer = Random.Range(0.3f, 0.8f);
+    }
+
     public void OnExit(AIControllerBase c)
     {
-
     }
 }
