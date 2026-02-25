@@ -14,9 +14,13 @@ public class ManeuverState : State.IState
     private float jinkOffset;
     private float jinkTimer;
 
-    public ManeuverState(float duration = 15f)
+    // Range at which incoming missiles trigger evasion
+    private float missileEvadeRange;
+
+    public ManeuverState(float duration = 5f, float missileEvadeRange = 5f)
     {
         this.duration = duration;
+        this.missileEvadeRange = missileEvadeRange;
     }
 
     public void OnEnter(AIControllerBase c)
@@ -27,8 +31,8 @@ public class ManeuverState : State.IState
 
     public void UpdateState(AIControllerBase c)
     {
-        // Don't exit ManeuverState while missiles are incoming
-        if (c.incomingMissiles.Count > 0)
+        // Don't exit ManeuverState while missiles are close
+        if (HasCloseIncomingMissile(c))
             return;
 
         if (maneuverTime <= 0)
@@ -47,9 +51,27 @@ public class ManeuverState : State.IState
 
     public void FixedUpdateState(AIControllerBase c)
     {
-        if (c.incomingMissiles.Count > 0)
+        // Try to acquire a target if we don't have one
+        if (c.target == null)
+        {
+            c.FindTarget();
+            if (c.target != null)
+            {
+                c.target.GetComponent<ShipBase>().OnShipDeath += c.HandleTargetDeath;
+            }
+        }
+
+        if (HasCloseIncomingMissile(c))
         {
             EvadeMissiles(c);
+
+            // Fire weapons at target while evading
+            if (c.target != null)
+            {
+                Vector2 targetAcceleration = c.CalculateTargetAcceleration();
+                float angle = c.GetAngleToTarget();
+                c.AttackTarget(targetAcceleration, Math.Abs(angle));
+            }
         }
         else if (c.target != null)
         {
@@ -65,6 +87,28 @@ public class ManeuverState : State.IState
         {
             c.ChangeState(c.searchState);
         }
+    }
+
+    private bool HasCloseIncomingMissile(AIControllerBase c)
+    {
+        float rangeSqr = missileEvadeRange * missileEvadeRange;
+        Vector2 myPos = c.rb.position;
+
+        for (int i = c.incomingMissiles.Count - 1; i >= 0; i--)
+        {
+            WeaponsAAMissile missile = c.incomingMissiles[i];
+            if (missile == null || !missile.gameObject.activeInHierarchy)
+            {
+                c.incomingMissiles.RemoveAt(i);
+                continue;
+            }
+
+            float distSqr = ((Vector2)missile.transform.position - myPos).sqrMagnitude;
+            if (distSqr <= rangeSqr)
+                return true;
+        }
+
+        return false;
     }
 
     private void EvadeMissiles(AIControllerBase c)
