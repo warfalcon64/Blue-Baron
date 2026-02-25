@@ -57,6 +57,16 @@ public class Radar : MonoBehaviour
                     RadarPing tmpPing = shipToPing[ship];
                     tmpPing.blip.position = raycastHit.point;
                     tmpPing.SetFadeTimer(0);
+
+                    if (playerManager.GetLockedEnemy() == ship.gameObject)
+                    {
+                        tmpPing.SetColor(new Color(1f, 0, 0));
+                        selectedPing = tmpPing;
+                    }
+                    else if (tmpPing != selectedPing)
+                    {
+                        tmpPing.SetColor(new Color(0, 1f, 0));
+                    }
                 }
                 else
                 {
@@ -68,6 +78,7 @@ public class Radar : MonoBehaviour
                     if (playerManager.GetLockedEnemy() == ship.gameObject)
                     {
                         tmpPing.SetColor(new Color(1f, 0, 0));
+                        selectedPing = tmpPing;
                     }
                     else
                     {
@@ -83,6 +94,10 @@ public class Radar : MonoBehaviour
         if (selectedPing != null)
         {
             selectedPing.SetColor(new Color(0, 1f, 0));
+        }
+
+        if (shipToPing.ContainsKey(ship) && shipToPing[ship] != null)
+        {
             shipToPing[ship].SetColor(new Color(1f, 0, 0));
             selectedPing = shipToPing[ship];
         }
