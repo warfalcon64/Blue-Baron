@@ -2,13 +2,13 @@ Planned Implementation:
 - Bomber craft with a turret (don't make it so that you need two different ships for both factions)
 - Make AI attempt to dodge missiles
 - Add flares/chaff to distract missiles
+- Rehaul weaponmap so that it allows for overriding base weapon stats in inspector
 
 Future Implementation:
 - Moving mouse to edge of screen pulls camera in that direction up till some arbitrary limit
 - Zooming in and out without making background look tiled
-- Rehaul weaponmap so that it allows for overriding base weapon stats in inspector
 - Missile warning system + UI indicators for missiles
 - Make separate missile explosion effect from fighter death explosion
 
 Things to fix:
-- Enemy ping selection on radar?
+- Make sure every ship calculates its own damage handling (weapons pass to them the damage that needs to be done)

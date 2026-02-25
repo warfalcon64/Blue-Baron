@@ -118,14 +118,24 @@ public class PlayerLockOnSystem : MonoBehaviour
 
     private void CalculateLead()
     {
-        GameObject player = pc.gameObject;
-        ShipBase playerShip = player.GetComponent<ShipBase>();
-        Tuple<Transform, Transform> gunPositions = playerShip.GetPrimaryFirePositions();
+        ShipBase playerShip = pc.gameObject.GetComponent<ShipBase>();
+        WeaponGroup primaryGroup = playerShip.GetWeaponGroup(0);
+        if (primaryGroup == null) return;
+
+        WeaponsBase repWeapon = primaryGroup.GetRepresentativeWeapon();
+        if (repWeapon == null) return;
+
+        List<Hardpoint> hps = primaryGroup.GetHardpoints();
+        Vector2 avgPos = Vector2.zero;
+        foreach (Hardpoint hp in hps)
+        {
+            avgPos += (Vector2)hp.transform.position;
+        }
+        avgPos /= hps.Count;
+
         Rigidbody2D targetRb = lockedEnemy.GetComponent<Rigidbody2D>();
-        float primarySpeed = playerShip.GetPrimaryWeapon().GetSpeed();
-        Vector2 avgGunPos = (gunPositions.Item1.position + gunPositions.Item2.position) / 2;
-        float distance = Vector2.Distance(avgGunPos, targetRb.position);
-        float travelTime = distance / primarySpeed;
+        float distance = Vector2.Distance(avgPos, targetRb.position);
+        float travelTime = distance / repWeapon.GetSpeed();
         lead = targetRb.position + targetRb.linearVelocity * travelTime;
     }
 

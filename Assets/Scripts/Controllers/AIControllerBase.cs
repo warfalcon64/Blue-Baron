@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 using static State;
 
@@ -18,19 +16,15 @@ public abstract class AIControllerBase : MonoBehaviour
     protected float nextAdjust;
     protected float maxSpeed;
     protected float minSpeed;
-    protected float primaryFieldofFire;
-    protected float primaryCooldown;
-    protected float secondaryCooldown;
 
     protected SceneManager sceneManager;
     protected List<ShipBase> attackingEnemies;
     protected IState currentState;
     protected Rigidbody2D targetRb;
-    protected WeaponMap weaponMap;
-    protected WeaponsBase primary;
-    protected WeaponsBase secondary;
     protected Vector2 targetAcceleration;
     protected Vector2 lastVelocity;
+
+    private List<int> controllableGroupIndices;
 
     public List<ShipBase> enemyTeam { get; private set; }
     public GameObject attacker { get; private set; }
@@ -54,7 +48,6 @@ public abstract class AIControllerBase : MonoBehaviour
     protected virtual void Awake()
     {
         target = null;
-        primaryFieldofFire = ship.GetPrimaryFieldOfFire();
         nextTurn = Random.Range(0, 2f);
         nextAdjust = Random.Range(0, 2f);
         stopSearch = false;
@@ -73,17 +66,20 @@ public abstract class AIControllerBase : MonoBehaviour
         attackState = new AttackState(7);
         searchState = new SearchState();
         maneuverState = new ManeuverState(2);
-        
+
         maxSpeed = ship.GetShipMaxSpeed();
         minSpeed = ship.GetShipMinSpeed();
         ship.OnShipDamage += HandleDamageEvent;
         ship.OnSeekerFired += HandleSeekerFired;
 
-        weaponMap = ship.GetWeaponMap();
-        primary = weaponMap.GetWeapon(ShootType.Primary);
-        primaryCooldown = primary.GetCoolDown();
-        secondary = weaponMap.GetWeapon(ShootType.Secondary);
-        secondaryCooldown = secondary.GetCoolDown();
+        // Cache non-autonomous weapon group indices
+        controllableGroupIndices = new List<int>();
+        List<WeaponGroup> groups = ship.GetWeaponGroups();
+        for (int i = 0; i < groups.Count; i++)
+        {
+            if (!groups[i].autonomous) controllableGroupIndices.Add(i);
+        }
+
         currentState = searchState;
     }
 
@@ -108,7 +104,7 @@ public abstract class AIControllerBase : MonoBehaviour
     }
 
     /// <summary>
-    /// Changes the current state of AI by calling the current state's exit function and callilng the new state's enter function.
+    /// Changes the current state of AI by calling the current state's exit function and calling the new state's enter function.
     /// </summary>
     /// <param name="newState">The new state to transition to.</param>
     public virtual void ChangeState(IState newState)
@@ -127,30 +123,25 @@ public abstract class AIControllerBase : MonoBehaviour
     /// Fires the AI's weapons at a given target by calculating the proper trajectory necessary for each weapon it attacks with.
     /// </summary>
     /// <param name="targetAcceleration">The acceleration vector of the target to be fired at.</param>
-    /// <param name="angle">***Unused parameter, potentially deprecated***</param>
+    /// <param name="angle">Kept for MoveToEngage compatibility but no longer used for arc check.</param>
     public virtual void AttackTarget(Vector2 targetAcceleration, float angle)
     {
-        if (primaryCooldown <= 0 && angle <= primaryFieldofFire)
+        foreach (int groupIndex in controllableGroupIndices)
         {
-            //Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary);
-            Tuple<Transform, Transform> gunPositions = ship.GetPrimaryFirePositions();
-            Vector2 avgGunPos = (gunPositions.Item1.position + gunPositions.Item2.position) / 2;
-            Vector2 aimPos = WorseTargetLeadingPosition(primary, avgGunPos);
-            ship.ShootPrimary(aimPos);
-            primaryCooldown = primary.GetCoolDown();
-        }
+            WeaponGroup group = ship.GetWeaponGroup(groupIndex);
+            WeaponsBase repWeapon = group.GetRepresentativeWeapon();
+            if (repWeapon == null) continue;
 
-        if (secondaryCooldown <= 0)
-        {
-            Transform missilePosition = ship.GetSecondaryFirePosition();
-            Vector2 aimPos = targetRb.position;
-            ship.ShootSecondary(aimPos);
-            secondaryCooldown = secondary.GetCoolDown();
-        }
-        // * ADD CODE FOR OTHER WEAPONS HERE
-        else
-        {
-            return;
+            List<Hardpoint> hps = group.GetHardpoints();
+            Vector2 avgPos = Vector2.zero;
+            foreach (Hardpoint hp in hps)
+            {
+                avgPos += (Vector2)hp.transform.position;
+            }
+            avgPos /= hps.Count;
+
+            Vector2 aimPos = WorseTargetLeadingPosition(repWeapon, avgPos);
+            ship.FireGroup(groupIndex, aimPos);
         }
     }
 
@@ -227,7 +218,6 @@ public abstract class AIControllerBase : MonoBehaviour
             // Turning logic
             if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= 0)
             {
-                //print("NEXTTURN IS: " + nextTurn);
                 if (angle > 0) turn = 1f;
 
                 if (angle < 0) turn = -1f;
@@ -244,13 +234,10 @@ public abstract class AIControllerBase : MonoBehaviour
 
                 if (Math.Abs(angle) < 70)
                 {
-                    //print("INCREASING SPEED");
-                    //speed += 0.2f;
                     ship.Accelerate(0.2f);
                 }
                 else if (Math.Abs(angle) >= 90)
                 {
-                    //speed -= 0.2f;
                     ship.Decelerate(0.2f);
                 }
                 else
@@ -267,8 +254,6 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         float turn = 0f;
 
-        // ** check for missiles here once implemented
-        
         if (Math.Abs(angle) > 5f)
         {
             if (angle > 0) turn = 1f;
@@ -301,10 +286,6 @@ public abstract class AIControllerBase : MonoBehaviour
         if (nextTurn > 0) nextTurn -= Time.deltaTime;
 
         if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
-
-        if (primaryCooldown > 0) primaryCooldown -= Time.deltaTime;
-
-        if (secondaryCooldown > 0) secondaryCooldown -= Time.deltaTime;
     }
 
     private void OnDisable()
@@ -378,7 +359,7 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         targetRb = target.GetComponent<Rigidbody2D>();
 
-        float s = weapon.GetSpeed(); // * maybe add ship speed somehow? <-- why does this matter?
+        float s = weapon.GetSpeed();
         float distance = Vector2.Distance(targetRb.position, rb.position);
 
         // setup formula constants
@@ -399,7 +380,7 @@ public abstract class AIControllerBase : MonoBehaviour
             float b = Vector2.Dot(accel, vT);
             float c = Vector2.Dot(accel, pT) + Vector2.Dot(vT, vT) - s * s;
             float d = 2f * Vector2.Dot(vT, vT);
-            float e = Vector3.Dot(pT, pT); // ** Check if this is supposed to be Vector3, kinda sus
+            float e = Vector3.Dot(pT, pT);
 
             // Solve with Newton's equation
             float finalGuess = SolveQuarticNewton(guess, iterations, a, b, c, d, e);

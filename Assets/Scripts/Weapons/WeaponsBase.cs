@@ -19,6 +19,7 @@ public abstract class WeaponsBase : MonoBehaviour
     [SerializeField] protected float coolDown = 1;
     [SerializeField] protected bool isDamageable = false;
     [SerializeField] protected bool isSeeker = false;
+    [SerializeField] protected WeaponUsage usage = WeaponUsage.None;
 
     [Header("Lifetime")]
     [SerializeField] protected float lifetime = 5f;
@@ -69,6 +70,11 @@ public abstract class WeaponsBase : MonoBehaviour
     public virtual bool IsSeeker()
     {
         return isSeeker;
+    }
+
+    public virtual WeaponUsage GetUsage()
+    {
+        return usage;
     }
 
     public virtual void SetCoolDown(float newCoolDown)

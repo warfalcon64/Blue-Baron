@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 using Random = UnityEngine.Random;
@@ -16,14 +14,9 @@ public abstract class ShipBase : MonoBehaviour
     [Header("Movement")]
     [SerializeField] protected float speed = 10;
     [SerializeField] protected float turnSpeed = 100f;
-    [Header("Attack")]
-    [SerializeField] protected float primaryCoolDown = 0.2f; // ** primaryCoolDown IN THE SHIP CLASS IS DEPRECATED, USE WEAPONMAP coolDown INSTEAD!!
-    [SerializeField] protected float primaryFieldofFire = 45; // Angle between the vertical line bisecting the craft and the line representing the edge of field
-    [SerializeField] protected float secondaryCoolDown = 1.5f;
-    [SerializeField] protected Transform leftGun;
-    [SerializeField] protected Transform rightGun;
-    [SerializeField] protected Transform missileSpawn;
-    //[SerializeField] protected WeaponsBase plasma;
+
+    [Header("Weapon Groups")]
+    [SerializeField] private List<WeaponGroup> weaponGroups;
 
     [Header("VFX")]
     [SerializeField] protected float lowHealth = 25;
@@ -35,7 +28,6 @@ public abstract class ShipBase : MonoBehaviour
     public bool isPlayer;
 
     protected bool isSmoking;
-    protected bool leftFire;
     protected float maxSpeed;
     protected float minSpeed;
     protected float turn;
@@ -54,10 +46,7 @@ public abstract class ShipBase : MonoBehaviour
     public event EventHandler OnShipDeath;
     public event EventHandler<WeaponsBase> OnSeekerFired;
 
-    [Header("Weapon Slots")]
-    [SerializeField] private List<WeaponMap.WeaponMapEntry> weapons;
-    private WeaponMap weaponMap;
-    private WeaponsBase primary;
+    private Hardpoint[] hardpoints;
 
     // Start is called before the first frame update
     protected virtual void Awake()
@@ -96,13 +85,9 @@ public abstract class ShipBase : MonoBehaviour
         turn = 0f;
         maxTurnSpeed = turnSpeed + 60f;
         minTurnSpeed = turnSpeed;
-        leftFire = false;
         isSmoking = false;
 
-        weaponMap = ScriptableObject.CreateInstance<WeaponMap>();
-        weaponMap.Init(weapons);
-
-        primary = weaponMap.GetWeapon(ShootType.Primary);
+        hardpoints = GetComponentsInChildren<Hardpoint>();
 
         rb = GetComponent<Rigidbody2D>();
 
@@ -141,7 +126,7 @@ public abstract class ShipBase : MonoBehaviour
             WeaponsBase weapon = collider.gameObject.GetComponent<WeaponsBase>();
             string type = weapon.damageType;
             float damage = weapon.GetDamage();
-            
+
 
             // Determine the type of damage weapon deals, apply modifiers accordingly
             // * Move damage code into the respective projectiles: they calculate damage with modifiers then tell ship the total damage, ship then applies damage to itself
@@ -172,35 +157,22 @@ public abstract class ShipBase : MonoBehaviour
         }
     }
 
-    public virtual void ShootPrimary(Vector2 aimPos)
+    public List<WeaponsBase> FireGroup(int groupIndex, Vector2 aimPos)
     {
-        WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Primary);
-        Vector2 projectileSpawn = leftGun.position;
+        if (groupIndex < 0 || groupIndex >= weaponGroups.Count)
+            return new List<WeaponsBase>();
 
-        leftFire = !leftFire;
+        List<WeaponsBase> projectiles = weaponGroups[groupIndex].Fire(aimPos, rb.linearVelocity, this);
 
-        if (!leftFire) projectileSpawn = rightGun.position;
-
-        //Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary.GetSpeed());
-        Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
-        WeaponsBase temp = Instantiate(projectile, projectileSpawn, leftGun.rotation);
-        temp.Setup(shootDirection, rb.linearVelocity, this);
-    }
-
-    public virtual void ShootSecondary(Vector2 aimPos)
-    {
-        WeaponsBase projectile = weaponMap.GetWeapon(ShootType.Secondary);
-        Vector2 projectileSpawn = missileSpawn.position;
-
-        Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
-        WeaponsBase temp = Instantiate(projectile, projectileSpawn, missileSpawn.rotation);
-
-        if (projectile.IsSeeker())
+        foreach (WeaponsBase projectile in projectiles)
         {
-            OnSeekerFired?.Invoke(this, temp);
+            if (projectile.IsSeeker())
+            {
+                OnSeekerFired?.Invoke(this, projectile);
+            }
         }
 
-        temp.Setup(shootDirection, rb.linearVelocity, this);
+        return projectiles;
     }
 
     // Moves the ship to keep the specified target gameobject within the given parameters
@@ -265,7 +237,6 @@ public abstract class ShipBase : MonoBehaviour
 
     public virtual float GetShipMaxSpeed()
     {
-        //print("MAX SPEED IS: " + maxSpeed);
         return maxSpeed;
     }
 
@@ -274,29 +245,27 @@ public abstract class ShipBase : MonoBehaviour
         return minSpeed;
     }
 
-    public virtual float GetPrimaryFieldOfFire()
+    public List<WeaponGroup> GetWeaponGroups()
     {
-        return primaryFieldofFire;
+        return weaponGroups;
     }
 
-    public virtual float GetPrimaryCoolDown()
+    public WeaponGroup GetWeaponGroup(int index)
     {
-        return primaryCoolDown;
+        if (index >= 0 && index < weaponGroups.Count)
+            return weaponGroups[index];
+        return null;
     }
 
-    public virtual float GetSecondaryCoolDown()
+    public List<WeaponGroup> GetWeaponGroupsByUsage(WeaponUsage usage)
     {
-        return secondaryCoolDown;
-    }
-
-    public virtual WeaponsBase GetPrimaryWeapon()
-    {
-        return primary;
-    }
-
-    public virtual WeaponMap GetWeaponMap()
-    {
-        return weaponMap;
+        List<WeaponGroup> result = new List<WeaponGroup>();
+        foreach (WeaponGroup group in weaponGroups)
+        {
+            if (group.HasUsage(usage))
+                result.Add(group);
+        }
+        return result;
     }
 
     public virtual PlayerController GetPlayerController()
@@ -312,16 +281,6 @@ public abstract class ShipBase : MonoBehaviour
     public virtual ShipType GetShipType()
     {
         return type;
-    }
-
-    public virtual Tuple<Transform, Transform> GetPrimaryFirePositions()
-    {
-        return new Tuple<Transform, Transform>(leftGun, rightGun);
-    }
-
-    public virtual Transform GetSecondaryFirePosition()
-    {
-        return missileSpawn;
     }
 
     public virtual void SetShipTurn(float newTurn)

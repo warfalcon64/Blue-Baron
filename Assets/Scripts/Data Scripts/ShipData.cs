@@ -16,13 +16,6 @@ public class ShipData : ScriptableObject
 
 }
 
-public enum ShootType
-{
-    Primary,
-    Secondary,
-    None
-}
-
 public enum ShipType
 {
     Fighter,
