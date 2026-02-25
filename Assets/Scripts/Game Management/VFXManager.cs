@@ -39,9 +39,8 @@ public class VFXManager : MonoBehaviour
         }
 
         VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
-        int vfxPosition = Shader.PropertyToID("Position");
 
-        mainEffects.SetVector3(vfxPosition, position);
+        mainEffects.SetVector3("Position", position);
         mainEffects.SendEvent(VFXValuePairs[type], eventAttribute);
     }
 }
