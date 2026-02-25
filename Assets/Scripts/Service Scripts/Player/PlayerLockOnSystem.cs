@@ -126,7 +126,7 @@ public class PlayerLockOnSystem : MonoBehaviour
         Vector2 avgGunPos = (gunPositions.Item1.position + gunPositions.Item2.position) / 2;
         float distance = Vector2.Distance(avgGunPos, targetRb.position);
         float travelTime = distance / primarySpeed;
-        lead = targetRb.position + targetRb.velocity * travelTime;
+        lead = targetRb.position + targetRb.linearVelocity * travelTime;
     }
 
     public void HandleRadarPingSelect(object sender, ShipBase ship)

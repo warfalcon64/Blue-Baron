@@ -157,7 +157,7 @@ public class WeaponsAAMissile : WeaponsBase
 
                 // Closing speed (positive when closing)
                 Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>();
-                Vector2 targetVel = targetRb != null ? targetRb.velocity : Vector2.zero;
+                Vector2 targetVel = targetRb != null ? targetRb.linearVelocity : Vector2.zero;
                 Vector2 relVel = missileVelocity - targetVel;
                 Vector2 losDir = los.normalized;
                 float closingSpeed = Mathf.Abs(Vector2.Dot(relVel, losDir));
@@ -209,7 +209,7 @@ public class WeaponsAAMissile : WeaponsBase
             rb.rotation = angle;
         }
 
-        rb.velocity = missileVelocity;
+        rb.linearVelocity = missileVelocity;
     }
 
     public override void Setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)

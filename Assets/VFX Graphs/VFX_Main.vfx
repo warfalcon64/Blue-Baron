@@ -20,7 +20,7 @@ MonoBehaviour:
     x: 1633
     y: -143
     width: 911
-    height: 1012
+    height: 1067
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -45,10 +45,13 @@ MonoBehaviour:
   m_UICollapsed: 1
   m_UISuperCollapsed: 0
   m_UIInfos: {fileID: 114340500867371532}
+  m_CustomAttributes: []
   m_ParameterInfo:
   - name: Position
     path: Position
     tooltip: 
+    space: -1
+    spaceable: 0
     sheetType: m_Vector3f
     realType: Vector3
     defaultValue:
@@ -61,9 +64,11 @@ MonoBehaviour:
     enumValues: []
     descendantCount: 0
   m_ImportDependencies: []
-  m_GraphVersion: 12
+  m_GraphVersion: 19
   m_ResourceVersion: 1
-  m_SubgraphDependencies: []
+  m_SubgraphDependencies:
+  - {fileID: 8926484042661614526, guid: 34d4612628f28984fa741a1852d92cec, type: 3}
+  - {fileID: 8926484042661614526, guid: 57568bbba6d65ee48b0d6180e3d6bb33, type: 3}
   m_CategoryPath: 
 --- !u!2058629511 &8926484042661614527
 VisualEffectResource:
@@ -77,9 +82,6 @@ VisualEffectResource:
     m_RendererSettings:
       motionVectorGenerationMode: 0
       shadowCastingMode: 0
-      receiveShadows: 0
-      reflectionProbeUsage: 0
-      lightProbeUsage: 0
     m_CullingFlags: 3
     m_UpdateMode: 0
     m_PreWarmDeltaTime: 0.05
@@ -129,7 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
-  m_Parent: {fileID: 114350483966674976}
+  m_Parent: {fileID: 0}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
@@ -207,7 +209,7 @@ MonoBehaviour:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"r":14.745096206665039,"g":2.4703826904296877,"b":0.21575888991355897,"a":0.0}'
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Color
     m_serializedType:
@@ -240,7 +242,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: r
     m_serializedType:
@@ -273,7 +275,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: g
     m_serializedType:
@@ -306,7 +308,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: b
     m_serializedType:
@@ -339,7 +341,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: a
     m_serializedType:
@@ -373,7 +375,7 @@ MonoBehaviour:
         m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 25
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Spark Count
     m_serializedType:
@@ -407,7 +409,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 1
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Circle Size
     m_serializedType:
@@ -441,7 +443,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 1
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Cross Size
     m_serializedType:
@@ -475,7 +477,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 0.2
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Min Particle Size
     m_serializedType:
@@ -509,7 +511,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 0.5
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Max Particle Size
     m_serializedType:
@@ -546,7 +548,7 @@ MonoBehaviour:
         m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"x":0.0,"y":0.0,"z":0.0}'
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Position
     m_serializedType:
@@ -580,7 +582,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: x
     m_serializedType:
@@ -613,7 +615,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: y
     m_serializedType:
@@ -646,7 +648,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: z
     m_serializedType:
@@ -696,7 +698,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
-  m_Parent: {fileID: 114350483966674976}
+  m_Parent: {fileID: 0}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
@@ -724,13 +726,15 @@ MonoBehaviour:
   m_UISuperCollapsed: 0
   m_InputSlots:
   - {fileID: 8926484042661614641}
-  - {fileID: 8926484042661614642}
   - {fileID: 8926484042661614643}
-  - {fileID: 8926484042661614644}
   - {fileID: 8926484042661614645}
+  - {fileID: 8926484042661614644}
   - {fileID: 8926484042661614646}
-  - {fileID: 8926484042661614647}
   - {fileID: 8926484042661614648}
+  - {fileID: 8926484042661614667}
+  - {fileID: 8926484042661614647}
+  - {fileID: 8926484042661614672}
+  - {fileID: 8926484042661614642}
   - {fileID: 8926484042661614649}
   - {fileID: 8926484042661614650}
   - {fileID: 8926484042661614651}
@@ -746,11 +750,9 @@ MonoBehaviour:
   - {fileID: 8926484042661614661}
   - {fileID: 8926484042661614662}
   - {fileID: 8926484042661614663}
-  - {fileID: 8926484042661614664}
   - {fileID: 8926484042661614665}
   - {fileID: 8926484042661614666}
-  - {fileID: 8926484042661614667}
-  - {fileID: 8926484042661614672}
+  - {fileID: 8926484042661614664}
   - {fileID: 8926484042661614677}
   m_OutputSlots: []
   m_Label: 
@@ -792,7 +794,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 25
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MinSparks
     m_serializedType:
@@ -826,7 +828,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 35
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MaxSparks
     m_serializedType:
@@ -859,8 +861,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 4
-    m_Space: 2147483647
+      m_SerializableObject: 3
+    m_Space: -1
   m_Property:
     name: MinSparkSpeed
     m_serializedType:
@@ -893,8 +895,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 7
-    m_Space: 2147483647
+      m_SerializableObject: 6
+    m_Space: -1
   m_Property:
     name: MaxSparkSpeed
     m_serializedType:
@@ -927,8 +929,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.4
-    m_Space: 2147483647
+      m_SerializableObject: 1
+    m_Space: -1
   m_Property:
     name: MinSparkLife
     m_serializedType:
@@ -961,8 +963,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.7
-    m_Space: 2147483647
+      m_SerializableObject: 1.5
+    m_Space: -1
   m_Property:
     name: MaxSparkLife
     m_serializedType:
@@ -995,8 +997,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.5
-    m_Space: 2147483647
+      m_SerializableObject: 0.3
+    m_Space: -1
   m_Property:
     name: MinSparkSize
     m_serializedType:
@@ -1029,8 +1031,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 1
-    m_Space: 2147483647
+      m_SerializableObject: 0.5
+    m_Space: -1
   m_Property:
     name: MaxSparkSize
     m_serializedType:
@@ -1063,8 +1065,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.2
-    m_Space: 2147483647
+      m_SerializableObject: 1
+    m_Space: -1
   m_Property:
     name: FlashLife
     m_serializedType:
@@ -1097,8 +1099,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 4
-    m_Space: 2147483647
+      m_SerializableObject: 3
+    m_Space: -1
   m_Property:
     name: FlashSize
     m_serializedType:
@@ -1132,7 +1134,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 10
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MinFire
     m_serializedType:
@@ -1166,7 +1168,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 12
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MaxFire
     m_serializedType:
@@ -1199,8 +1201,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.3
-    m_Space: 2147483647
+      m_SerializableObject: 1
+    m_Space: -1
   m_Property:
     name: MinFireLife
     m_serializedType:
@@ -1233,8 +1235,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.5
-    m_Space: 2147483647
+      m_SerializableObject: 1.5
+    m_Space: -1
   m_Property:
     name: MaxFireLife
     m_serializedType:
@@ -1268,7 +1270,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 0.7
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MinFireSpeed
     m_serializedType:
@@ -1302,7 +1304,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 1.2
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MaxFireSpeed
     m_serializedType:
@@ -1336,7 +1338,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 0.5
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MinFireSize
     m_serializedType:
@@ -1370,7 +1372,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 1
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MaxFireSize
     m_serializedType:
@@ -1404,7 +1406,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 10
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MinSmoke
     m_serializedType:
@@ -1438,7 +1440,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 12
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MaxSmoke
     m_serializedType:
@@ -1471,8 +1473,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.5
-    m_Space: 2147483647
+      m_SerializableObject: 1.2
+    m_Space: -1
   m_Property:
     name: MinSmokeLife
     m_serializedType:
@@ -1505,8 +1507,8 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.7
-    m_Space: 2147483647
+      m_SerializableObject: 1.7
+    m_Space: -1
   m_Property:
     name: MaxSmokeLife
     m_serializedType:
@@ -1540,7 +1542,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 0.25
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MinSmokeSpeed
     m_serializedType:
@@ -1574,7 +1576,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 1
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MaxSmokeSpeed
     m_serializedType:
@@ -1608,7 +1610,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 0.2
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MinSmokeSize
     m_serializedType:
@@ -1642,7 +1644,7 @@ MonoBehaviour:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
       m_SerializableObject: 0.8
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MaxSmokeSize
     m_serializedType:
@@ -1680,7 +1682,7 @@ MonoBehaviour:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"r":32.052734375,"g":3.1884918212890627,"b":0.839076817035675,"a":1.0}'
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: MainColor
     m_serializedType:
@@ -1713,7 +1715,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: r
     m_serializedType:
@@ -1746,7 +1748,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: g
     m_serializedType:
@@ -1779,7 +1781,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: b
     m_serializedType:
@@ -1812,7 +1814,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: a
     m_serializedType:
@@ -1850,7 +1852,7 @@ MonoBehaviour:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"r":3.2060024738311769,"g":1.5106817483901978,"b":1.1414040327072144,"a":0.0}'
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: SmokeColor
     m_serializedType:
@@ -1883,7 +1885,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: r
     m_serializedType:
@@ -1916,7 +1918,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: g
     m_serializedType:
@@ -1949,7 +1951,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: b
     m_serializedType:
@@ -1982,7 +1984,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: a
     m_serializedType:
@@ -2019,7 +2021,7 @@ MonoBehaviour:
         m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"x":0.0,"y":0.0,"z":0.0}'
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: Position
     m_serializedType:
@@ -2053,7 +2055,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: x
     m_serializedType:
@@ -2086,7 +2088,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: y
     m_serializedType:
@@ -2119,7 +2121,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: z
     m_serializedType:
@@ -2174,6 +2176,7 @@ MonoBehaviour:
     position: {x: 1857.6, y: 708.8}
     expandedSlots: []
     expanded: 0
+    supecollapsed: 0
 --- !u!114 &8926484042661614682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2203,7 +2206,7 @@ MonoBehaviour:
         m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: o
     m_serializedType:
@@ -2238,7 +2241,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: x
     m_serializedType:
@@ -2271,7 +2274,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: y
     m_serializedType:
@@ -2304,7 +2307,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: 
       m_SerializableObject: 
-    m_Space: 2147483647
+    m_Space: -1
   m_Property:
     name: z
     m_serializedType:

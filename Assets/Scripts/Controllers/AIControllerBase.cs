@@ -45,7 +45,7 @@ public abstract class AIControllerBase : MonoBehaviour
     [SerializeField] public bool canHover = false;
     [SerializeField] public float faceEnemyAngle = 1; // * May have to change access of this in future
     [SerializeField] public float angularError = 5f;
-    [SerializeField] public float plasmaInaccuracy { get; private set; } // *** in the future make this solely for ship script, and instead of changing calculations try changing rotation of bullet as it is instantiated
+    public float plasmaInaccuracy { get; private set; } // *** in the future make this solely for ship script, and instead of changing calculations try changing rotation of bullet as it is instantiated
 
     public ShipBase ship;
     public Rigidbody2D rb { get; private set; }
@@ -328,7 +328,7 @@ public abstract class AIControllerBase : MonoBehaviour
         float speed = weapon.GetSpeed();
         float distance = Vector2.Distance(gunPosition, targetRb.position);
         float travelTime = distance / speed;
-        return targetRb.position + targetRb.velocity * travelTime;
+        return targetRb.position + targetRb.linearVelocity * travelTime;
     }
 
 
@@ -361,8 +361,8 @@ public abstract class AIControllerBase : MonoBehaviour
     public virtual Vector2 CalculateTargetAcceleration()
     {
         targetRb = target.GetComponent<Rigidbody2D>();
-        Vector2 targetAcceleration = (targetRb.velocity - lastVelocity) / Time.fixedDeltaTime;
-        lastVelocity = targetRb.velocity;
+        Vector2 targetAcceleration = (targetRb.linearVelocity - lastVelocity) / Time.fixedDeltaTime;
+        lastVelocity = targetRb.linearVelocity;
 
         return targetAcceleration;
     }
@@ -383,7 +383,7 @@ public abstract class AIControllerBase : MonoBehaviour
 
         // setup formula constants
         Vector2 pT = targetRb.position - rb.position;
-        Vector2 vT = targetRb.velocity - rb.velocity;
+        Vector2 vT = targetRb.linearVelocity - rb.linearVelocity;
         Vector2 aT = targetAcceleration;
         Vector2 aP = Vector2.zero;
 

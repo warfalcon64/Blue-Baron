@@ -28,7 +28,7 @@ public class WeaponsPlasma : WeaponsBase
         float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
 
         rb.rotation = angle;
-        rb.velocity = (shootDirection * speed) + shipVelocity;
+        rb.linearVelocity = (shootDirection * speed) + shipVelocity;
         this.source = source;
 
         Destroy(gameObject, lifetime);

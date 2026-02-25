@@ -184,7 +184,7 @@ public abstract class ShipBase : MonoBehaviour
         //Vector2 aimPos = GetTargetLeadingPosition(targetAcceleration, 0, primary.GetSpeed());
         Vector2 shootDirection = (aimPos - projectileSpawn).normalized;
         WeaponsBase temp = Instantiate(projectile, projectileSpawn, leftGun.rotation);
-        temp.Setup(shootDirection, rb.velocity, this);
+        temp.Setup(shootDirection, rb.linearVelocity, this);
     }
 
     public virtual void ShootSecondary(Vector2 aimPos)
@@ -200,13 +200,13 @@ public abstract class ShipBase : MonoBehaviour
             OnSeekerFired?.Invoke(this, temp);
         }
 
-        temp.Setup(shootDirection, rb.velocity, this);
+        temp.Setup(shootDirection, rb.linearVelocity, this);
     }
 
     // Moves the ship to keep the specified target gameobject within the given parameters
     protected virtual void Move()
     {
-        rb.velocity = transform.up * speed;
+        rb.linearVelocity = transform.up * speed;
         rb.MoveRotation(rb.rotation + (turnSpeed * turn * Time.fixedDeltaTime));
     }
 
