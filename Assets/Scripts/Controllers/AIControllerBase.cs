@@ -88,8 +88,8 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         UpdateTimers();
 
-        // Transition to ManeuverState when missiles are incoming
-        if (incomingMissiles.Count > 0 && currentState != maneuverState)
+        // Transition to ManeuverState only when a missile is within evade range
+        if (currentState != maneuverState && maneuverState.HasCloseIncomingMissile(this))
         {
             ChangeState(maneuverState);
         }

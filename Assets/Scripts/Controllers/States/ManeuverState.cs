@@ -17,7 +17,7 @@ public class ManeuverState : State.IState
     // Range at which incoming missiles trigger evasion
     private float missileEvadeRange;
 
-    public ManeuverState(float duration = 5f, float missileEvadeRange = 5f)
+    public ManeuverState(float duration = 5f, float missileEvadeRange = 15f)
     {
         this.duration = duration;
         this.missileEvadeRange = missileEvadeRange;
@@ -31,18 +31,14 @@ public class ManeuverState : State.IState
 
     public void UpdateState(AIControllerBase c)
     {
-        // Don't exit ManeuverState while missiles are close
-        if (HasCloseIncomingMissile(c))
+        // Return to attack as soon as no missiles are close
+        if (!HasCloseIncomingMissile(c))
+        {
+            c.ChangeState(c.attackState);
             return;
+        }
 
-        if (maneuverTime <= 0)
-        {
-            c.ChangeState(c.searchState);
-        }
-        else
-        {
-            maneuverTime -= Time.deltaTime;
-        }
+        maneuverTime -= Time.deltaTime;
     }
 
     public void OnHurt(AIControllerBase c)
@@ -61,35 +57,22 @@ public class ManeuverState : State.IState
             }
         }
 
+        // Evade close missiles while still firing at target
         if (HasCloseIncomingMissile(c))
         {
             EvadeMissiles(c);
-
-            // Fire weapons at target while evading
-            if (c.target != null)
-            {
-                Vector2 targetAcceleration = c.CalculateTargetAcceleration();
-                float angle = c.GetAngleToTarget();
-                c.AttackTarget(targetAcceleration, Math.Abs(angle));
-            }
         }
-        else if (c.target != null)
-        {
-            // Existing behavior: run away from attack target
-            Vector2 tPos = c.target.GetComponent<Rigidbody2D>().position;
-            Vector2 myPos = c.rb.position;
-            Vector2 moveDirection = -(tPos - myPos).normalized;
 
-            float angle = c.GetAngleToDestination(moveDirection);
-            c.MoveToEvade(angle);
-        }
-        else
+        // Fire weapons at target regardless of evasion
+        if (c.target != null)
         {
-            c.ChangeState(c.searchState);
+            Vector2 targetAcceleration = c.CalculateTargetAcceleration();
+            float angle = c.GetAngleToTarget();
+            c.AttackTarget(targetAcceleration, Math.Abs(angle));
         }
     }
 
-    private bool HasCloseIncomingMissile(AIControllerBase c)
+    public bool HasCloseIncomingMissile(AIControllerBase c)
     {
         float rangeSqr = missileEvadeRange * missileEvadeRange;
         Vector2 myPos = c.rb.position;
