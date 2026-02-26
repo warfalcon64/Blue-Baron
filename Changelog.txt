@@ -11,5 +11,4 @@ Future Implementation:
 - Make separate missile explosion effect from fighter death explosion
 
 Things to fix:
-- Fix AI just flying off into the opposite direction of enemies forever
 - Make sure every ship calculates its own damage handling (weapons pass to them the damage that needs to be done)

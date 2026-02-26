@@ -774,11 +774,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.69
+      value: 11.28
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -10.7
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1100,6 +1100,40 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &406181759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 406181760}
+  m_Layer: 7
+  m_Name: Hardpoints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &406181760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406181759}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1623587067}
+  - {fileID: 608164800}
+  - {fileID: 1848023873}
+  m_Father: {fileID: 1987034916}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &417115956
 GameObject:
@@ -1644,6 +1678,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 608164800}
+  - component: {fileID: 608164801}
   m_Layer: 7
   m_Name: RightLaserSpawn
   m_TagString: Untagged
@@ -1660,12 +1695,28 @@ Transform:
   m_GameObject: {fileID: 608164799}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.34, y: 5, z: 0}
+  m_LocalPosition: {x: 4.340003, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1987034916}
+  m_Father: {fileID: 406181760}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &608164801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 608164799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9b40a5a51a28234387d7a7f39235841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Hardpoint
+  weaponPrefab: {fileID: -5470632126457490998, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
+  cooldownOverride: 0
+  rangeOverride: 0
+  fireArc: 45
 --- !u!1 &734071395
 GameObject:
   m_ObjectHideFlags: 0
@@ -2787,11 +2838,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.35
+      value: 13.32
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -10.7
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3271,6 +3322,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1623587067}
+  - component: {fileID: 1623587068}
   m_Layer: 7
   m_Name: LeftLaserSpawn
   m_TagString: Untagged
@@ -3287,12 +3339,28 @@ Transform:
   m_GameObject: {fileID: 1623587066}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.34, y: 5, z: 0}
+  m_LocalPosition: {x: -4.340003, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1987034916}
+  m_Father: {fileID: 406181760}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1623587068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623587066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9b40a5a51a28234387d7a7f39235841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Hardpoint
+  weaponPrefab: {fileID: -5470632126457490998, guid: e3108a7d17a6fca44928338ac2bb4ca8, type: 3}
+  cooldownOverride: 0
+  rangeOverride: 0
+  fireArc: 45
 --- !u!1 &1669139933
 GameObject:
   m_ObjectHideFlags: 0
@@ -3595,11 +3663,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.73
+      value: 9.24
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -10.7
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3651,6 +3719,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1848023873}
+  - component: {fileID: 1848023874}
   m_Layer: 7
   m_Name: MissileSpawn
   m_TagString: Untagged
@@ -3666,13 +3735,29 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848023872}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1987034916}
+  m_Father: {fileID: 406181760}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1848023874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848023872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9b40a5a51a28234387d7a7f39235841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Hardpoint
+  weaponPrefab: {fileID: 3018362006425249580, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
+  cooldownOverride: 0
+  rangeOverride: 0
+  fireArc: 360
 --- !u!1 &1848262851
 GameObject:
   m_ObjectHideFlags: 0
@@ -4276,13 +4361,11 @@ Transform:
   m_LocalScale: {x: 0.017, y: 0.017, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 406181760}
   - {fileID: 1528766619}
-  - {fileID: 1623587067}
-  - {fileID: 608164800}
   - {fileID: 1421119157}
   - {fileID: 951736828}
   - {fileID: 73179591}
-  - {fileID: 1848023873}
   m_Father: {fileID: 1562954570}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &1987034919
@@ -4789,10 +4872,21 @@ MonoBehaviour:
   shield: 0
   speed: 10
   turnSpeed: 150
-  weaponGroups: []
+  weaponGroups:
+  - groupName: Primary
+    fireMode: 1
+    autonomous: 0
+    hardpoints:
+    - {fileID: 1623587068}
+    - {fileID: 608164801}
+  - groupName: Secondary
+    fireMode: 0
+    autonomous: 0
+    hardpoints:
+    - {fileID: 1848023874}
   lowHealth: 25
   smoke: {fileID: 73179591}
-  godMode: 1
+  godMode: 0
   isPlayer: 0
 --- !u!114 &2001088873 stripped
 MonoBehaviour:
