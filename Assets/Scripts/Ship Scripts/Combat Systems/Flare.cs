@@ -10,7 +10,6 @@ public class Flare : MonoBehaviour
     [SerializeField] private float deceleration = 3f;
 
     [Header("VFX")]
-    [SerializeField] private Color flareColor = Color.white;
     [SerializeField] private Transform FlareVFX;
 
     private VisualEffect flareTrail;
@@ -48,7 +47,6 @@ public class Flare : MonoBehaviour
     {
         rb.linearVelocity = direction.normalized * speed;
 
-        //spriteRenderer.color = flareColor;
         flareTrail.SendEvent("OnDamage");
         Destroy(gameObject, lifetime);
     }
