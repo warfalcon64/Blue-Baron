@@ -42,10 +42,6 @@ public class Flare : MonoBehaviour
             Vector2 trailDir = -rb.linearVelocity.normalized;
             flareTrail.SetVector3(smokeVelocityID, new Vector3(trailDir.x, trailDir.y, 0f));
         }
-
-        // Debug: velocity arrow (green) and smoke trail direction (red)
-        Debug.DrawRay(transform.position, rb.linearVelocity, Color.green);
-        Debug.DrawRay(transform.position, -rb.linearVelocity.normalized * 2f, Color.red);
     }
 
     public void Setup(Vector2 direction, Vector2 shipVelocity, ShipBase source)
