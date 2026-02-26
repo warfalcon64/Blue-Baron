@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 37b3abbd5b4de994da5024346ea9fd29, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -168,7 +168,7 @@ MonoBehaviour:
   speed: 5
   strength: 10
   lifetime: 3
-  deceleration: 2
+  deceleration: 3.7
   flareColor: {r: 1, g: 0.9198312, b: 0, a: 1}
   FlareVFX: {fileID: 8825063089103271391}
 --- !u!1 &8817818035097138601
@@ -222,14 +222,17 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 0.1
+      - m_Value: 0.05
         m_Name: SmokeSize
+        m_Overridden: 1
+      - m_Value: 0.4
+        m_Name: SmokeLifetime
         m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
       m_Array:
-      - m_Value: {x: 0.3, y: 1, z: 3}
+      - m_Value: {x: 0.3, y: 2, z: 3}
         m_Name: SmokeVelocity
         m_Overridden: 1
     m_Vector4f:
@@ -246,7 +249,7 @@ VisualEffect:
       m_Array:
       - m_Value:
           serializedVersion: 2
-          key0: {r: 0.34591186, g: 0.34591186, b: 0.34591186, a: 0}
+          key0: {r: 1, g: 1, b: 1, a: 0}
           key1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
           key2: {r: 0, g: 0, b: 0, a: 0.8}
           key3: {r: 0, g: 0, b: 0, a: 0}
@@ -263,7 +266,7 @@ VisualEffect:
           ctime6: 0
           ctime7: 0
           atime0: 0
-          atime1: 2570
+          atime1: 6811
           atime2: 52428
           atime3: 65535
           atime4: 0

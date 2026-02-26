@@ -48,7 +48,7 @@ public class Flare : MonoBehaviour
     {
         rb.linearVelocity = direction.normalized * speed;
 
-        spriteRenderer.color = flareColor;
+        //spriteRenderer.color = flareColor;
         flareTrail.SendEvent("OnDamage");
         Destroy(gameObject, lifetime);
     }
