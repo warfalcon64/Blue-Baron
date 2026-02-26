@@ -64,6 +64,11 @@ public class PlayerController : MonoBehaviour
             playerLockOnSystem.LockClosestEnemy();
         }
 
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ship.ActivateCombatSystem();
+        }
+
         // Calculate mouse position on screen
         mousePosition = Input.mousePosition;
         mousePosition.z = Camera.main.nearClipPlane;

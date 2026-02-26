@@ -1,7 +1,7 @@
 Planned Implementation:
 - Bomber craft with a turret (don't make it so that you need two different ships for both factions)
 - Make AI attempt to dodge missiles
-- Add flares/chaff to distract missiles
+- Add flares/chaff to distract missiles --> make better flare sprite that has HDR (or reuse spark?)
 - Rehaul the state based system. Most likely will need different states for each ship class instead of attempting to consolidate states for all ship classes.
 
 Future Implementation:
@@ -11,4 +11,5 @@ Future Implementation:
 - Make separate missile explosion effect from fighter death explosion
 
 Things to fix:
+- Flare smoke being wrong color
 - Make sure every ship calculates its own damage handling (weapons pass to them the damage that needs to be done)

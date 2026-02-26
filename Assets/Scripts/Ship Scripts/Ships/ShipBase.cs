@@ -18,6 +18,9 @@ public abstract class ShipBase : MonoBehaviour
     [Header("Weapon Groups")]
     [SerializeField] private List<WeaponGroup> weaponGroups;
 
+    [Header("Combat System")]
+    [SerializeField] private CombatSystemBase combatSystem;
+
     [Header("VFX")]
     [SerializeField] protected float lowHealth = 25;
     [SerializeField] protected Transform smoke;
@@ -93,6 +96,9 @@ public abstract class ShipBase : MonoBehaviour
 
         type = ShipType.Fighter;
         shipEffects = smoke.GetComponent<VisualEffect>();
+
+        if (combatSystem != null)
+            combatSystem.Init(this);
     }
 
     protected virtual void OnDeath()
@@ -291,6 +297,14 @@ public abstract class ShipBase : MonoBehaviour
     public virtual void SetShipTurnSpeed(float newTurnSpeed)
     {
         turnSpeed = newTurnSpeed;
+    }
+
+    public CombatSystemBase GetCombatSystem() => combatSystem;
+
+    public void ActivateCombatSystem()
+    {
+        if (combatSystem != null && combatSystem.IsReady())
+            combatSystem.Activate();
     }
 
 }
