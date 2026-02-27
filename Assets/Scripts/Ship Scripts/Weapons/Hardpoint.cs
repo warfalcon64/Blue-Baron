@@ -9,6 +9,16 @@ public class Hardpoint : MonoBehaviour
 
     private float nextFireTime;
 
+    public WeaponsBase Fire(Vector2 aimPos, Vector2 shipVelocity, ShipBase source)
+    {
+        Vector2 spawnPos = transform.position;
+        Vector2 shootDirection = (aimPos - spawnPos).normalized;
+        WeaponsBase projectile = Instantiate(weaponPrefab, spawnPos, transform.rotation);
+        projectile.Setup(shootDirection, shipVelocity, source);
+        nextFireTime = Time.time + GetCooldown();
+        return projectile;
+    }
+
     public float GetCooldown()
     {
         return cooldownOverride > 0 ? cooldownOverride : weaponPrefab.GetCoolDown();
@@ -37,16 +47,6 @@ public class Hardpoint : MonoBehaviour
     public bool IsReady()
     {
         return Time.time >= nextFireTime;
-    }
-
-    public WeaponsBase Fire(Vector2 aimPos, Vector2 shipVelocity, ShipBase source)
-    {
-        Vector2 spawnPos = transform.position;
-        Vector2 shootDirection = (aimPos - spawnPos).normalized;
-        WeaponsBase projectile = Instantiate(weaponPrefab, spawnPos, transform.rotation);
-        projectile.Setup(shootDirection, shipVelocity, source);
-        nextFireTime = Time.time + GetCooldown();
-        return projectile;
     }
 
     public bool IsInFireArc(Vector2 aimPos, Transform shipTransform)

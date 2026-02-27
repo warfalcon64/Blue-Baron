@@ -42,7 +42,7 @@ public class Radar : MonoBehaviour
         radarSweep.eulerAngles -= new Vector3(0, 0, rotateSpeed * Time.deltaTime);
 
         RaycastHit2D[] raycastHitArray = Physics2D.CircleCastAll(transform.position, 3f, GetVectorFromAngle(radarSweep.eulerAngles.z), radarDistance, radarLayerMask);
-        Debug.DrawRay(transform.position, GetVectorFromAngle(radarSweep.eulerAngles.z) * radarDistance, Color.red);
+        // Debug.DrawRay(transform.position, GetVectorFromAngle(radarSweep.eulerAngles.z) * radarDistance, Color.red);
         
 
         foreach (RaycastHit2D raycastHit in raycastHitArray)

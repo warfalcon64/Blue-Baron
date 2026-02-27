@@ -29,7 +29,7 @@ public class FlareLauncher : CombatSystemBase
 
         for (int i = 0; i < flareCount; i++)
         {
-            // Alternate sides: even = positive angle, odd = negative angle
+            // Alternate sides for flare launch
             float angle = (i % 2 == 0) ? spreadAngle : -spreadAngle;
             Vector2 backward = -ship.transform.up;
             Vector2 direction = Quaternion.Euler(0, 0, angle) * backward;

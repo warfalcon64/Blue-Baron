@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2237458042500013455}
   - component: {fileID: 6035457375794937776}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,9 +100,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7039334170514139081}
+  - component: {fileID: 8129553337831333372}
   - component: {fileID: 6767298068978630805}
   - component: {fileID: 6202980971237958320}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Flare
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,6 +127,42 @@ Transform:
   - {fileID: 8825063089103271391}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &8129553337831333372
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2541679667156767606}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.103
 --- !u!50 &6767298068978630805
 Rigidbody2D:
   serializedVersion: 5
@@ -166,8 +203,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Flare
   speed: 5
-  strength: 10
-  extraLifetime: 0
+  chaffStrength: 10
+  flareStrength: 10
   deceleration: 3.7
   FlareVFX: {fileID: 8825063089103271391}
 --- !u!1 &8817818035097138601
@@ -181,7 +218,7 @@ GameObject:
   - component: {fileID: 8825063089103271391}
   - component: {fileID: 5855585736791776648}
   - component: {fileID: 3203277221182184565}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Flare_VFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -274,7 +311,7 @@ VisualEffect:
       m_Array:
       - m_Value:
           serializedVersion: 2
-          key0: {r: 2.9960787, g: 2.9960787, b: 2.9960787, a: 1}
+          key0: {r: 1.4980394, g: 1.4980394, b: 1.4980394, a: 1}
           key1: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 0.9254902}
           key2: {r: 0, g: 0, b: 0, a: 0}
           key3: {r: 0, g: 0, b: 0, a: 0}

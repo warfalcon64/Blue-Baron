@@ -163,12 +163,12 @@ public class PlayerLockOnSystem : MonoBehaviour
         lead = Vector2.zero;
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = gizmoColor;
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Gizmos.DrawWireSphere(mousePosition, lockRadius);
-    }
+    // private void OnDrawGizmos()
+    // {
+    //     Gizmos.color = gizmoColor;
+    //     Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    //     Gizmos.DrawWireSphere(mousePosition, lockRadius);
+    // }
 
     public GameObject GetLockedEnemy()
     {

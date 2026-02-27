@@ -4,14 +4,21 @@ using UnityEngine;
 
 public class WeaponsAAMissile : WeaponsBase
 {
-    [Header("Proportional Navigation")]
-    [SerializeField] private float navigationGain = 4f;
-    [SerializeField] private float boostAcceleration = 30f;
+    [Header("Radar Seeker")]
+    [SerializeField] private float seekerHalfAngle = 30f;
+    [SerializeField] private float seekerSweepRate = 20f;
+    [SerializeField] private float targetRadarSignature = 5f;
+    [SerializeField] private float lockHoldTime = 0.5f;
+    [SerializeField] private LayerMask seekerLayerMask;
 
     [Header("One Turn")]
     [SerializeField] private float oneTurnDelay = 1f;
     [SerializeField] private float oneTurnAngleThreshold = 10f;
     [SerializeField] private float turnAcceleration = 50f;
+
+    [Header("Proportional Navigation")]
+    [SerializeField] private float navigationGain = 4f;
+    [SerializeField] private float boostAcceleration = 30f;
 
     [Header("Fuel")]
     [SerializeField] private float totalFuel = 100f;
@@ -28,13 +35,18 @@ public class WeaponsAAMissile : WeaponsBase
     private bool hasPreviousLOS;
     private float currentSpeed;
     private float fuelRemaining;
-    private bool hasLock;
+
     private bool oneTurnComplete;
     private float oneTurnTimer;
     private float currentTurnSpeed;
     private Vector2 missileVelocity;
 
     private GameObject previousTarget;
+
+    private float seekerCurrentAngle;
+    private bool seekerSweepRight = true;
+    private float lockHoldTimer;
+    private bool hadTargetLastFrame;
 
     private VFXManager vfxManager;
     private Rigidbody2D rb;
@@ -51,154 +63,53 @@ public class WeaponsAAMissile : WeaponsBase
     {
         float dt = Time.fixedDeltaTime;
 
-        // Source ship check — lose lock permanently if source is destroyed
-        if (source == null && hasLock)
+        if (source == null && !oneTurnComplete)
         {
-            hasLock = false;
-            if (previousTarget != null)
-            {
-                previousTarget.GetComponent<AIControllerBase>()?.RemoveIncomingMissile(this);
-                previousTarget = null;
-            }
+            oneTurnComplete = true;
+            hasPreviousLOS = false;
         }
 
-        // Motor thrust — burn fuel while motor has fuel
         if (fuelRemaining > 0f)
         {
             float fuelCost = Mathf.Min(thrustFuelRate * dt, fuelRemaining);
 
-            // Accelerate toward max speed (don't clamp down inherited velocity)
-            if (currentSpeed < speed)
-            {
-                currentSpeed = Mathf.MoveTowards(currentSpeed, speed, boostAcceleration * dt);
-            }
-            else
-            {
-                // Inherited velocity above max speed — let it decay toward max
-                currentSpeed = Mathf.MoveTowards(currentSpeed, speed, boostAcceleration * dt);
-            }
+            currentSpeed = Mathf.MoveTowards(currentSpeed, speed, boostAcceleration * dt);
 
             fuelRemaining -= fuelCost;
         }
 
-        // Kill engine trail when fuel is depleted
         if (fuelRemaining <= 0f && engineTrail != null && engineTrail.emitting)
         {
             engineTrail.emitting = false;
         }
 
-        // Guidance
-        if (hasLock && target != null)
+        if (oneTurnComplete && fuelRemaining > 0f)
         {
-            Vector2 targetPos = target.transform.position;
-            Vector2 missilePos = rb.position;
-            Vector2 los = targetPos - missilePos;
+            UpdateSeekerSweep(dt);
+        }
+
+        // Guidance
+        if (target != null)
+        {
+            Vector2 los = (Vector2)target.transform.position - rb.position;
             float losAngle = Mathf.Atan2(los.y, los.x);
 
-            // Initiate One Turn phase after specified delay
             if (!oneTurnComplete)
-            {
-                oneTurnTimer += dt;
-                if (oneTurnTimer < oneTurnDelay)
-                {
-                    // Coast during delay before one-turn begins
-                    missileVelocity = missileVelocity.normalized * currentSpeed;
-                }
-                else
-                {
-                    // Check if one-turn phase is complete
-                    float velAngle = Mathf.Atan2(missileVelocity.y, missileVelocity.x) * Mathf.Rad2Deg;
-                    float losAngleDeg = losAngle * Mathf.Rad2Deg;
-                    float angleDiff = Mathf.Abs(Mathf.DeltaAngle(velAngle, losAngleDeg));
-
-                    if (angleDiff <= oneTurnAngleThreshold)
-                    {
-                        oneTurnComplete = true;
-                    }
-                    else
-                    {
-                        // One-turn phase: direct pursuit — ramp up turn rate
-                        currentTurnSpeed = Mathf.MoveTowards(currentTurnSpeed, turnSpeed, turnAcceleration * dt);
-
-                        Vector2 velDir = missileVelocity.normalized;
-                        Vector2 losDir = los.normalized;
-                        Vector2 perpDir = new Vector2(-velDir.y, velDir.x);
-
-                        // Project LOS onto perpendicular to get turn direction
-                        // Scale lateral acceleration by speed ratio so angular turn rate is consistent
-                        float turnDirection = Vector2.Dot(losDir, perpDir);
-                        float speedRatio = speed > 0f ? currentSpeed / speed : 0f;
-                        float clampedAccel = Mathf.Sign(turnDirection) * currentTurnSpeed * speedRatio;
-
-                        // RCS fuel cost
-                        float absAccel = Mathf.Abs(clampedAccel);
-                        float rcsCost = rcsFuelRate * absAccel * dt;
-                        if (rcsCost > fuelRemaining)
-                        {
-                            float scaleFactor = fuelRemaining / rcsCost;
-                            clampedAccel *= scaleFactor;
-                            rcsCost = fuelRemaining;
-                        }
-
-                        fuelRemaining -= rcsCost;
-
-                        missileVelocity += perpDir * clampedAccel * dt;
-                        missileVelocity = missileVelocity.normalized * currentSpeed;
-
-                        // Reset PN state so it starts fresh after one-turn completes
-                        hasPreviousLOS = false;
-                    }
-                }
-            }
+                UpdateOneTurn(dt, los, losAngle);
             else if (hasPreviousLOS)
-            {
-                // PN guidance
-                float losRate = Mathf.DeltaAngle(previousLOSAngle * Mathf.Rad2Deg, losAngle * Mathf.Rad2Deg) * Mathf.Deg2Rad / dt;
-
-                // Closing speed (positive when closing)
-                Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>();
-                Vector2 targetVel = targetRb != null ? targetRb.linearVelocity : Vector2.zero;
-                Vector2 relVel = missileVelocity - targetVel;
-                Vector2 losDir = los.normalized;
-                float closingSpeed = Mathf.Abs(Vector2.Dot(relVel, losDir));
-
-                // PN commanded lateral acceleration: a = N * Vc * losRate
-                float lateralAccelMag = navigationGain * closingSpeed * losRate;
-
-                // Perpendicular to missile velocity (left-hand normal in 2D)
-                Vector2 velDir = missileVelocity.normalized;
-                Vector2 perpDir = new Vector2(-velDir.y, velDir.x);
-
-                // Clamp to max lateral accel (turnSpeed from WeaponsBase)
-                float clampedAccel = Mathf.Clamp(lateralAccelMag, -turnSpeed, turnSpeed);
-
-                // RCS fuel cost
-                float absAccel = Mathf.Abs(clampedAccel);
-                float rcsCost = rcsFuelRate * absAccel * dt;
-                if (rcsCost > fuelRemaining)
-                {
-                    // Scale down proportionally
-                    float scaleFactor = fuelRemaining / rcsCost;
-                    clampedAccel *= scaleFactor;
-                    absAccel *= scaleFactor;
-                    rcsCost = fuelRemaining;
-                }
-
-                fuelRemaining -= rcsCost;
-
-                // Apply lateral acceleration to velocity
-                missileVelocity += perpDir * clampedAccel * dt;
-
-                // Re-normalize to currentSpeed (PN changes direction, not speed)
-                missileVelocity = missileVelocity.normalized * currentSpeed;
-            }
+                UpdateProNav(dt, los, losAngle);
 
             previousLOSAngle = losAngle;
             hasPreviousLOS = true;
+            hadTargetLastFrame = true;
         }
         else
         {
-            // No lock — coast ballistically, keep velocity direction
+            if (hadTargetLastFrame)
+            {
+                Debug.Log($"[Missile] Lost target, coasting ballistically (fuel: {fuelRemaining:F1})");
+                hadTargetLastFrame = false;
+            }
             missileVelocity = missileVelocity.normalized * currentSpeed;
         }
 
@@ -233,12 +144,194 @@ public class WeaponsAAMissile : WeaponsBase
         missileVelocity = shipVelocity;
         currentSpeed = missileVelocity.magnitude;
         fuelRemaining = totalFuel;
-        hasLock = true;
         hasPreviousLOS = false;
         oneTurnComplete = false;
         oneTurnTimer = 0f;
         currentTurnSpeed = 0f;
         Destroy(gameObject, lifetime);
+    }
+
+
+    private void UpdateOneTurn(float dt, Vector2 los, float losAngle)
+    {
+        oneTurnTimer += dt;
+        if (oneTurnTimer < oneTurnDelay)
+        {
+            missileVelocity = missileVelocity.normalized * currentSpeed;
+            return;
+        }
+
+        // Check if one-turn phase is complete
+        float velAngle = Mathf.Atan2(missileVelocity.y, missileVelocity.x) * Mathf.Rad2Deg;
+        float losAngleDeg = losAngle * Mathf.Rad2Deg;
+        float angleDiff = Mathf.Abs(Mathf.DeltaAngle(velAngle, losAngleDeg));
+
+        if (angleDiff <= oneTurnAngleThreshold)
+        {
+            Debug.Log($"[Missile] One-turn complete, switching to seeker/PN phase");
+            oneTurnComplete = true;
+            return;
+        }
+
+        // Direct pursuit, ramp up turn rate
+        currentTurnSpeed = Mathf.MoveTowards(currentTurnSpeed, turnSpeed, turnAcceleration * dt);
+
+        Vector2 velDir = missileVelocity.normalized;
+        Vector2 losDir = los.normalized;
+        Vector2 perpDir = new Vector2(-velDir.y, velDir.x);
+
+        // Scale lateral acceleration by speed ratio so angular turn rate is consistent
+        float turnDirection = Vector2.Dot(losDir, perpDir);
+        float speedRatio = speed > 0f ? currentSpeed / speed : 0f;
+        float clampedAccel = Mathf.Sign(turnDirection) * currentTurnSpeed * speedRatio;
+
+        // RCS fuel cost
+        float absAccel = Mathf.Abs(clampedAccel);
+        float rcsCost = rcsFuelRate * absAccel * dt;
+        if (rcsCost > fuelRemaining)
+        {
+            float scaleFactor = fuelRemaining / rcsCost;
+            clampedAccel *= scaleFactor;
+            rcsCost = fuelRemaining;
+        }
+
+        fuelRemaining -= rcsCost;
+
+        missileVelocity += perpDir * clampedAccel * dt;
+        missileVelocity = missileVelocity.normalized * currentSpeed;
+
+        // Reset PN state so it starts fresh after one-turn completes
+        hasPreviousLOS = false;
+    }
+
+    private void UpdateProNav(float dt, Vector2 los, float losAngle)
+    {
+        float losRate = Mathf.DeltaAngle(previousLOSAngle * Mathf.Rad2Deg, losAngle * Mathf.Rad2Deg) * Mathf.Deg2Rad / dt;
+
+        // Closing speed (positive when closing)
+        Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>();
+        Vector2 targetVel = targetRb != null ? targetRb.linearVelocity : Vector2.zero;
+        Vector2 relVel = missileVelocity - targetVel;
+        Vector2 losDir = los.normalized;
+        float closingSpeed = Mathf.Abs(Vector2.Dot(relVel, losDir));
+
+        // PN commanded lateral acceleration: a = N * Vc * losRate
+        float lateralAccelMag = navigationGain * closingSpeed * losRate;
+
+        // Perpendicular to missile velocity (left-hand normal in 2D)
+        Vector2 velDir = missileVelocity.normalized;
+        Vector2 perpDir = new Vector2(-velDir.y, velDir.x);
+
+        // Clamp to max lateral accel (turnSpeed from WeaponsBase)
+        float clampedAccel = Mathf.Clamp(lateralAccelMag, -turnSpeed, turnSpeed);
+
+        // RCS fuel cost
+        float absAccel = Mathf.Abs(clampedAccel);
+        float rcsCost = rcsFuelRate * absAccel * dt;
+        if (rcsCost > fuelRemaining)
+        {
+            float scaleFactor = fuelRemaining / rcsCost;
+            clampedAccel *= scaleFactor;
+            absAccel *= scaleFactor;
+            rcsCost = fuelRemaining;
+        }
+
+        fuelRemaining -= rcsCost;
+
+        // Apply lateral acceleration to velocity
+        missileVelocity += perpDir * clampedAccel * dt;
+
+        // Re-normalize to currentSpeed (PN changes direction, not speed)
+        missileVelocity = missileVelocity.normalized * currentSpeed;
+    }
+
+    private void UpdateSeekerSweep(float dt)
+    {
+        if (lockHoldTimer > 0f)
+            lockHoldTimer -= dt;
+
+        float sweepDelta = seekerSweepRate * dt;
+        if (seekerSweepRight)
+        {
+            seekerCurrentAngle += sweepDelta;
+            if (seekerCurrentAngle >= seekerHalfAngle)
+            {
+                seekerCurrentAngle = seekerHalfAngle;
+                seekerSweepRight = false;
+            }
+        }
+        else
+        {
+            seekerCurrentAngle -= sweepDelta;
+            if (seekerCurrentAngle <= -seekerHalfAngle)
+            {
+                seekerCurrentAngle = -seekerHalfAngle;
+                seekerSweepRight = true;
+            }
+        }
+
+        // Cast ray in swept direction
+        Vector2 velDir = missileVelocity.normalized;
+        Vector2 rayDir = (Vector2)(Quaternion.Euler(0f, 0f, seekerCurrentAngle) * velDir);
+
+        float rayLength;
+        if (target != null)
+            rayLength = Vector2.Distance(rb.position, (Vector2)target.transform.position);
+        else
+            rayLength = speed * lifetime;
+
+        RaycastHit2D hit = Physics2D.Raycast(rb.position, rayDir, rayLength, seekerLayerMask);
+        if (hit.collider == null)
+            return;
+
+        if (target != null && hit.collider.gameObject == target)
+            return;
+
+        float detectedSignal;
+        Flare flare = hit.collider.GetComponent<Flare>();
+        if (flare != null)
+            detectedSignal = flare.GetChaffStrength();
+        else if (hit.collider.GetComponent<ShipBase>() != null)
+            detectedSignal = targetRadarSignature;
+        else
+            return;
+
+        float currentSignal = 0f;
+        if (target != null)
+        {
+            Flare currentFlare = target.GetComponent<Flare>();
+            if (currentFlare != null)
+                currentSignal = currentFlare.GetChaffStrength();
+            else if (target.GetComponent<ShipBase>() != null)
+                currentSignal = targetRadarSignature;
+        }
+
+        if (detectedSignal > currentSignal && lockHoldTimer <= 0f)
+        {
+            if (previousTarget != null)
+            {
+                AIControllerBase prevAI = previousTarget.GetComponent<AIControllerBase>();
+                if (prevAI != null)
+                    prevAI.RemoveIncomingMissile(this);
+            }
+
+            bool wasFlare = flare != null;
+            target = hit.collider.gameObject;
+            previousTarget = target;
+
+            if (wasFlare)
+                Debug.Log($"[Missile] Locked onto flare (chaff strength: {detectedSignal:F1}) over previous target (signal: {currentSignal:F1})");
+            else
+                Debug.Log($"[Missile] Locked onto ship {target.name} (signal: {detectedSignal:F1}) over previous target (signal: {currentSignal:F1})");
+
+            if (target.TryGetComponent<AIControllerBase>(out AIControllerBase newAI))
+                newAI.AddIncomingMissile(this);
+
+            // Reset PN state so guidance restarts fresh toward new target
+            hasPreviousLOS = false;
+
+            lockHoldTimer = lockHoldTime;
+        }
     }
 
     public override float GetSpeed()
@@ -248,19 +341,21 @@ public class WeaponsAAMissile : WeaponsBase
 
     public override void SetTarget(GameObject newTarget)
     {
-        // Remove self from previous target's incoming list
         if (previousTarget != null)
         {
-            previousTarget.GetComponent<AIControllerBase>()?.RemoveIncomingMissile(this);
+            AIControllerBase prevAI = previousTarget.GetComponent<AIControllerBase>();
+            if (prevAI != null)
+                prevAI.RemoveIncomingMissile(this);
         }
 
         base.SetTarget(newTarget);
         previousTarget = newTarget;
 
-        // Notify new target's AI that a missile is tracking it
         if (target != null)
         {
-            target.GetComponent<AIControllerBase>()?.AddIncomingMissile(this);
+            AIControllerBase targetAI = target.GetComponent<AIControllerBase>();
+            if (targetAI != null)
+                targetAI.AddIncomingMissile(this);
         }
     }
 
@@ -274,11 +369,37 @@ public class WeaponsAAMissile : WeaponsBase
         return totalFuel > 0f ? fuelRemaining / totalFuel : 0f;
     }
 
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying || !oneTurnComplete)
+            return;
+
+        Vector2 velDir = missileVelocity.normalized;
+        float rayLength = target != null
+            ? Vector2.Distance(rb.position, (Vector2)target.transform.position)
+            : speed * lifetime;
+
+        // Draw cone edges
+        Vector2 leftDir = (Vector2)(Quaternion.Euler(0f, 0f, seekerHalfAngle) * velDir);
+        Vector2 rightDir = (Vector2)(Quaternion.Euler(0f, 0f, -seekerHalfAngle) * velDir);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(rb.position, rb.position + leftDir * rayLength);
+        Gizmos.DrawLine(rb.position, rb.position + rightDir * rayLength);
+
+        // Draw current sweep ray
+        Vector2 sweepDir = (Vector2)(Quaternion.Euler(0f, 0f, seekerCurrentAngle) * velDir);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(rb.position, rb.position + sweepDir * rayLength);
+    }
+
     private void OnDestroy()
     {
         if (previousTarget != null)
         {
-            previousTarget.GetComponent<AIControllerBase>()?.RemoveIncomingMissile(this);
+            AIControllerBase prevAI = previousTarget.GetComponent<AIControllerBase>();
+            if (prevAI != null)
+                prevAI.RemoveIncomingMissile(this);
         }
     }
 

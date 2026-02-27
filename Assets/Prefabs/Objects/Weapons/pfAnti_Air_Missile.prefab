@@ -374,14 +374,21 @@ MonoBehaviour:
   isSeeker: 1
   usage: 17
   lifetime: 1000
-  navigationGain: 4
-  boostAcceleration: 5
+  seekerHalfAngle: 45
+  seekerSweepRate: 20
+  targetRadarSignature: 5
+  lockHoldTime: 0.5
+  seekerLayerMask:
+    serializedVersion: 2
+    m_Bits: 4224
   oneTurnDelay: 0.5
   oneTurnAngleThreshold: 10
   turnAcceleration: 100
+  navigationGain: 4
+  boostAcceleration: 5
   totalFuel: 200
-  thrustFuelRate: 20
-  rcsFuelRate: 5
+  thrustFuelRate: 10
+  rcsFuelRate: 1
   blueTeamTrailStart: {r: 0.1, g: 0.73, b: 1, a: 1}
   blueTeamTrailEnd: {r: 0.35, g: 0.68, b: 0.82, a: 1}
   redTeamTrailStart: {r: 1, g: 0.5, b: 0.1, a: 1}

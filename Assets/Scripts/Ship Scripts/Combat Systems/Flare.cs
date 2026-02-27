@@ -5,7 +5,8 @@ public class Flare : MonoBehaviour
 {
     [Header("Attributes")]
     [SerializeField] private float speed = 10f;
-    [SerializeField] private float strength = 10f;
+    [SerializeField] private float chaffStrength = 10f;
+    [SerializeField] private float flareStrength = 10f;
     [SerializeField] private float deceleration = 3f;
 
     [Header("VFX")]
@@ -21,6 +22,7 @@ public class Flare : MonoBehaviour
     private float totalLifetime;
     private float spawnTime;
     private float initialSmokeSize;
+    private float currentT;
     private bool stopped;
 
     private void Awake()
@@ -49,14 +51,13 @@ public class Flare : MonoBehaviour
         }
 
         float elapsed = Time.time - spawnTime;
-        float t = Mathf.Clamp01(elapsed / totalLifetime);
+        currentT = Mathf.Clamp01(elapsed / totalLifetime);
 
         // Fade sprite opacity over the total lifetime
-        baseColor.a = 1f - t;
+        baseColor.a = 1f - currentT;
         spriteRenderer.color = baseColor;
 
-        // Shrink smoke trail size linearly over the total lifetime
-        flareTrail.SetFloat(smokeSizeID, initialSmokeSize * (1f - t));
+        flareTrail.SetFloat(smokeSizeID, initialSmokeSize * (1f - currentT));
 
         // Update smoke trail to trail behind flare movement
         if (currentSpeed > 0.1f)
@@ -82,5 +83,7 @@ public class Flare : MonoBehaviour
         Destroy(gameObject, totalLifetime);
     }
 
-    public float GetStrength() => strength;
+    public float GetChaffStrength() => chaffStrength * (1f - currentT);
+
+    public float GetFlareStrength() => flareStrength * (1f - currentT);
 }
