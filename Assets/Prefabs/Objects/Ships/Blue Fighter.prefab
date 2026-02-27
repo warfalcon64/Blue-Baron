@@ -1077,7 +1077,7 @@ MonoBehaviour:
   - groupName: Secondary
     fireMode: 0
     autonomous: 0
-    enabled: 0
+    enabled: 1
     hardpoints:
     - {fileID: 3655943799203410016}
   combatSystem: {fileID: 0}
@@ -1101,6 +1101,9 @@ MonoBehaviour:
   canHover: 0
   faceEnemyAngle: 5
   angularError: 5
+  leadFactorMin: 0.7
+  leadFactorMax: 1.3
+  leadFactorRerollInterval: 3
   ship: {fileID: 8497475259681279297}
 --- !u!1 &9045316319554966681
 GameObject:
