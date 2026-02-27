@@ -36,7 +36,6 @@ public class SearchState : State.IState
             if (found != null)
             {
                 c.SetTarget(found);
-                c.target.GetComponent<ShipBase>().OnShipDeath += c.HandleTargetDeath;
                 c.ChangeState(c.attackState);
             }
         }

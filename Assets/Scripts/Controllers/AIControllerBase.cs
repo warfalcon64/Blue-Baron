@@ -25,6 +25,8 @@ public abstract class AIControllerBase : MonoBehaviour
     protected Vector2 lastVelocity;
 
     private List<int> controllableGroupIndices;
+    private float leadFactor;
+    private float leadFactorTimer;
 
     public List<ShipBase> enemyTeam { get; private set; }
     public GameObject attacker { get; private set; }
@@ -39,6 +41,9 @@ public abstract class AIControllerBase : MonoBehaviour
     [SerializeField] public bool canHover = false;
     [SerializeField] public float faceEnemyAngle = 1; // * May have to change access of this in future
     [SerializeField] public float angularError = 5f;
+    [SerializeField] private float leadFactorMin = 0.7f;
+    [SerializeField] private float leadFactorMax = 1.3f;
+    [SerializeField] private float leadFactorRerollInterval = 3f;
     public float plasmaInaccuracy { get; private set; } // *** in the future make this solely for ship script, and instead of changing calculations try changing rotation of bullet as it is instantiated
 
     public ShipBase ship;
@@ -50,6 +55,8 @@ public abstract class AIControllerBase : MonoBehaviour
         target = null;
         nextTurn = Random.Range(0, 2f);
         nextAdjust = Random.Range(0, 2f);
+        leadFactor = Random.Range(leadFactorMin, leadFactorMax);
+        leadFactorTimer = leadFactorRerollInterval;
         stopSearch = false;
         attackingEnemies = new List<ShipBase>();
         incomingMissiles = new List<WeaponsAAMissile>();
@@ -152,8 +159,8 @@ public abstract class AIControllerBase : MonoBehaviour
     /// <returns>The target, if a valid target exists. Otherwise, it returns null.</returns>
     public virtual GameObject FindTarget()
     {
-        float distance;
         float lowestDistance = Mathf.Infinity;
+        GameObject closest = null;
         enemyTeam = SceneManager.Instance.GetLiveEnemies(tag);
 
         if (enemyTeam.Count == 0)
@@ -164,17 +171,19 @@ public abstract class AIControllerBase : MonoBehaviour
 
         foreach (ShipBase enemy in enemyTeam)
         {
+            if (!enemy.gameObject.activeInHierarchy) continue;
+
             Vector2 posDiff = enemy.GetComponent<Rigidbody2D>().position - rb.position;
-            distance = posDiff.sqrMagnitude;
+            float distance = posDiff.sqrMagnitude;
 
             if (distance < lowestDistance)
             {
                 lowestDistance = distance;
-                target = enemy.gameObject;
+                closest = enemy.gameObject;
             }
         }
 
-        return target;
+        return closest;
     }
 
     protected virtual void HandleDamageEvent(object sender, ShipBase attacker)
@@ -196,13 +205,15 @@ public abstract class AIControllerBase : MonoBehaviour
     public virtual void HandleTargetDeath(object sender, EventArgs e)
     {
         ShipBase shipBase = (ShipBase)sender;
-        target = FindTarget();
-        if (target != null)
-        {
-            target.GetComponent<ShipBase>().OnShipDeath += HandleTargetDeath;
-        }
-
         shipBase.OnShipDeath -= HandleTargetDeath;
+
+        // Clear stale target, then find a new one
+        target = null;
+        GameObject found = FindTarget();
+        if (found != null)
+        {
+            SetTarget(found);
+        }
     }
 
     /// <summary>
@@ -216,16 +227,10 @@ public abstract class AIControllerBase : MonoBehaviour
         if (target != null && !stopSearch) // ** Not sure if target check is needed here anymore
         {
             // Turning logic
-            if (Mathf.Abs(angle) > faceEnemyAngle && nextTurn <= 0)
+            if (Mathf.Abs(angle) > faceEnemyAngle)
             {
                 if (angle > 0) turn = 1f;
-
                 if (angle < 0) turn = -1f;
-
-            }
-            else if (Mathf.Abs(angle) < faceEnemyAngle && nextTurn <= 0)
-            {
-                nextTurn = Random.Range(0, 2f);
             }
 
             // Acceleration logic
@@ -286,6 +291,13 @@ public abstract class AIControllerBase : MonoBehaviour
         if (nextTurn > 0) nextTurn -= Time.deltaTime;
 
         if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
+
+        leadFactorTimer -= Time.deltaTime;
+        if (leadFactorTimer <= 0f)
+        {
+            leadFactor = Random.Range(leadFactorMin, leadFactorMax);
+            leadFactorTimer = leadFactorRerollInterval;
+        }
     }
 
     private void OnDisable()
@@ -296,9 +308,24 @@ public abstract class AIControllerBase : MonoBehaviour
 
     public void SetTarget(GameObject newTarget)
     {
-        if (newTarget != null && newTarget != target)
+        if (newTarget == null || newTarget == target) return;
+        if (!newTarget.activeInHierarchy) return;
+
+        if (target != null)
         {
-            target = newTarget;
+            ShipBase oldShip = target.GetComponent<ShipBase>();
+            if (oldShip != null)
+            {
+                oldShip.OnShipDeath -= HandleTargetDeath;
+            }
+        }
+
+        target = newTarget;
+
+        ShipBase newShip = target.GetComponent<ShipBase>();
+        if (newShip != null)
+        {
+            newShip.OnShipDeath += HandleTargetDeath;
         }
     }
 
@@ -323,6 +350,23 @@ public abstract class AIControllerBase : MonoBehaviour
         Vector2 targetDirection = targetRb.position - rb.position;
 
         return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
+    }
+
+    public virtual float GetAngleToLeadTarget()
+    {
+        WeaponGroup primaryGroup = ship.GetWeaponGroup(0);
+        WeaponsBase repWeapon = primaryGroup.GetRepresentativeWeapon();
+        if (repWeapon == null)
+            return GetAngleToTarget();
+
+        targetRb = target.GetComponent<Rigidbody2D>();
+        float projectileSpeed = repWeapon.GetSpeed();
+        float distance = Vector2.Distance(rb.position, targetRb.position);
+        float travelTime = distance / projectileSpeed * leadFactor;
+        Vector2 leadPos = targetRb.position + targetRb.linearVelocity * travelTime;
+        Vector2 leadDirection = leadPos - rb.position;
+
+        return Vector2.SignedAngle((Vector2)transform.up, leadDirection);
     }
 
     /// <summary>

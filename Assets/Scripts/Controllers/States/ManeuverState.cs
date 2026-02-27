@@ -48,12 +48,12 @@ public class ManeuverState : State.IState
     public void FixedUpdateState(AIControllerBase c)
     {
         // Try to acquire a target if we don't have one
-        if (c.target == null)
+        if (c.target == null || !c.target.activeInHierarchy)
         {
-            c.FindTarget();
-            if (c.target != null)
+            GameObject found = c.FindTarget();
+            if (found != null)
             {
-                c.target.GetComponent<ShipBase>().OnShipDeath += c.HandleTargetDeath;
+                c.SetTarget(found);
             }
         }
 
@@ -64,7 +64,7 @@ public class ManeuverState : State.IState
         }
 
         // Fire weapons at target regardless of evasion
-        if (c.target != null)
+        if (c.target != null && c.target.activeInHierarchy)
         {
             Vector2 targetAcceleration = c.CalculateTargetAcceleration();
             float angle = c.GetAngleToTarget();
