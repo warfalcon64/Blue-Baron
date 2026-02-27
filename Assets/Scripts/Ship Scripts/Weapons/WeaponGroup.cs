@@ -14,6 +14,7 @@ public class WeaponGroup
     public string groupName;
     public FireMode fireMode;
     public bool autonomous;
+    public bool enabled = true;
     public List<Hardpoint> hardpoints;
 
     [NonSerialized] private int nextHardpointIndex;
@@ -22,7 +23,7 @@ public class WeaponGroup
     {
         List<WeaponsBase> fired = new List<WeaponsBase>();
 
-        if (hardpoints == null || hardpoints.Count == 0) return fired;
+        if (!enabled || hardpoints == null || hardpoints.Count == 0) return fired;
 
         if (fireMode == FireMode.Unison)
         {

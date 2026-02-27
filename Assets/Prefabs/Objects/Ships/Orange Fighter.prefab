@@ -965,12 +965,14 @@ MonoBehaviour:
   - groupName: Primary
     fireMode: 1
     autonomous: 0
+    enabled: 1
     hardpoints:
     - {fileID: 8424769688557783063}
     - {fileID: 8622569849044809258}
   - groupName: Secondary
     fireMode: 0
     autonomous: 0
+    enabled: 0
     hardpoints:
     - {fileID: 220117002755116494}
   combatSystem: {fileID: 0}
