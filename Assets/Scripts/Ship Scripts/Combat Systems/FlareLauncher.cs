@@ -8,8 +8,6 @@ public class FlareLauncher : CombatSystemBase
     [SerializeField] private int flareCount = 4;
     [SerializeField] private float spreadAngle = 45f;
     [SerializeField] private float burstInterval = 0.1f;
-    [SerializeField] private Transform spawnPoint;
-
     private bool isFiring;
 
     public override void Activate()
@@ -34,7 +32,7 @@ public class FlareLauncher : CombatSystemBase
             Vector2 backward = -ship.transform.up;
             Vector2 direction = Quaternion.Euler(0, 0, angle) * backward;
 
-            Vector2 spawnPos = spawnPoint != null ? (Vector2)spawnPoint.position : (Vector2)ship.transform.position;
+            Vector2 spawnPos = (Vector2)transform.position;
             Flare flare = Instantiate(flarePrefab, spawnPos, Quaternion.identity);
             flare.Setup(direction, ship.GetRigidBody().linearVelocity, ship);
 

@@ -48,6 +48,56 @@ MonoBehaviour:
   cooldownOverride: 0
   rangeOverride: 0
   fireArc: 45
+--- !u!1 &1608466281747555831
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3935434577491465333}
+  - component: {fileID: 8734995988375712972}
+  m_Layer: 0
+  m_Name: Flare Launcher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3935434577491465333
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1608466281747555831}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -7.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1685657086373102519}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8734995988375712972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1608466281747555831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fccf53bc15ac8bb4cac5ce3602b12728, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FlareLauncher
+  cooldown: 2
+  maxCharges: -1
+  flarePrefab: {fileID: 6202980971237958320, guid: f826b97a08569e249b7e502cbd5e3743, type: 3}
+  flareCount: 4
+  spreadAngle: 45
+  burstInterval: 0.07
 --- !u!1 &2410906246744907081
 GameObject:
   m_ObjectHideFlags: 0
@@ -467,6 +517,7 @@ Transform:
   - {fileID: 1056712624097617353}
   - {fileID: 4077070804185217646}
   - {fileID: 4119226456086350580}
+  - {fileID: 3935434577491465333}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &8941532685634839918
@@ -975,7 +1026,7 @@ MonoBehaviour:
     enabled: 1
     hardpoints:
     - {fileID: 220117002755116494}
-  combatSystem: {fileID: 0}
+  combatSystem: {fileID: 8734995988375712972}
   lowHealth: 25
   smoke: {fileID: 4119226456086350580}
   godMode: 0

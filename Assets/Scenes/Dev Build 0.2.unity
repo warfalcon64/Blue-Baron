@@ -748,11 +748,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.28
+      value: 27.491646
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10.7
+      value: -10.497126
       objectReference: {fileID: 0}
     - target: {fileID: 1685657086373102519, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
       propertyPath: m_LocalPosition.z
@@ -928,7 +928,6 @@ MonoBehaviour:
   flareCount: 4
   spreadAngle: 45
   burstInterval: 0.07
-  spawnPoint: {fileID: 356152110}
 --- !u!1 &406181759
 GameObject:
   m_ObjectHideFlags: 0
@@ -3861,6 +3860,7 @@ MonoBehaviour:
   shipData: {fileID: 11400000, guid: 6cb2b35daab4fe5488cc5b43e30bd944, type: 2}
   mainCam: {fileID: 519420033}
   minimapCam: {fileID: 1096590109}
+  spectatorMode: 0
 --- !u!1 &1987034914
 GameObject:
   m_ObjectHideFlags: 0
@@ -4470,18 +4470,20 @@ MonoBehaviour:
   - groupName: Primary
     fireMode: 1
     autonomous: 0
+    enabled: 1
     hardpoints:
     - {fileID: 1623587068}
     - {fileID: 608164801}
   - groupName: Secondary
     fireMode: 0
     autonomous: 0
+    enabled: 1
     hardpoints:
     - {fileID: 1848023874}
   combatSystem: {fileID: 356152111}
   lowHealth: 25
   smoke: {fileID: 73179591}
-  godMode: 1
+  godMode: 0
   isPlayer: 0
 --- !u!1 &2138508682
 GameObject:

@@ -17,6 +17,10 @@ public class ManeuverState : State.IState
     // Range at which incoming missiles trigger evasion
     private float missileEvadeRange;
 
+    // Flare deployment thresholds
+    private float flareRearAngle = 60f;    // Max angle between rear and threat to deploy flares
+    private float flareEmergencyRange = 5f; // Deploy flares regardless of angle if missile is this close
+
     public ManeuverState(float duration = 5f, float missileEvadeRange = 15f)
     {
         this.duration = duration;
@@ -31,7 +35,6 @@ public class ManeuverState : State.IState
 
     public void UpdateState(AIControllerBase c)
     {
-        // Return to attack as soon as no missiles are close
         if (!HasCloseIncomingMissile(c))
         {
             c.ChangeState(c.attackState);
@@ -47,7 +50,6 @@ public class ManeuverState : State.IState
 
     public void FixedUpdateState(AIControllerBase c)
     {
-        // Try to acquire a target if we don't have one
         if (c.target == null || !c.target.activeInHierarchy)
         {
             GameObject found = c.FindTarget();
@@ -57,7 +59,6 @@ public class ManeuverState : State.IState
             }
         }
 
-        // Evade close missiles while still firing at target
         if (HasCloseIncomingMissile(c))
         {
             EvadeMissiles(c);
@@ -66,9 +67,7 @@ public class ManeuverState : State.IState
         // Fire weapons at target regardless of evasion
         if (c.target != null && c.target.activeInHierarchy)
         {
-            Vector2 targetAcceleration = c.CalculateTargetAcceleration();
-            float angle = c.GetAngleToTarget();
-            c.AttackTarget(targetAcceleration, Math.Abs(angle));
+            c.AttackTarget();
         }
     }
 
@@ -98,7 +97,6 @@ public class ManeuverState : State.IState
     {
         float dt = Time.fixedDeltaTime;
 
-        // Update jink timer
         jinkTimer -= dt;
         if (jinkTimer <= 0f)
         {
@@ -108,6 +106,7 @@ public class ManeuverState : State.IState
         // Compute weighted threat direction (closer missiles = heavier weight)
         Vector2 myPos = c.rb.position;
         Vector2 evadeDir = Vector2.zero;
+        float closestDistSqr = float.MaxValue;
 
         for (int i = c.incomingMissiles.Count - 1; i >= 0; i--)
         {
@@ -119,8 +118,12 @@ public class ManeuverState : State.IState
             }
 
             Vector2 toShip = myPos - (Vector2)missile.transform.position;
-            float dist = toShip.magnitude;
+            float distSqr = toShip.sqrMagnitude;
+            float dist = Mathf.Sqrt(distSqr);
             if (dist < 0.01f) continue;
+
+            if (distSqr < closestDistSqr)
+                closestDistSqr = distSqr;
 
             float weight = 1f / dist;
             evadeDir += toShip.normalized * weight;
@@ -140,6 +143,18 @@ public class ManeuverState : State.IState
         // Turn toward jinked direction and accelerate to max
         float angle = c.GetAngleToDestination(jinkedDir);
         c.MoveToEvade(angle);
+
+        // Deploy flares when rear faces the threat, or immediately if missile is dangerously close
+        Vector2 rear = -(Vector2)c.transform.up;
+        Vector2 threatDir = -evadeDir; // Direction toward missiles
+        float rearAngle = Vector2.Angle(rear, threatDir);
+        bool rearFacingThreat = rearAngle <= flareRearAngle;
+        bool missileEmergency = closestDistSqr <= flareEmergencyRange * flareEmergencyRange;
+
+        if (rearFacingThreat || missileEmergency)
+        {
+            c.ship.ActivateCombatSystem(); // * may have to later check for specific combat system instead of blind activation
+        }
     }
 
     private void RollJink()

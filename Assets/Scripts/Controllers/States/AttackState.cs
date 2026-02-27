@@ -64,15 +64,7 @@ public class AttackState : State.IState
             float aDistance = (aPos - c.rb.position).sqrMagnitude;
             float tDistance = (tPos - c.rb.position).sqrMagnitude;
 
-            //if (c.attacker.GetComponent<ShipBase>())
-            //{
-                c.SetTarget(c.attacker);
-            //}
-
-            //if (aDistance < tDistance)
-            //{
-            //    c.SetTarget(c.attacker);
-            //}
+            c.SetTarget(c.attacker); // * may have to later add condition instead of blind setting to avoid dumb AI
         }
     }
 
@@ -89,9 +81,6 @@ public class AttackState : State.IState
 
         Vector2 tDirection = targetRb.position - c.rb.position;
         float distance = tDirection.magnitude;
-        Vector2 inaccuracy = (new Vector2(Random.Range(-c.plasmaInaccuracy, c.plasmaInaccuracy),
-            Random.Range(-c.plasmaInaccuracy, c.plasmaInaccuracy)) * (1 / distance));
-        Vector2 targetAcceleration = c.CalculateTargetAcceleration() + inaccuracy;
 
         if (isDisengaging)
         {
@@ -101,7 +90,7 @@ public class AttackState : State.IState
             c.ship.Accelerate(0.2f);
 
             // Still fire if target is in arc
-            c.AttackTarget(targetAcceleration, Math.Abs(angle));
+            c.AttackTarget();
 
             disengageTimer -= Time.fixedDeltaTime;
             if (disengageTimer <= 0f)
@@ -144,7 +133,7 @@ public class AttackState : State.IState
             }
 
             c.MoveToEngage(angle);
-            c.AttackTarget(targetAcceleration, Math.Abs(angle));
+            c.AttackTarget();
         }
     }
 

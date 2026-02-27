@@ -22,7 +22,7 @@ public abstract class AIControllerBase : MonoBehaviour
     protected IState currentState;
     protected Rigidbody2D targetRb;
     protected Vector2 targetAcceleration;
-    protected Vector2 lastVelocity;
+
 
     private List<int> controllableGroupIndices;
     private float leadFactor;
@@ -44,8 +44,6 @@ public abstract class AIControllerBase : MonoBehaviour
     [SerializeField] private float leadFactorMin = 0.7f;
     [SerializeField] private float leadFactorMax = 1.3f;
     [SerializeField] private float leadFactorRerollInterval = 3f;
-    public float plasmaInaccuracy { get; private set; } // *** in the future make this solely for ship script, and instead of changing calculations try changing rotation of bullet as it is instantiated
-
     public ShipBase ship;
     public Rigidbody2D rb { get; private set; }
 
@@ -129,9 +127,7 @@ public abstract class AIControllerBase : MonoBehaviour
     /// <summary>
     /// Fires the AI's weapons at a given target by calculating the proper trajectory necessary for each weapon it attacks with.
     /// </summary>
-    /// <param name="targetAcceleration">The acceleration vector of the target to be fired at.</param>
-    /// <param name="angle">Kept for MoveToEngage compatibility but no longer used for arc check.</param>
-    public virtual void AttackTarget(Vector2 targetAcceleration, float angle)
+    public virtual void AttackTarget()
     {
         foreach (int groupIndex in controllableGroupIndices)
         {
@@ -377,19 +373,6 @@ public abstract class AIControllerBase : MonoBehaviour
     public virtual float GetAngleToDestination(Vector2 dest)
     {
         return Vector2.SignedAngle((Vector2)transform.up, dest);
-    }
-
-    /// <summary>
-    /// Calculates the acceleration of the target.
-    /// </summary>
-    /// <returns>A vector signifying the target's acceleration.</returns>
-    public virtual Vector2 CalculateTargetAcceleration()
-    {
-        targetRb = target.GetComponent<Rigidbody2D>();
-        Vector2 targetAcceleration = (targetRb.linearVelocity - lastVelocity) / Time.fixedDeltaTime;
-        lastVelocity = targetRb.linearVelocity;
-
-        return targetAcceleration;
     }
 
     /// <summary>
