@@ -225,6 +225,17 @@ public class SceneManager : MonoBehaviour
 
         // Remove scene manager as listener to ship's death event
         ship.OnShipDeath -= RecordDeadShip;
+
+        // In spectator mode, keep the camera on a valid ship
+        if (spectatorMode && ship.CompareTag(shipData.blueTag) && blueShips.Count > 0)
+        {
+            if (playerIndex >= blueShips.Count)
+                playerIndex = blueShips.Count - 1;
+
+            ShipBase destShip = blueShips[playerIndex];
+            mainCam.player = destShip;
+            vfxManager.GetComponent<FollowPlayer>().player = destShip;
+        }
     }
 
     public List<ShipBase> GetLiveEnemies(string team)
