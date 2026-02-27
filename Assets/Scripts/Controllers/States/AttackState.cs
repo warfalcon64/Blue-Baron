@@ -12,6 +12,21 @@ public class AttackState : State.IState
 
     private float attackTime;
 
+    // Stale engagement detection
+    private float lastSampledDistance;
+    private float staleTimer;
+    private float sampleTimer;
+    private float staleThreshold = 4f;
+    private float staleTimeLimit;
+    private float staleTimeLimitMin = 0.5f;
+    private float staleTimeLimitMax = 2f;
+    private float staleSampleInterval = 0.5f;
+
+    // Break turn
+    private bool isDisengaging;
+    private float disengageTimer;
+    private float disengageDuration = 0.75f;
+
     public AttackState(float duration = 15f)
     {
         this.duration = duration;
@@ -20,6 +35,12 @@ public class AttackState : State.IState
     public void OnEnter(AIControllerBase c)
     {
         attackTime = Random.Range(4, duration);
+        lastSampledDistance = 0f;
+        staleTimer = 0f;
+        sampleTimer = 0f;
+        staleTimeLimit = Random.Range(staleTimeLimitMin, staleTimeLimitMax);
+        isDisengaging = false;
+        disengageTimer = 0f;
     }
 
     public void UpdateState(AIControllerBase c)
@@ -57,22 +78,73 @@ public class AttackState : State.IState
 
     public void FixedUpdateState(AIControllerBase c)
     {
-        if (c.target != null)
+        if (c.target == null || !c.target.activeInHierarchy)
         {
-            float angle = c.GetAngleToTarget();
-            Rigidbody2D targetRb = c.target.GetComponent<Rigidbody2D>();
+            c.ChangeState(c.searchState);
+            return;
+        }
 
-            Vector2 tDirection = targetRb.position - c.rb.position;
-            float distance = Mathf.Sqrt(tDirection.sqrMagnitude);
-            Vector2 inaccuracy = (new Vector2(Random.Range(-c.plasmaInaccuracy, c.plasmaInaccuracy),
+        float angle = c.GetAngleToLeadTarget();
+        Rigidbody2D targetRb = c.target.GetComponent<Rigidbody2D>();
+
+        Vector2 tDirection = targetRb.position - c.rb.position;
+        float distance = tDirection.magnitude;
+        Vector2 inaccuracy = (new Vector2(Random.Range(-c.plasmaInaccuracy, c.plasmaInaccuracy),
             Random.Range(-c.plasmaInaccuracy, c.plasmaInaccuracy)) * (1 / distance));
-            Vector2 targetAcceleration = c.CalculateTargetAcceleration() + inaccuracy;
-            c.MoveToEngage(angle);
+        Vector2 targetAcceleration = c.CalculateTargetAcceleration() + inaccuracy;
+
+        if (isDisengaging)
+        {
+            // Break turn: reverse turn direction and accelerate to max
+            float reverseTurn = angle > 0 ? -1f : 1f;
+            c.ship.SetShipTurn(reverseTurn);
+            c.ship.Accelerate(0.2f);
+
+            // Still fire if target is in arc
             c.AttackTarget(targetAcceleration, Math.Abs(angle));
+
+            disengageTimer -= Time.fixedDeltaTime;
+            if (disengageTimer <= 0f)
+            {
+                isDisengaging = false;
+                staleTimer = 0f;
+                sampleTimer = 0f;
+                staleTimeLimit = Random.Range(staleTimeLimitMin, staleTimeLimitMax);
+                lastSampledDistance = distance;
+            }
         }
         else
         {
-            c.ChangeState(c.searchState);
+            // Sample distance periodically for stale detection
+            sampleTimer -= Time.fixedDeltaTime;
+            if (sampleTimer <= 0f)
+            {
+                if (lastSampledDistance > 0f)
+                {
+                    if (Mathf.Abs(distance - lastSampledDistance) < staleThreshold)
+                    {
+                        staleTimer += staleSampleInterval;
+                    }
+                    else
+                    {
+                        staleTimer = 0f;
+                    }
+                }
+
+                lastSampledDistance = distance;
+                sampleTimer = staleSampleInterval;
+
+                // Trigger break turn
+                if (staleTimer >= staleTimeLimit)
+                {
+                    isDisengaging = true;
+                    disengageTimer = disengageDuration;
+                    return;
+                }
+            }
+
+            c.MoveToEngage(angle);
+            c.AttackTarget(targetAcceleration, Math.Abs(angle));
         }
     }
 
