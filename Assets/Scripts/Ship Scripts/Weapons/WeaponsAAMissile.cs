@@ -46,6 +46,8 @@ public class WeaponsAAMissile : WeaponsBase
     private float seekerCurrentAngle;
     private bool seekerSweepRight = true;
     private float lockHoldTimer;
+    private float lockLossTimer;
+    private bool hasLock;
     private bool hadTargetLastFrame;
 
     private VFXManager vfxManager;
@@ -85,11 +87,17 @@ public class WeaponsAAMissile : WeaponsBase
 
         if (oneTurnComplete && fuelRemaining > 0f)
         {
+            // Check if current target is still within seeker cone
+            if (target != null && hasLock)
+            {
+                UpdateLockTracking(dt);
+            }
+
             UpdateSeekerSweep(dt);
         }
 
-        // Guidance
-        if (target != null)
+        // Guidance — only steer when locked
+        if (target != null && (hasLock || !oneTurnComplete))
         {
             Vector2 los = (Vector2)target.transform.position - rb.position;
             float losAngle = Mathf.Atan2(los.y, los.x);
@@ -105,9 +113,10 @@ public class WeaponsAAMissile : WeaponsBase
         }
         else
         {
+            // Coast ballistically — no target or lost lock
             if (hadTargetLastFrame)
             {
-                Debug.Log($"[Missile] Lost target, coasting ballistically (fuel: {fuelRemaining:F1})");
+                Debug.Log($"[Missile] Lost lock, coasting ballistically (fuel: {fuelRemaining:F1})");
                 hadTargetLastFrame = false;
             }
             missileVelocity = missileVelocity.normalized * currentSpeed;
@@ -148,6 +157,8 @@ public class WeaponsAAMissile : WeaponsBase
         oneTurnComplete = false;
         oneTurnTimer = 0f;
         currentTurnSpeed = 0f;
+        hasLock = true;
+        lockLossTimer = 0f;
         Destroy(gameObject, lifetime);
     }
 
@@ -222,8 +233,10 @@ public class WeaponsAAMissile : WeaponsBase
         Vector2 velDir = missileVelocity.normalized;
         Vector2 perpDir = new Vector2(-velDir.y, velDir.x);
 
-        // Clamp to max lateral accel (turnSpeed from WeaponsBase)
-        float clampedAccel = Mathf.Clamp(lateralAccelMag, -turnSpeed, turnSpeed);
+        // Scale max lateral accel by speed ratio so angular turn rate stays constant
+        float speedRatio = speed > 0f ? currentSpeed / speed : 0f;
+        float maxAccel = turnSpeed * speedRatio;
+        float clampedAccel = Mathf.Clamp(lateralAccelMag, -maxAccel, maxAccel);
 
         // RCS fuel cost
         float absAccel = Mathf.Abs(clampedAccel);
@@ -243,6 +256,31 @@ public class WeaponsAAMissile : WeaponsBase
 
         // Re-normalize to currentSpeed (PN changes direction, not speed)
         missileVelocity = missileVelocity.normalized * currentSpeed;
+    }
+
+    private void UpdateLockTracking(float dt)
+    {
+        Vector2 los = (Vector2)target.transform.position - rb.position;
+        Vector2 velDir = missileVelocity.normalized;
+        float angleToTarget = Vector2.SignedAngle(velDir, los.normalized);
+
+        if (Mathf.Abs(angleToTarget) > seekerHalfAngle)
+        {
+            // Target outside seeker cone — count down to loss
+            lockLossTimer += dt;
+            if (lockLossTimer >= lockHoldTime)
+            {
+                Debug.Log($"[Missile] Lock lost — target outside seeker cone for {lockHoldTime:F1}s");
+                hasLock = false;
+                hasPreviousLOS = false;
+                lockLossTimer = 0f;
+            }
+        }
+        else
+        {
+            // Target still in cone — reset loss timer
+            lockLossTimer = 0f;
+        }
     }
 
     private void UpdateSeekerSweep(float dt)
@@ -284,8 +322,19 @@ public class WeaponsAAMissile : WeaponsBase
         if (hit.collider == null)
             return;
 
+        // Sweep ray hit our current target — re-acquire lock if lost
         if (target != null && hit.collider.gameObject == target)
+        {
+            if (!hasLock && lockHoldTimer <= 0f)
+            {
+                Debug.Log($"[Missile] Re-acquired lock on {target.name}");
+                hasLock = true;
+                lockLossTimer = 0f;
+                hasPreviousLOS = false;
+                lockHoldTimer = lockHoldTime;
+            }
             return;
+        }
 
         float detectedSignal;
         Flare flare = hit.collider.GetComponent<Flare>();
@@ -318,6 +367,8 @@ public class WeaponsAAMissile : WeaponsBase
             bool wasFlare = flare != null;
             target = hit.collider.gameObject;
             previousTarget = target;
+            hasLock = true;
+            lockLossTimer = 0f;
 
             if (wasFlare)
                 Debug.Log($"[Missile] Locked onto flare (chaff strength: {detectedSignal:F1}) over previous target (signal: {currentSignal:F1})");
