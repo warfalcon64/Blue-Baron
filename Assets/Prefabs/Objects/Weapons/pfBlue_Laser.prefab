@@ -208,7 +208,7 @@ MonoBehaviour:
   health: 0
   damage: 10
   range: 100
-  coolDown: 0.6
+  coolDown: 0.45
   isDamageable: 0
   isSeeker: 0
   usage: 8
