@@ -32,6 +32,9 @@ public class SceneManager : MonoBehaviour
     public FollowPlayer mainCam;
     public Camera minimapCam;
 
+    [Header("Debug")]
+    [SerializeField] private bool spectatorMode = false;
+
     private int playerIndex;
     private bool inSwapMode = false;
     private PlayerController pc;
@@ -74,6 +77,18 @@ public class SceneManager : MonoBehaviour
 
     private void Start()
     {
+        if (spectatorMode)
+        {
+            playerIndex = 0;
+            inSwapMode = true;
+            ShipBase destShip = blueShips[playerIndex];
+            mainCam.player = destShip;
+            vfxManager.GetComponent<FollowPlayer>().player = destShip;
+            if (minimapCam != null)
+                minimapCam.gameObject.SetActive(false);
+            return;
+        }
+
         for (int i = 0; i < blueShips.Count; i++)
         {
             if (blueShips[i].isPlayer)
@@ -81,7 +96,7 @@ public class SceneManager : MonoBehaviour
                 playerIndex = i;
             }
         }
-        
+
         playerShip = blueShips[playerIndex];
         pc = playerShip.GetPlayerController();
         pc.SwapShip += EnableShipSwapping; // * make a method for connecting player controller to other scripts via events if necessary
@@ -104,7 +119,7 @@ public class SceneManager : MonoBehaviour
             {
                 SwapPlayerShip(KeyCode.D);
             }
-            else if (Input.GetKeyDown(KeyCode.Space))
+            else if (!spectatorMode && Input.GetKeyDown(KeyCode.Space))
             {
                 SwapPlayerShip(KeyCode.Space);
             }

@@ -26,8 +26,15 @@ public class UIManager : MonoBehaviour
 
         radarMinimapUI.OnRadarPingSelect += lockOnSystem.HandleRadarPingSelect;
         radarMinimapUI.OnRadarPingSelect += playerSceneRadar.GetComponent<Radar>().HandleRadarPingSelect;
-        radarMinimapUI.SubscribeToPlayerController(pc);
-        
+        if (pc != null)
+        {
+            radarMinimapUI.SubscribeToPlayerController(pc);
+        }
+        else
+        {
+            radarMinimapUI.gameObject.SetActive(false);
+            playerSceneRadar.gameObject.SetActive(false);
+        }
     }
 
     // Update is called once per frame
