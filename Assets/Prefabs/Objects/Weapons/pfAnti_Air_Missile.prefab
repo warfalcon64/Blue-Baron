@@ -375,9 +375,9 @@ MonoBehaviour:
   usage: 17
   lifetime: 1000
   seekerHalfAngle: 45
-  seekerSweepRate: 20
+  seekerSweepRate: 400
+  beamHalfWidth: 5
   targetRadarSignature: 5
-  lockHoldTime: 0.5
   seekerLayerMask:
     serializedVersion: 2
     m_Bits: 4224
