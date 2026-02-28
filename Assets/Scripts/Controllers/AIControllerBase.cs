@@ -126,14 +126,24 @@ public abstract class AIControllerBase : MonoBehaviour
 
     /// <summary>
     /// Fires the AI's weapons at a given target by calculating the proper trajectory necessary for each weapon it attacks with.
+    /// When urgentFire is false, missiles are only launched when the target is within a forward cone.
+    /// When urgentFire is true (e.g. during evasion), missiles fire freely as a distraction.
     /// </summary>
-    public virtual void AttackTarget()
+    public virtual void AttackTarget(bool urgentFire = false)
     {
         foreach (int groupIndex in controllableGroupIndices)
         {
             WeaponGroup group = ship.GetWeaponGroup(groupIndex);
             WeaponsBase repWeapon = group.GetRepresentativeWeapon();
             if (repWeapon == null) continue;
+
+            // Missiles: only fire when target is in front, unless urgent
+            if (!urgentFire && (repWeapon.GetUsage() & WeaponUsage.Missile) != 0)
+            {
+                float angleToTarget = Mathf.Abs(GetAngleToTarget());
+                if (angleToTarget > 45f)
+                    continue;
+            }
 
             List<Hardpoint> hps = group.GetHardpoints();
             Vector2 avgPos = Vector2.zero;

@@ -318,7 +318,6 @@ public class WeaponsAAMissile : WeaponsBase
         Vector2 toExpected = expectedPos - rb.position;
         Vector2 lookDir = toExpected.normalized;
 
-        // If expected position is outside seeker FOV, can't look there
         float lookAngle = Mathf.Abs(Vector2.SignedAngle(velDir, lookDir));
         if (lookAngle > seekerHalfAngle)
             return;

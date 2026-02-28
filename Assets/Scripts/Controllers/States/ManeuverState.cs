@@ -64,10 +64,10 @@ public class ManeuverState : State.IState
             EvadeMissiles(c);
         }
 
-        // Fire weapons at target regardless of evasion
+        // Fire weapons at target regardless of evasion — urgent fire to distract attacker
         if (c.target != null && c.target.activeInHierarchy)
         {
-            c.AttackTarget();
+            c.AttackTarget(urgentFire: true);
         }
     }
 
