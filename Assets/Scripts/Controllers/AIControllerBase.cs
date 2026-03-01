@@ -158,6 +158,7 @@ public abstract class AIControllerBase : MonoBehaviour
         }
     }
 
+    // *** DEPRECATED: Implemented as behavior graph action
     // ** Change this to target enemies in specified collider, otherwise go towards radar signature once radar is added
     /// <summary>
     /// Attempts to find a valid target. A valid target consists of the ship closest to the AI on a different team.
@@ -289,6 +290,28 @@ public abstract class AIControllerBase : MonoBehaviour
         incomingMissiles.Remove(missile);
     }
 
+    public bool HasCloseIncomingMissile(float range)
+    {
+        float rangeSqr = range * range;
+        Vector2 myPos = rb.position;
+
+        for (int i = incomingMissiles.Count - 1; i >= 0; i--)
+        {
+            WeaponsAAMissile missile = incomingMissiles[i];
+            if (missile == null || !missile.gameObject.activeInHierarchy)
+            {
+                incomingMissiles.RemoveAt(i);
+                continue;
+            }
+
+            float distSqr = ((Vector2)missile.transform.position - myPos).sqrMagnitude;
+            if (distSqr <= rangeSqr)
+                return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Updates all the timers.
     /// </summary>
@@ -352,10 +375,7 @@ public abstract class AIControllerBase : MonoBehaviour
     /// <returns>A signed angle.</returns>
     public virtual float GetAngleToTarget()
     {
-        targetRb = target.GetComponent<Rigidbody2D>();
-        Vector2 targetDirection = targetRb.position - rb.position;
-
-        return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
+        return ship.GetAngleToTarget(target);
     }
 
     public virtual float GetAngleToLeadTarget()

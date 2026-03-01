@@ -11,3 +11,24 @@ Future Implementation:
 
 Things to fix:
 - Make sure every ship calculates its own damage handling (weapons pass to them the damage that needs to be done)
+
+
+BT Notes:
+  Selector (root)
+  ├── Sequence: "Evade Missiles"
+  │   ├── Condition: has close incoming missile?
+  │   ├── Action: jink/evade
+  │   ├── Action: deploy flares (when rear faces threat)
+  │   └── Action: fire weapons (urgent)
+  │
+  ├── Sequence: "Attack Target"
+  │   ├── Condition: has target?
+  │   ├── Selector: "Engage or Break"
+  │   │   ├── Sequence: "Break Turn"
+  │   │   │   ├── Condition: engagement is stale?
+  │   │   │   └── Action: reverse turn + accelerate
+  │   │   └── Sequence: "Normal Engage"
+  │   │       ├── Action: move to engage
+  │   │       └── Action: fire weapons
+  │
+  └── Action: "Search for Target"

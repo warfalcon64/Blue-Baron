@@ -73,24 +73,7 @@ public class ManeuverState : State.IState
 
     public bool HasCloseIncomingMissile(AIControllerBase c)
     {
-        float rangeSqr = missileEvadeRange * missileEvadeRange;
-        Vector2 myPos = c.rb.position;
-
-        for (int i = c.incomingMissiles.Count - 1; i >= 0; i--)
-        {
-            WeaponsAAMissile missile = c.incomingMissiles[i];
-            if (missile == null || !missile.gameObject.activeInHierarchy)
-            {
-                c.incomingMissiles.RemoveAt(i);
-                continue;
-            }
-
-            float distSqr = ((Vector2)missile.transform.position - myPos).sqrMagnitude;
-            if (distSqr <= rangeSqr)
-                return true;
-        }
-
-        return false;
+        return c.HasCloseIncomingMissile(missileEvadeRange);
     }
 
     private void EvadeMissiles(AIControllerBase c)
