@@ -1045,6 +1045,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 0
+  onDamagedChannel: {fileID: 11400000, guid: 8a664bc7669f0f540b3a240e67a92f1d, type: 2}
   canHover: 0
   faceEnemyAngle: 5
   angularError: 5

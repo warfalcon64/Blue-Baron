@@ -45,14 +45,14 @@ public class AttackState : State.IState
 
     public void UpdateState(AIControllerBase c)
     {
-        if (attackTime <= 0)
-        {
-            c.ChangeState(c.maneuverState);
-        }
-        else
-        {
-            attackTime -= Time.deltaTime;
-        }
+        // if (attackTime <= 0)
+        // {
+        //     c.ChangeState(c.maneuverState);
+        // }
+        // else
+        // {
+        //     attackTime -= Time.deltaTime;
+        // }
     }
 
     public void OnHurt(AIControllerBase c)
@@ -70,71 +70,7 @@ public class AttackState : State.IState
 
     public void FixedUpdateState(AIControllerBase c)
     {
-        if (c.target == null || !c.target.activeInHierarchy)
-        {
-            c.ChangeState(c.searchState);
-            return;
-        }
-
-        float angle = c.GetAngleToLeadTarget();
-        Rigidbody2D targetRb = c.target.GetComponent<Rigidbody2D>();
-
-        Vector2 tDirection = targetRb.position - c.rb.position;
-        float distance = tDirection.magnitude;
-
-        if (isDisengaging)
-        {
-            // Break turn: reverse turn direction and accelerate to max
-            float reverseTurn = angle > 0 ? -1f : 1f;
-            c.ship.SetShipTurn(reverseTurn);
-            c.ship.Accelerate(0.2f);
-
-            // Still fire if target is in arc
-            c.AttackTarget();
-
-            disengageTimer -= Time.fixedDeltaTime;
-            if (disengageTimer <= 0f)
-            {
-                isDisengaging = false;
-                staleTimer = 0f;
-                sampleTimer = 0f;
-                staleTimeLimit = Random.Range(staleTimeLimitMin, staleTimeLimitMax);
-                lastSampledDistance = distance;
-            }
-        }
-        else
-        {
-            // Sample distance periodically for stale detection
-            sampleTimer -= Time.fixedDeltaTime;
-            if (sampleTimer <= 0f)
-            {
-                if (lastSampledDistance > 0f)
-                {
-                    if (Mathf.Abs(distance - lastSampledDistance) < staleThreshold)
-                    {
-                        staleTimer += staleSampleInterval;
-                    }
-                    else
-                    {
-                        staleTimer = 0f;
-                    }
-                }
-
-                lastSampledDistance = distance;
-                sampleTimer = staleSampleInterval;
-
-                // Trigger break turn
-                if (staleTimer >= staleTimeLimit)
-                {
-                    isDisengaging = true;
-                    disengageTimer = disengageDuration;
-                    return;
-                }
-            }
-
-            c.MoveToEngage(angle);
-            c.AttackTarget();
-        }
+        // Replaced by DogfightTargetAction in behavior graph
     }
 
     public void OnExit(AIControllerBase c)

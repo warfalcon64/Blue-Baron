@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Behavior;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static State;
@@ -37,6 +38,8 @@ public abstract class AIControllerBase : MonoBehaviour
     public SearchState searchState;
     public ManeuverState maneuverState;
 
+    private OnDamagedEventChannel onDamagedChannel;
+
     [Header("Behaviors")]
     [SerializeField] public bool canHover = false;
     [SerializeField] public float faceEnemyAngle = 1; // * May have to change access of this in future
@@ -67,15 +70,19 @@ public abstract class AIControllerBase : MonoBehaviour
         sceneManager = SceneManager.Instance;
         enemyTeam = sceneManager.GetLiveEnemies(tag);
 
-        // Initialize states
-        attackState = new AttackState(7);
-        searchState = new SearchState();
-        maneuverState = new ManeuverState(2);
+        // // Initialize states
+        // attackState = new AttackState(7);
+        // searchState = new SearchState();
+        // maneuverState = new ManeuverState(2);
 
         maxSpeed = ship.GetShipMaxSpeed();
         minSpeed = ship.GetShipMinSpeed();
         ship.OnShipDamage += HandleDamageEvent;
         ship.OnSeekerFired += HandleSeekerFired;
+
+        BehaviorGraphAgent agent = GetComponent<BehaviorGraphAgent>();
+        if (agent != null && agent.GetVariable("OnDamagedEventChannel", out BlackboardVariable<OnDamagedEventChannel> channelVar))
+            onDamagedChannel = channelVar.Value;
 
         // Cache non-autonomous weapon group indices
         controllableGroupIndices = new List<int>();
@@ -85,78 +92,68 @@ public abstract class AIControllerBase : MonoBehaviour
             if (!groups[i].autonomous) controllableGroupIndices.Add(i);
         }
 
-        currentState = searchState;
+        // currentState = searchState;
     }
 
-    // Update is called once per frame
-    protected virtual void Update()
-    {
-        UpdateTimers();
-
-        // Transition to ManeuverState only when a missile is within evade range
-        if (currentState != maneuverState && maneuverState.HasCloseIncomingMissile(this))
-        {
-            ChangeState(maneuverState);
-        }
-
-        currentState.UpdateState(this);
-    }
-
-    protected virtual void FixedUpdate()
-    {
-        enemyTeam = sceneManager.GetLiveEnemies(tag);
-        currentState.FixedUpdateState(this);
-    }
-
-    /// <summary>
-    /// Changes the current state of AI by calling the current state's exit function and calling the new state's enter function.
-    /// </summary>
-    /// <param name="newState">The new state to transition to.</param>
-    public virtual void ChangeState(IState newState)
-    {
-        if (newState != null)
-        {
-            currentState.OnExit(this);
-        }
-
-        currentState = newState;
-        if (debug) print(currentState);
-        currentState.OnEnter(this);
-    }
-
-    /// <summary>
-    /// Fires the AI's weapons at a given target by calculating the proper trajectory necessary for each weapon it attacks with.
-    /// When urgentFire is false, missiles are only launched when the target is within a forward cone.
-    /// When urgentFire is true (e.g. during evasion), missiles fire freely as a distraction.
-    /// </summary>
-    public virtual void AttackTarget(bool urgentFire = false)
-    {
-        foreach (int groupIndex in controllableGroupIndices)
-        {
-            WeaponGroup group = ship.GetWeaponGroup(groupIndex);
-            WeaponsBase repWeapon = group.GetRepresentativeWeapon();
-            if (repWeapon == null) continue;
-
-            // Missiles: only fire when target is in front, unless urgent
-            if (!urgentFire && (repWeapon.GetUsage() & WeaponUsage.Missile) != 0)
-            {
-                float angleToTarget = Mathf.Abs(GetAngleToTarget());
-                if (angleToTarget > 45f)
-                    continue;
-            }
-
-            List<Hardpoint> hps = group.GetHardpoints();
-            Vector2 avgPos = Vector2.zero;
-            foreach (Hardpoint hp in hps)
-            {
-                avgPos += (Vector2)hp.transform.position;
-            }
-            avgPos /= hps.Count;
-
-            Vector2 aimPos = WorseTargetLeadingPosition(repWeapon, avgPos);
-            ship.FireGroup(groupIndex, aimPos);
-        }
-    }
+    // // *** FSM Update/FixedUpdate — replaced by behavior graph ***
+    // protected virtual void Update()
+    // {
+    //     UpdateTimers();
+    //
+    //     // Transition to ManeuverState only when a missile is within evade range
+    //     if (currentState != maneuverState && maneuverState.HasCloseIncomingMissile(this))
+    //     {
+    //         ChangeState(maneuverState);
+    //     }
+    //
+    //     currentState.UpdateState(this);
+    // }
+    //
+    // protected virtual void FixedUpdate()
+    // {
+    //     enemyTeam = sceneManager.GetLiveEnemies(tag);
+    //     currentState.FixedUpdateState(this);
+    // }
+    //
+    // public virtual void ChangeState(IState newState)
+    // {
+    //     if (newState != null)
+    //     {
+    //         currentState.OnExit(this);
+    //     }
+    //
+    //     currentState = newState;
+    //     if (debug) print(currentState);
+    //     currentState.OnEnter(this);
+    // }
+    //
+    // public virtual void AttackTarget(bool urgentFire = false)
+    // {
+    //     foreach (int groupIndex in controllableGroupIndices)
+    //     {
+    //         WeaponGroup group = ship.GetWeaponGroup(groupIndex);
+    //         WeaponsBase repWeapon = group.GetRepresentativeWeapon();
+    //         if (repWeapon == null) continue;
+    //
+    //         if (!urgentFire && (repWeapon.GetUsage() & WeaponUsage.Missile) != 0)
+    //         {
+    //             float angleToTarget = Mathf.Abs(GetAngleToTarget());
+    //             if (angleToTarget > 45f)
+    //                 continue;
+    //         }
+    //
+    //         List<Hardpoint> hps = group.GetHardpoints();
+    //         Vector2 avgPos = Vector2.zero;
+    //         foreach (Hardpoint hp in hps)
+    //         {
+    //             avgPos += (Vector2)hp.transform.position;
+    //         }
+    //         avgPos /= hps.Count;
+    //
+    //         Vector2 aimPos = WorseTargetLeadingPosition(repWeapon, avgPos);
+    //         ship.FireGroup(groupIndex, aimPos);
+    //     }
+    // }
 
     // *** DEPRECATED: Implemented as behavior graph action
     // ** Change this to target enemies in specified collider, otherwise go towards radar signature once radar is added
@@ -196,7 +193,8 @@ public abstract class AIControllerBase : MonoBehaviour
     protected virtual void HandleDamageEvent(object sender, ShipBase attacker)
     {
         this.attacker = attacker.gameObject;
-        currentState.OnHurt(this);
+        if (onDamagedChannel != null)
+            onDamagedChannel.SendEventMessage(gameObject, attacker.gameObject);
     }
 
     protected virtual void HandleSeekerFired(object sender, WeaponsBase seeker)
@@ -223,59 +221,54 @@ public abstract class AIControllerBase : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Makes the AI turn and accelerate/decelerate towards the current target to place it within the ship's field of fire. (Old method)
-    /// </summary>
-    public virtual void MoveToEngage(float angle)
-    {
-        float turn = 0f;
-        float speed = ship.GetShipSpeed();
-
-        if (target != null && !stopSearch) // ** Not sure if target check is needed here anymore
-        {
-            // Turning logic
-            if (Mathf.Abs(angle) > faceEnemyAngle)
-            {
-                if (angle > 0) turn = 1f;
-                if (angle < 0) turn = -1f;
-            }
-
-            // Acceleration logic
-            if (nextAdjust <= 0)
-            {
-
-                if (Math.Abs(angle) < 70)
-                {
-                    ship.Accelerate(0.2f);
-                }
-                else if (Math.Abs(angle) >= 90)
-                {
-                    ship.Decelerate(0.2f);
-                }
-                else
-                {
-                    nextAdjust = Random.Range(0, 0.2f);
-                }
-            }
-        }
-
-        ship.SetShipTurn(turn);
-    }
-
-    public virtual void MoveToEvade(float angle)
-    {
-        float turn = 0f;
-
-        if (Math.Abs(angle) > 5f)
-        {
-            if (angle > 0) turn = 1f;
-
-            if (angle < 0) turn = -1f;
-        }
-
-        ship.Accelerate(0.2f);
-        ship.SetShipTurn(turn);
-    }
+    // // *** FSM movement methods — replaced by behavior graph action nodes ***
+    // public virtual void MoveToEngage(float angle)
+    // {
+    //     float turn = 0f;
+    //     float speed = ship.GetShipSpeed();
+    //
+    //     if (target != null && !stopSearch)
+    //     {
+    //         if (Mathf.Abs(angle) > faceEnemyAngle)
+    //         {
+    //             if (angle > 0) turn = 1f;
+    //             if (angle < 0) turn = -1f;
+    //         }
+    //
+    //         if (nextAdjust <= 0)
+    //         {
+    //             if (Math.Abs(angle) < 70)
+    //             {
+    //                 ship.Accelerate(0.2f);
+    //             }
+    //             else if (Math.Abs(angle) >= 90)
+    //             {
+    //                 ship.Decelerate(0.2f);
+    //             }
+    //             else
+    //             {
+    //                 nextAdjust = Random.Range(0, 0.2f);
+    //             }
+    //         }
+    //     }
+    //
+    //     ship.SetShipTurn(turn);
+    // }
+    //
+    // public virtual void MoveToEvade(float angle)
+    // {
+    //     float turn = 0f;
+    //
+    //     if (Math.Abs(angle) > 5f)
+    //     {
+    //         if (angle > 0) turn = 1f;
+    //
+    //         if (angle < 0) turn = -1f;
+    //     }
+    //
+    //     ship.Accelerate(0.2f);
+    //     ship.SetShipTurn(turn);
+    // }
 
     public void AddIncomingMissile(WeaponsAAMissile missile)
     {
@@ -312,22 +305,20 @@ public abstract class AIControllerBase : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// Updates all the timers.
-    /// </summary>
-    protected virtual void UpdateTimers()
-    {
-        if (nextTurn > 0) nextTurn -= Time.deltaTime;
-
-        if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
-
-        leadFactorTimer -= Time.deltaTime;
-        if (leadFactorTimer <= 0f)
-        {
-            leadFactor = Random.Range(leadFactorMin, leadFactorMax);
-            leadFactorTimer = leadFactorRerollInterval;
-        }
-    }
+    // // *** FSM timer updates — BT nodes manage their own timers ***
+    // protected virtual void UpdateTimers()
+    // {
+    //     if (nextTurn > 0) nextTurn -= Time.deltaTime;
+    //
+    //     if (nextAdjust > 0) nextAdjust -= Time.deltaTime;
+    //
+    //     leadFactorTimer -= Time.deltaTime;
+    //     if (leadFactorTimer <= 0f)
+    //     {
+    //         leadFactor = Random.Range(leadFactorMin, leadFactorMax);
+    //         leadFactorTimer = leadFactorRerollInterval;
+    //     }
+    // }
 
     private void OnDisable()
     {

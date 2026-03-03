@@ -30,15 +30,7 @@ public class SearchState : State.IState
 
     public void FixedUpdateState(AIControllerBase c)
     {
-        if (c.enemyTeam.Count > 0)
-        {
-            GameObject found = c.FindTarget();
-            if (found != null)
-            {
-                c.SetTarget(found);
-                c.ChangeState(c.attackState);
-            }
-        }
+        // Replaced by FindTargetAction in behavior graph
     }
 
     public void OnExit(AIControllerBase c)

@@ -10,6 +10,7 @@ using Action = Unity.Behavior.Action;
 public partial class FleeFromMissileAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
+    [SerializeReference] public BlackboardVariable<GameObject> Target;
     [SerializeReference] public BlackboardVariable<float> MissileEvadeRange = new(15f);
 
     // Jink fields
@@ -35,6 +36,10 @@ public partial class FleeFromMissileAction : Action
         return Status.Running;
     }
 
+    protected override void OnEnd()
+    {
+    }
+
     protected override Status OnUpdate()
     {
         if (!ai.HasCloseIncomingMissile(MissileEvadeRange))
@@ -50,10 +55,6 @@ public partial class FleeFromMissileAction : Action
         AttackTarget();
 
         return Status.Running;
-    }
-
-    protected override void OnEnd()
-    {
     }
 
     private void EvadeMissiles(float dt)
@@ -119,9 +120,10 @@ public partial class FleeFromMissileAction : Action
 
     private void AttackTarget()
     {
-        if (ai.target == null || !ai.target.activeInHierarchy)
+        if (Target.Value == null || !Target.Value.activeInHierarchy)
             return;
 
+        Rigidbody2D targetRb = Target.Value.GetComponent<Rigidbody2D>();
         List<WeaponGroup> groups = ship.GetWeaponGroups();
         for (int i = 0; i < groups.Count; i++)
         {
@@ -141,7 +143,6 @@ public partial class FleeFromMissileAction : Action
             avgPos /= hps.Count;
 
             float speed = repWeapon.GetSpeed();
-            Rigidbody2D targetRb = ai.target.GetComponent<Rigidbody2D>();
             float distance = Vector2.Distance(avgPos, targetRb.position);
             float travelTime = distance / speed;
             Vector2 aimPos = targetRb.position + targetRb.linearVelocity * travelTime;

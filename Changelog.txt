@@ -14,21 +14,6 @@ Things to fix:
 
 
 BT Notes:
-  Selector (root)
-  ├── Sequence: "Evade Missiles"
-  │   ├── Condition: has close incoming missile?
-  │   ├── Action: jink/evade
-  │   ├── Action: deploy flares (when rear faces threat)
-  │   └── Action: fire weapons (urgent)
-  │
-  ├── Sequence: "Attack Target"
-  │   ├── Condition: has target?
-  │   ├── Selector: "Engage or Break"
-  │   │   ├── Sequence: "Break Turn"
-  │   │   │   ├── Condition: engagement is stale?
-  │   │   │   └── Action: reverse turn + accelerate
-  │   │   └── Sequence: "Normal Engage"
-  │   │       ├── Action: move to engage
-  │   │       └── Action: fire weapons
-  │
-  └── Action: "Search for Target"
+https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fquestion-make-the-behavior-graph-start-a-flow-when-certain-v0-pbu4laiw09jf1.png%3Fwidth%3D1448%26format%3Dpng%26auto%3Dwebp%26s%3D52a6dde9e297d75b62aa100ce751c4b3a497abd4
+
+just get blackboard variable and send event message via Var.Value.SendEventMessage?

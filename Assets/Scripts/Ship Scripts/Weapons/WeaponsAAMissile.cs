@@ -98,7 +98,7 @@ public class WeaponsAAMissile : WeaponsBase
             // Lose lock if sweep hasn't re-contacted target within hold window
             if (hasLock && timeSinceLastContact > lockHoldTime)
             {
-                Debug.Log($"[Missile] Lock lost — no sweep contact for {lockHoldTime:F1}s");
+                // Debug.Log($"[Missile] Lock lost — no sweep contact for {lockHoldTime:F1}s");
                 hasLock = false;
                 hasPreviousLOS = false;
             }
@@ -144,7 +144,7 @@ public class WeaponsAAMissile : WeaponsBase
             // Coast ballistically — no target or lost lock
             if (hadTargetLastFrame)
             {
-                Debug.Log($"[Missile] Lost lock, coasting ballistically (fuel: {fuelRemaining:F1})");
+                // Debug.Log($"[Missile] Lost lock, coasting ballistically (fuel: {fuelRemaining:F1})");
                 hadTargetLastFrame = false;
             }
             missileVelocity = missileVelocity.normalized * currentSpeed;
@@ -208,7 +208,7 @@ public class WeaponsAAMissile : WeaponsBase
 
         if (angleDiff <= oneTurnAngleThreshold)
         {
-            Debug.Log($"[Missile] One-turn complete, switching to seeker/PN phase");
+            // Debug.Log($"[Missile] One-turn complete, switching to seeker/PN phase");
             oneTurnComplete = true;
 
             // Seed fresh track data for seeker handoff
@@ -382,7 +382,7 @@ public class WeaponsAAMissile : WeaponsBase
 
             if (angularOffset <= beamHalfWidth)
             {
-                Debug.Log($"[Missile] Re-acquired lock on {target.name}");
+                // Debug.Log($"[Missile] Re-acquired lock on {target.name}");
                 hasLock = true;
                 hasPreviousLOS = false;
 
@@ -461,10 +461,10 @@ public class WeaponsAAMissile : WeaponsBase
         timeSinceLastContact = 0f;
         revisitTimer = 0f;
 
-        if (wasFlare)
-            Debug.Log($"[Missile] Locked onto flare (chaff strength: {detectedSignal:F1}) over previous target (signal: {currentSignal:F1})");
-        else
-            Debug.Log($"[Missile] Locked onto ship {target.name} (signal: {detectedSignal:F1}) over previous target (signal: {currentSignal:F1})");
+        // if (wasFlare)
+        //     Debug.Log($"[Missile] Locked onto flare (chaff strength: {detectedSignal:F1}) over previous target (signal: {currentSignal:F1})");
+        // else
+        //     Debug.Log($"[Missile] Locked onto ship {target.name} (signal: {detectedSignal:F1}) over previous target (signal: {currentSignal:F1})");
 
         if (target.TryGetComponent<AIControllerBase>(out AIControllerBase newAI))
             newAI.AddIncomingMissile(this);

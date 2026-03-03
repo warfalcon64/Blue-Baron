@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Behavior;
 using UnityEngine;
 
 using Common;
@@ -175,6 +176,7 @@ public class SceneManager : MonoBehaviour
         {
             playerShip = destShip;
             playerShip.GetComponent<AIControllerBase>().enabled = false;
+            playerShip.GetComponent<BehaviorGraphAgent>().enabled = false;
             pc = playerShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;

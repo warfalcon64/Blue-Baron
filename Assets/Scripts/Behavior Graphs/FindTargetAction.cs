@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
@@ -12,14 +11,17 @@ public partial class FindTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
-    
-    private Rigidbody2D rb;
 
-    private List<ShipBase> enemyTeam;
+    private Rigidbody2D rb;
+    private AIControllerBase ai;
 
     protected override Status OnStart()
     {
         rb = Agent.Value.GetComponent<Rigidbody2D>();
+        if (ai == null)
+            ai = Agent.Value.GetComponent<AIControllerBase>();
+
+        List<ShipBase> enemyTeam = SceneManager.Instance.GetLiveEnemies(Agent.Value.tag);
 
         if (enemyTeam.Count == 0)
             return Status.Failure;
@@ -43,6 +45,7 @@ public partial class FindTargetAction : Action
             return Status.Failure;
 
         Target.Value = closest;
+        ai.SetTarget(closest);
         return Status.Success;
     }
 
@@ -55,4 +58,3 @@ public partial class FindTargetAction : Action
     {
     }
 }
-

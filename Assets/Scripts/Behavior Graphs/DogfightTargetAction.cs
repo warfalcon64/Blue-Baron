@@ -40,16 +40,14 @@ public partial class DogfightTargetAction : Action
 
     private ShipBase ship;
     private Rigidbody2D rb;
-    private Rigidbody2D targetRb;
 
     protected override Status OnStart()
     {
         ship = Self.Value.GetComponent<ShipBase>();
         rb = Self.Value.GetComponent<Rigidbody2D>();
-        targetRb = Target.Value.GetComponent<Rigidbody2D>();
 
         groups = ship.GetWeaponGroups();
-        
+
         leadFactor = UnityEngine.Random.Range(leadFactorMin, leadFactorMax);
         leadFactorTimer = leadFactorRerollInterval;
 
@@ -68,20 +66,22 @@ public partial class DogfightTargetAction : Action
         if (Target.Value == null || !Target.Value.activeInHierarchy)
             return Status.Failure;
 
+        Rigidbody2D targetRb = Target.Value.GetComponent<Rigidbody2D>();
+
         float dt = Time.deltaTime;
         if (nextAdjust > 0) nextAdjust -= dt;
 
-        float angle = GetAngleToLeadTarget();
+        float directAngle = ship.GetAngleToTarget(Target.Value);
         float distance = (targetRb.position - rb.position).magnitude;
 
         if (isDisengaging)
         {
-            BreakTurn(angle, distance, dt);
+            BreakTurn(directAngle, distance, dt);
         }
         else
         {
             UpdateDisengageTimer(distance, dt);
-            FollowTarget(angle);
+            FollowTarget(directAngle);
             AttackTarget();
         }
 
@@ -137,6 +137,8 @@ public partial class DogfightTargetAction : Action
 
     private void AttackTarget()
     {
+        float angleToTarget = Mathf.Abs(ship.GetAngleToTarget(Target.Value));
+
         for (int i = 0; i < groups.Count; i++)
         {
             WeaponGroup group = groups[i];
@@ -145,14 +147,17 @@ public partial class DogfightTargetAction : Action
             WeaponsBase repWeapon = group.GetRepresentativeWeapon();
             if (repWeapon == null) continue;
 
+            // Skip if target is outside the group's fire arc
+            List<Hardpoint> hps = group.GetHardpoints();
+            float fireArc = hps[0].GetFireArc();
+            if (fireArc < 360f && angleToTarget > fireArc)
+                continue;
+
             if ((repWeapon.GetUsage() & WeaponUsage.Missile) != 0)
             {
-                float angleToTarget = Mathf.Abs(ship.GetAngleToTarget(Target.Value));
                 if (angleToTarget > 45f)
                     continue;
             }
-
-            List<Hardpoint> hps = group.GetHardpoints();
             Vector2 avgPos = Vector2.zero;
             foreach (Hardpoint hp in hps)
             {
@@ -160,7 +165,8 @@ public partial class DogfightTargetAction : Action
             }
             avgPos /= hps.Count;
 
-            Vector2 aimPos = GetLeadPosition(repWeapon, avgPos);
+            Rigidbody2D tRb = Target.Value.GetComponent<Rigidbody2D>();
+            Vector2 aimPos = GetLeadPosition(repWeapon, avgPos, tRb);
             ship.FireGroup(i, aimPos);
         }
     }
@@ -196,7 +202,7 @@ public partial class DogfightTargetAction : Action
         ship.SetShipTurn(turn);
     }
 
-    private Vector2 GetLeadPosition(WeaponsBase weapon, Vector2 gunPosition)
+    private Vector2 GetLeadPosition(WeaponsBase weapon, Vector2 gunPosition, Rigidbody2D targetRb)
     {
         float speed = weapon.GetSpeed();
         float distance = Vector2.Distance(gunPosition, targetRb.position);
@@ -204,7 +210,7 @@ public partial class DogfightTargetAction : Action
         return targetRb.position + targetRb.linearVelocity * travelTime;
     }
 
-    private float GetAngleToLeadTarget()
+    private float GetAngleToLeadTarget(Rigidbody2D targetRb)
     {
         leadFactorTimer -= Time.deltaTime;
         if (leadFactorTimer <= 0f)
@@ -213,10 +219,15 @@ public partial class DogfightTargetAction : Action
             leadFactorTimer = leadFactorRerollInterval;
         }
 
+        // Use direct angle when target is behind — lead is meaningless until we face them
+        float directAngle = ship.GetAngleToTarget(Target.Value);
+        if (Mathf.Abs(directAngle) > 90f)
+            return directAngle;
+
         WeaponGroup primaryGroup = ship.GetWeaponGroup(0);
         WeaponsBase repWeapon = primaryGroup.GetRepresentativeWeapon();
         if (repWeapon == null)
-            return ship.GetAngleToTarget(Target.Value);
+            return directAngle;
 
         float projectileSpeed = repWeapon.GetSpeed();
         float distance = Vector2.Distance(rb.position, targetRb.position);
@@ -227,4 +238,3 @@ public partial class DogfightTargetAction : Action
         return Vector2.SignedAngle((Vector2)Self.Value.transform.up, leadDirection);
     }
 }
-

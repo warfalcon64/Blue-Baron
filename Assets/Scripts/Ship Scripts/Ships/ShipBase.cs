@@ -259,6 +259,11 @@ public abstract class ShipBase : MonoBehaviour
         return minSpeed;
     }
 
+    public virtual float GetShipTurnSpeed()
+    {
+        return turnSpeed;
+    }
+
     public List<WeaponGroup> GetWeaponGroups()
     {
         return weaponGroups;

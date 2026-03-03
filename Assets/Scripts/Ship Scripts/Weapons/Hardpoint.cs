@@ -12,7 +12,7 @@ public class Hardpoint : MonoBehaviour
     public WeaponsBase Fire(Vector2 aimPos, Vector2 shipVelocity, ShipBase source)
     {
         Vector2 spawnPos = transform.position;
-        Vector2 shootDirection = (aimPos - spawnPos).normalized;
+        Vector2 shootDirection = (aimPos - (Vector2)source.transform.position).normalized;
         WeaponsBase projectile = Instantiate(weaponPrefab, spawnPos, transform.rotation);
         projectile.Setup(shootDirection, shipVelocity, source);
         nextFireTime = Time.time + GetCooldown();
