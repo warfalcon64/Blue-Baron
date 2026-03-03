@@ -78,6 +78,12 @@ public class SceneManager : MonoBehaviour
 
     private void Start()
     {
+        if (blueShips.Count == 0)
+        {
+            Debug.LogWarning("SceneManager: blueShips list is empty. Check spawner or Inspector setup.");
+            return;
+        }
+
         if (spectatorMode)
         {
             playerIndex = 0;
