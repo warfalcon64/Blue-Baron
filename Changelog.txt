@@ -1,7 +1,6 @@
 Planned Implementation:
 - Maybe make ship acceleration non linear?
-- Bomber craft with a turret (don't make it so that you need two different ships for both factions)
-- Rehaul the state based system. Most likely will need different states for each ship class instead of attempting to consolidate states for all ship classes.
+- Bomber craft with a turret (don't make it so that you need two different ships for both factions?)
 
 Future Implementation:
 - Moving mouse to edge of screen pulls camera in that direction up till some arbitrary limit
@@ -11,9 +10,3 @@ Future Implementation:
 
 Things to fix:
 - Make sure every ship calculates its own damage handling (weapons pass to them the damage that needs to be done)
-
-
-BT Notes:
-https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fquestion-make-the-behavior-graph-start-a-flow-when-certain-v0-pbu4laiw09jf1.png%3Fwidth%3D1448%26format%3Dpng%26auto%3Dwebp%26s%3D52a6dde9e297d75b62aa100ce751c4b3a497abd4
-
-just get blackboard variable and send event message via Var.Value.SendEventMessage?

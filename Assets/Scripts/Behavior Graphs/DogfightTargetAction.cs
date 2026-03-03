@@ -25,7 +25,7 @@ public partial class DogfightTargetAction : Action
     private float lastSampledDistance;
     private float disengageBuildup;
     private float disengageSampleTimer;
-    private float disengageThreshold = 4f;
+    private float disengageThreshold = 2f;
     private float disengageTimeLimit;
     private float disengageTimeLimitMin = 0.5f;
     private float disengageTimeLimitMax = 2f;
