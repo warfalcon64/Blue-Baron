@@ -12,8 +12,16 @@ public class Hardpoint : MonoBehaviour
     public WeaponsBase Fire(Vector2 aimPos, Vector2 shipVelocity, ShipBase source)
     {
         Vector2 spawnPos = transform.position;
-        Vector2 shootDirection = (aimPos - (Vector2)source.transform.position).normalized;
-        WeaponsBase projectile = Instantiate(weaponPrefab, spawnPos, transform.rotation);
+        Vector2 toAim = aimPos - (Vector2)source.transform.position;
+        float sqrMag = toAim.sqrMagnitude;
+        Vector2 shootDirection;
+        if (float.IsNaN(sqrMag) || float.IsInfinity(sqrMag) || sqrMag < 0.001f)
+            shootDirection = source.transform.up;
+        else
+            shootDirection = toAim.normalized;
+        float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
+        Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
+        WeaponsBase projectile = Instantiate(weaponPrefab, spawnPos, rotation);
         projectile.Setup(shootDirection, shipVelocity, source);
         nextFireTime = Time.time + GetCooldown();
         return projectile;
