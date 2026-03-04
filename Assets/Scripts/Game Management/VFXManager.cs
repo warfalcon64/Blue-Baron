@@ -9,26 +9,17 @@ public class VFXManager : MonoBehaviour
 
     public enum VFXType
     {
-        Spark,
         Explosion
     }
 
     private Dictionary<VFXType, string> VFXValuePairs = new Dictionary<VFXType, string>
-    { 
-        [VFXType.Spark] = "LaserHit",
+    {
         [VFXType.Explosion] = "OnDeath"
     };
 
-    // Start is called before the first frame update
     void Start()
     {
         mainEffects = GetComponentInChildren<VisualEffect>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void PlayVFX(VFXType type, Vector3 position)
@@ -38,9 +29,7 @@ public class VFXManager : MonoBehaviour
             print("NO VFX OF TYPE " + type + " FOUND IN VFXVALUEPAIRS");
         }
 
-        VFXEventAttribute eventAttribute = mainEffects.CreateVFXEventAttribute();
-
         mainEffects.SetVector3("Position", position);
-        mainEffects.SendEvent(VFXValuePairs[type], eventAttribute);
+        mainEffects.SendEvent(VFXValuePairs[type]);
     }
 }

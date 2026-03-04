@@ -1024,12 +1024,14 @@ MonoBehaviour:
   - groupName: Secondary
     fireMode: 0
     autonomous: 0
-    enabled: 1
+    enabled: 0
     hardpoints:
     - {fileID: 220117002755116494}
   combatSystem: {fileID: 8734995988375712972}
   lowHealth: 25
   smoke: {fileID: 4119226456086350580}
+  deathVFXEvent: OnDeath
+  deathVFXLifetime: 2
   godMode: 0
   isPlayer: 0
 --- !u!114 &-2540090203102408868
@@ -1044,14 +1046,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debug: 0
-  onDamagedChannel: {fileID: 11400000, guid: 8a664bc7669f0f540b3a240e67a92f1d, type: 2}
-  canHover: 0
-  faceEnemyAngle: 5
-  angularError: 5
-  leadFactorMin: 0.7
-  leadFactorMax: 1.3
-  leadFactorRerollInterval: 3
   ship: {fileID: 6372454098448783548}
 --- !u!114 &6946207469076967532
 MonoBehaviour:

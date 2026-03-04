@@ -1,21 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.Pool;
-using UnityEngine.VFX;
 
 public class WeaponsPlasma : WeaponsBase
 {
-    private VFXManager vfxManager;
     private Rigidbody2D rb;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        vfxManager = SceneManager.Instance.vfxManager.GetComponent<VFXManager>();
     }
 
     private void Start()
@@ -35,8 +29,7 @@ public class WeaponsPlasma : WeaponsBase
     {
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
-            Vector3 hitPos = transform.position;
-            vfxManager.PlayVFX(VFXManager.VFXType.Spark, hitPos);
+            SpawnImpactVFX();
             Destroy(gameObject);
         }
     }

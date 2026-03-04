@@ -24,6 +24,8 @@ public abstract class ShipBase : MonoBehaviour
     [Header("VFX")]
     [SerializeField] protected float lowHealth = 25;
     [SerializeField] protected Transform smoke;
+    [SerializeField] protected string deathVFXEvent = "OnDeath";
+    [SerializeField] protected float deathVFXLifetime = 1f;
 
     public bool godMode;
 
@@ -37,10 +39,8 @@ public abstract class ShipBase : MonoBehaviour
     protected float maxTurnSpeed;
     protected float minTurnSpeed;
 
-    protected VisualEffect mainEffects;
     protected VisualEffect shipEffects;
     protected Rigidbody2D rb;
-    protected VFXManager vfxManager;
 
     protected ShipType type;
 
@@ -59,8 +59,6 @@ public abstract class ShipBase : MonoBehaviour
 
     protected virtual void Start()
     {
-        mainEffects = SceneManager.Instance.GetVFXManager().GetComponentInChildren<VisualEffect>();
-        vfxManager = SceneManager.Instance.vfxManager.GetComponent<VFXManager>();
     }
 
     protected virtual void Update()
@@ -103,21 +101,22 @@ public abstract class ShipBase : MonoBehaviour
 
     protected virtual void OnDeath()
     {
-        vfxManager.PlayVFX(VFXManager.VFXType.Explosion, transform.position);
+        // Detach ship VFX so it survives the ship being deactivated
+        smoke.SetParent(null);
+        if (isSmoking)
+        {
+            shipEffects.Stop();
+        }
+        shipEffects.SetVector3("Position", transform.position);
+        shipEffects.SendEvent(deathVFXEvent);
+        shipEffects.Play();
+        float maxLifetime = shipEffects.GetFloat(Shader.PropertyToID("SmokeLifetime"));
+        Destroy(smoke.gameObject, Mathf.Max(maxLifetime, deathVFXLifetime));
 
         if (isPlayer)
         {
             PlayerController pc = GetComponent<PlayerController>();
             pc.OnPlayerDeath();
-        }
-
-        // Detach smoke trail so it can fade out after the ship is deactivated
-        if (isSmoking)
-        {
-            smoke.SetParent(null);
-            shipEffects.Stop();
-            float maxLifetime = shipEffects.GetFloat(Shader.PropertyToID("SmokeLifetime"));
-            Destroy(smoke.gameObject, maxLifetime);
         }
 
         gameObject.SetActive(false);

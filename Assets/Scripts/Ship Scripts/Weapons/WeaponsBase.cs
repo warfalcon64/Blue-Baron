@@ -24,6 +24,11 @@ public abstract class WeaponsBase : MonoBehaviour
     [Header("Lifetime")]
     [SerializeField] protected float lifetime = 5f;
 
+    [Header("Impact VFX")]
+    [SerializeField] protected VisualEffect impactVFX;
+    [SerializeField] protected string impactVFXEvent = "OnHit";
+    [SerializeField] protected float impactVFXLifetime = 1f;
+
     protected GameObject target;
     protected ShipBase source;
 
@@ -85,5 +90,14 @@ public abstract class WeaponsBase : MonoBehaviour
     public virtual void SetTarget(GameObject newTarget)
     {
         target = newTarget;
+    }
+
+    protected void SpawnImpactVFX()
+    {
+        if (impactVFX == null) return;
+        impactVFX.transform.SetParent(null);
+        impactVFX.SetVector3("Position", impactVFX.transform.position);
+        impactVFX.SendEvent(impactVFXEvent);
+        Destroy(impactVFX.gameObject, impactVFXLifetime);
     }
 }

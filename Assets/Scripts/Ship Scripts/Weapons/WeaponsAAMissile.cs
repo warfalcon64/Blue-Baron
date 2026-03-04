@@ -56,14 +56,12 @@ public class WeaponsAAMissile : WeaponsBase
     private float timeSinceLastContact;
     private float revisitTimer;
 
-    private VFXManager vfxManager;
     private Rigidbody2D rb;
     private TrailRenderer engineTrail;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        vfxManager = SceneManager.Instance.vfxManager.GetComponent<VFXManager>();
         engineTrail = GetComponentInChildren<TrailRenderer>();
     }
 
@@ -573,8 +571,7 @@ public class WeaponsAAMissile : WeaponsBase
     {
         if (collision.GetComponent<Rigidbody2D>() != null && !collision.CompareTag(tag))
         {
-            Vector3 hitPos = transform.position;
-            vfxManager.PlayVFX(VFXManager.VFXType.Explosion, hitPos);
+            SpawnImpactVFX();
             Destroy(gameObject);
         }
     }
