@@ -237,6 +237,12 @@ public abstract class ShipBase : MonoBehaviour
         return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
     }
 
+    public float GetAngleToTarget(Rigidbody2D targetRb)
+    {
+        Vector2 targetDirection = targetRb.position - rb.position;
+        return Vector2.SignedAngle((Vector2)transform.up, targetDirection);
+    }
+
     // ====== Getters and Setters ======
     public virtual float GetShipSpeed()
     {

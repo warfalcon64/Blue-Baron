@@ -24,12 +24,14 @@ public partial class FleeFromMissileAction : Action
     private ShipBase ship;
     private Rigidbody2D rb;
     private AIControllerBase ai;
+    private Rigidbody2D targetRb;
 
     protected override Status OnStart()
     {
         ship = Self.Value.GetComponent<ShipBase>();
         rb = Self.Value.GetComponent<Rigidbody2D>();
         ai = Self.Value.GetComponent<AIControllerBase>();
+        targetRb = Target.Value != null ? Target.Value.GetComponent<Rigidbody2D>() : null;
 
         RollJink();
 
@@ -122,8 +124,6 @@ public partial class FleeFromMissileAction : Action
     {
         if (Target.Value == null || !Target.Value.activeInHierarchy)
             return;
-
-        Rigidbody2D targetRb = Target.Value.GetComponent<Rigidbody2D>();
         List<WeaponGroup> groups = ship.GetWeaponGroups();
         for (int i = 0; i < groups.Count; i++)
         {

@@ -40,11 +40,13 @@ public partial class DogfightTargetAction : Action
 
     private ShipBase ship;
     private Rigidbody2D rb;
+    private Rigidbody2D targetRb;
 
     protected override Status OnStart()
     {
         ship = Self.Value.GetComponent<ShipBase>();
         rb = Self.Value.GetComponent<Rigidbody2D>();
+        targetRb = Target.Value.GetComponent<Rigidbody2D>();
 
         groups = ship.GetWeaponGroups();
 
@@ -66,12 +68,10 @@ public partial class DogfightTargetAction : Action
         if (Target.Value == null || !Target.Value.activeInHierarchy)
             return Status.Failure;
 
-        Rigidbody2D targetRb = Target.Value.GetComponent<Rigidbody2D>();
-
         float dt = Time.deltaTime;
         if (nextAdjust > 0) nextAdjust -= dt;
 
-        float directAngle = ship.GetAngleToTarget(Target.Value);
+        float directAngle = ship.GetAngleToTarget(targetRb);
         float distance = (targetRb.position - rb.position).magnitude;
 
         if (isDisengaging)
@@ -137,7 +137,7 @@ public partial class DogfightTargetAction : Action
 
     private void AttackTarget()
     {
-        float angleToTarget = Mathf.Abs(ship.GetAngleToTarget(Target.Value));
+        float angleToTarget = Mathf.Abs(ship.GetAngleToTarget(targetRb));
 
         for (int i = 0; i < groups.Count; i++)
         {
@@ -165,8 +165,7 @@ public partial class DogfightTargetAction : Action
             }
             avgPos /= hps.Count;
 
-            Rigidbody2D tRb = Target.Value.GetComponent<Rigidbody2D>();
-            Vector2 aimPos = GetLeadPosition(repWeapon, avgPos, tRb);
+            Vector2 aimPos = GetLeadPosition(repWeapon, avgPos, targetRb);
             ship.FireGroup(i, aimPos);
         }
     }
@@ -220,7 +219,7 @@ public partial class DogfightTargetAction : Action
         }
 
         // Use direct angle when target is behind — lead is meaningless until we face them
-        float directAngle = ship.GetAngleToTarget(Target.Value);
+        float directAngle = ship.GetAngleToTarget(targetRb);
         if (Mathf.Abs(directAngle) > 90f)
             return directAngle;
 

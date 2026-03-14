@@ -33,7 +33,7 @@ public partial class FindTargetAction : Action
         {
             if (!enemy.gameObject.activeInHierarchy) continue;
 
-            float distance = (enemy.GetComponent<Rigidbody2D>().position - rb.position).sqrMagnitude;
+            float distance = (enemy.GetRigidBody().position - rb.position).sqrMagnitude;
             if (distance < lowestDistance)
             {
                 lowestDistance = distance;
