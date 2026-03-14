@@ -90,7 +90,7 @@ public partial class DogfightTargetAction : Action
 
     private void BreakTurn(float angle, float distance, float dt)
     {
-        float reverseTurn = angle > 0 ? -1f : 1f;
+        float reverseTurn = Mathf.Clamp(-angle / 45f, -1f, 1f);
         ship.SetShipTurn(reverseTurn);
         ship.Accelerate(0.2f);
 
@@ -174,11 +174,10 @@ public partial class DogfightTargetAction : Action
     {
         float turn = 0f;
 
-        // Turning logic
+        // Turning logic — proportional to avoid oscillation at low tick rates
         if (Mathf.Abs(angle) > faceEnemyAngle)
         {
-            if (angle > 0) turn = 1f;
-            if (angle < 0) turn = -1f;
+            turn = Mathf.Clamp(angle / 45f, -1f, 1f);
         }
 
         // Acceleration logic
