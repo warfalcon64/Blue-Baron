@@ -159,9 +159,9 @@ public partial class DogfightTargetAction : Action
                     continue;
             }
             Vector2 avgPos = Vector2.zero;
-            foreach (Hardpoint hp in hps)
+            for (int j = 0; j < hps.Count; j++)
             {
-                avgPos += (Vector2)hp.transform.position;
+                avgPos += (Vector2)hps[j].transform.position;
             }
             avgPos /= hps.Count;
 

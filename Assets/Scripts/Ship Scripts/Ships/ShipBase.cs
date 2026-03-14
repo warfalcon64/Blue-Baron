@@ -162,18 +162,20 @@ public abstract class ShipBase : MonoBehaviour
         }
     }
 
+    private static readonly List<WeaponsBase> emptyProjectiles = new List<WeaponsBase>();
+
     public List<WeaponsBase> FireGroup(int groupIndex, Vector2 aimPos)
     {
         if (groupIndex < 0 || groupIndex >= weaponGroups.Count)
-            return new List<WeaponsBase>();
+            return emptyProjectiles;
 
         List<WeaponsBase> projectiles = weaponGroups[groupIndex].Fire(aimPos, rb.linearVelocity, this);
 
-        foreach (WeaponsBase projectile in projectiles)
+        for (int i = 0; i < projectiles.Count; i++)
         {
-            if (projectile.IsSeeker())
+            if (projectiles[i].IsSeeker())
             {
-                OnSeekerFired?.Invoke(this, projectile);
+                OnSeekerFired?.Invoke(this, projectiles[i]);
             }
         }
 

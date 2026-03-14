@@ -18,20 +18,22 @@ public class WeaponGroup
     public List<Hardpoint> hardpoints;
 
     [NonSerialized] private int nextHardpointIndex;
+    [NonSerialized] private readonly List<WeaponsBase> firedCache = new List<WeaponsBase>();
 
     public List<WeaponsBase> Fire(Vector2 aimPos, Vector2 shipVelocity, ShipBase source)
     {
-        List<WeaponsBase> fired = new List<WeaponsBase>();
+        firedCache.Clear();
 
-        if (!enabled || hardpoints == null || hardpoints.Count == 0) return fired;
+        if (!enabled || hardpoints == null || hardpoints.Count == 0) return firedCache;
 
         if (fireMode == FireMode.Unison)
         {
-            foreach (Hardpoint hp in hardpoints)
+            for (int i = 0; i < hardpoints.Count; i++)
             {
+                Hardpoint hp = hardpoints[i];
                 if (hp.IsReady() && hp.IsInFireArc(aimPos, source.transform))
                 {
-                    fired.Add(hp.Fire(aimPos, shipVelocity, source));
+                    firedCache.Add(hp.Fire(aimPos, shipVelocity, source));
                 }
             }
         }
@@ -45,7 +47,7 @@ public class WeaponGroup
 
                 if (hp.IsReady() && hp.IsInFireArc(aimPos, source.transform))
                 {
-                    fired.Add(hp.Fire(aimPos, shipVelocity, source));
+                    firedCache.Add(hp.Fire(aimPos, shipVelocity, source));
                     nextHardpointIndex = (index + 1) % count;
 
                     // Stagger the remaining hardpoints evenly across the cooldown
@@ -66,16 +68,16 @@ public class WeaponGroup
             }
         }
 
-        return fired;
+        return firedCache;
     }
 
     public bool HasUsage(WeaponUsage usage)
     {
         if (hardpoints == null) return false;
 
-        foreach (Hardpoint hp in hardpoints)
+        for (int i = 0; i < hardpoints.Count; i++)
         {
-            if ((hp.GetUsage() & usage) != 0) return true;
+            if ((hardpoints[i].GetUsage() & usage) != 0) return true;
         }
         return false;
     }
