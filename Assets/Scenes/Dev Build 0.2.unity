@@ -1731,10 +1731,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DebugBattleSpawner
   blueFighterPrefab: {fileID: 8497475259681279303, guid: 0756d354c730517419536cf487ad61c8, type: 3}
   redFighterPrefab: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-  blueTeamSize: 1
-  redTeamSize: 1
+  blueTeamSize: 100
+  redTeamSize: 100
   shipSpacing: 5
-  teamSeparation: 40
+  teamSeparation: 200
   maxColumns: 5
   assignPlayer: 0
   sceneManager: {fileID: 1974449429}

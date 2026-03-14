@@ -1,4 +1,5 @@
 Planned Implementation:
+- Fix missile VFX after VFX decentralization and pray that VFX centralization is not required for optimization
 - ** Better optimization ** --> aim for 1,000 ships total on scene?
 - Maybe make ship acceleration non linear?
 - Bomber craft with a turret (don't make it so that you need two different ships for both factions?)

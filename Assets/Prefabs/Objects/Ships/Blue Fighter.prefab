@@ -1122,7 +1122,7 @@ MonoBehaviour:
   - groupName: Primary
     fireMode: 1
     autonomous: 0
-    enabled: 1
+    enabled: 0
     hardpoints:
     - {fileID: 6855967242540894086}
     - {fileID: 7745746146600437085}
