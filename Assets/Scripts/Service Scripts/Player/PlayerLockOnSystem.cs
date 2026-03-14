@@ -47,7 +47,7 @@ public class PlayerLockOnSystem : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (lockedEnemy != null && lockedEnemy.activeSelf && lockingEnabled)
+        if (pc != null && lockedEnemy != null && lockedEnemy.activeSelf && lockingEnabled)
         {
             CalculateLead();
         }
@@ -88,6 +88,8 @@ public class PlayerLockOnSystem : MonoBehaviour
 
     private void UpdateHoverState()
     {
+        if (pc == null) return;
+
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Collider2D[] detectedShips = Physics2D.OverlapCircleAll(mousePos, lockRadius, enemyLayer);
 
