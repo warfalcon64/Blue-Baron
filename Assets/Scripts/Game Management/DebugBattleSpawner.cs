@@ -10,8 +10,8 @@ public class DebugBattleSpawner : MonoBehaviour
     [SerializeField] private GameObject redFighterPrefab;
 
     [Header("Team Sizes")]
-    [SerializeField, Range(1, 100)] private int blueTeamSize = 3;
-    [SerializeField, Range(1, 100)] private int redTeamSize = 3;
+    [SerializeField, Range(1, 500)] private int blueTeamSize = 3;
+    [SerializeField, Range(1, 500)] private int redTeamSize = 3;
 
     [Header("Formation")]
     [SerializeField] private float shipSpacing = 5f;

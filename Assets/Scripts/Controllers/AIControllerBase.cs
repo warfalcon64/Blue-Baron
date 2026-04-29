@@ -55,6 +55,8 @@ public abstract class AIControllerBase : MonoBehaviour
 
     public bool HasCloseIncomingMissile(float range)
     {
+        if (incomingMissiles.Count == 0) return false;
+
         float rangeSqr = range * range;
         Vector2 myPos = rb.position;
 

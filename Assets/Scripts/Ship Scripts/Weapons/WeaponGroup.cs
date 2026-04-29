@@ -71,6 +71,17 @@ public class WeaponGroup
         return firedCache;
     }
 
+    public bool HasReadyHardpoint()
+    {
+        if (hardpoints == null) return false;
+
+        for (int i = 0; i < hardpoints.Count; i++)
+        {
+            if (hardpoints[i].IsReady()) return true;
+        }
+        return false;
+    }
+
     public bool HasUsage(WeaponUsage usage)
     {
         if (hardpoints == null) return false;

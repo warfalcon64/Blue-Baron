@@ -28,12 +28,13 @@ public partial class FindTargetAction : Action
 
         float lowestDistance = Mathf.Infinity;
         GameObject closest = null;
+        Vector2 selfPos = rb.position;
 
         foreach (ShipBase enemy in enemyTeam)
         {
             if (!enemy.gameObject.activeInHierarchy) continue;
 
-            float distance = (enemy.GetRigidBody().position - rb.position).sqrMagnitude;
+            float distance = (enemy.GetRigidBody().position - selfPos).sqrMagnitude;
             if (distance < lowestDistance)
             {
                 lowestDistance = distance;

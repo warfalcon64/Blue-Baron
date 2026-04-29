@@ -74,27 +74,29 @@ public partial class DogfightTargetAction : Action
         float directAngle = ship.GetAngleToTarget(targetRb);
         float distance = (targetRb.position - rb.position).magnitude;
 
+        float absAngle = Mathf.Abs(directAngle);
+
         if (isDisengaging)
         {
-            BreakTurn(directAngle, distance, dt);
+            BreakTurn(directAngle, distance, dt, absAngle);
         }
         else
         {
             UpdateDisengageTimer(distance, dt);
             FollowTarget(directAngle);
-            AttackTarget();
+            AttackTarget(absAngle);
         }
 
         return Status.Running;
     }
 
-    private void BreakTurn(float angle, float distance, float dt)
+    private void BreakTurn(float angle, float distance, float dt, float absAngle)
     {
         float reverseTurn = Mathf.Clamp(-angle / 45f, -1f, 1f);
         ship.SetShipTurn(reverseTurn);
         ship.Accelerate(0.2f);
 
-        AttackTarget();
+        AttackTarget(absAngle);
 
         disengageTimer -= dt;
         if (disengageTimer <= 0f)
@@ -135,14 +137,13 @@ public partial class DogfightTargetAction : Action
     {
     }
 
-    private void AttackTarget()
+    private void AttackTarget(float angleToTarget)
     {
-        float angleToTarget = Mathf.Abs(ship.GetAngleToTarget(targetRb));
-
         for (int i = 0; i < groups.Count; i++)
         {
             WeaponGroup group = groups[i];
             if (group.autonomous) continue;
+            if (!group.HasReadyHardpoint()) continue;
 
             WeaponsBase repWeapon = group.GetRepresentativeWeapon();
             if (repWeapon == null) continue;
