@@ -73,6 +73,8 @@ crashlytics-build.properties
 
 # Claude Code local settings
 .claude/
+CLAUDE.md
+CURRENT_OBJECTIVE.md
 
 # Unimported source art files
 Unimported Images/
