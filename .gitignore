@@ -56,6 +56,14 @@ sysinfo.txt
 *.apk
 *.unitypackage
 /[Tt]est[Bb]uilds/
+/[Tt]est?[Bb]uilds/
+
+# Profiler captures (large binary files, machine-specific)
+/ProfilerCaptures/
+
+# Unity auto-recovery scenes (machine-specific)
+/[Aa]ssets/_[Rr]ecovery/
+/[Aa]ssets/_[Rr]ecovery.meta
 
 # Crashlytics generated file
 crashlytics-build.properties
