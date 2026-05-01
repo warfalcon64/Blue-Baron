@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Behavior;
 using UnityEngine;
 
 using Common;
@@ -33,9 +32,7 @@ public class SceneManager : MonoBehaviour
     public FollowPlayer mainCam;
     public Camera minimapCam;
 
-    [Header("Debug")]
-    [SerializeField] private bool spectatorMode = false;
-
+    private bool spectatorMode;
     private int playerIndex;
     private bool inSwapMode = false;
     private PlayerController pc;
@@ -84,6 +81,18 @@ public class SceneManager : MonoBehaviour
             return;
         }
 
+        // Auto-detect spectator: if no blue ship is marked as the player, run spectator mode.
+        int foundPlayerIndex = -1;
+        for (int i = 0; i < blueShips.Count; i++)
+        {
+            if (blueShips[i].isPlayer)
+            {
+                foundPlayerIndex = i;
+                break;
+            }
+        }
+        spectatorMode = foundPlayerIndex < 0;
+
         if (spectatorMode)
         {
             playerIndex = 0;
@@ -96,15 +105,10 @@ public class SceneManager : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < blueShips.Count; i++)
-        {
-            if (blueShips[i].isPlayer)
-            {
-                playerIndex = i;
-            }
-        }
-
+        playerIndex = foundPlayerIndex;
         playerShip = blueShips[playerIndex];
+        mainCam.player = playerShip;
+        vfxManager.GetComponent<FollowPlayer>().player = playerShip;
         pc = playerShip.GetPlayerController();
         pc.SwapShip += EnableShipSwapping; // * make a method for connecting player controller to other scripts via events if necessary
         playerLockOnSystem = playerManager.GetPlayerLockOnSystem();
@@ -182,7 +186,6 @@ public class SceneManager : MonoBehaviour
         {
             playerShip = destShip;
             playerShip.GetComponent<AIControllerBase>().enabled = false;
-            playerShip.GetComponent<BehaviorGraphAgent>().enabled = false;
             pc = playerShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;

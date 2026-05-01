@@ -1,16 +1,16 @@
+using System;
 using System.Collections.Generic;
-using Unity.Behavior;
 using UnityEngine;
 
 public abstract class AIControllerBase : MonoBehaviour
 {
-    private OnDamagedEventChannel onDamagedChannel;
-
     public GameObject target { get; private set; }
     public List<WeaponsAAMissile> incomingMissiles { get; private set; }
 
     public ShipBase ship;
     public Rigidbody2D rb { get; private set; }
+
+    public event Action<ShipBase> OnDamaged;
 
     protected virtual void Awake()
     {
@@ -23,16 +23,11 @@ public abstract class AIControllerBase : MonoBehaviour
     {
         ship.OnShipDamage += HandleDamageEvent;
         ship.OnSeekerFired += HandleSeekerFired;
-
-        BehaviorGraphAgent agent = GetComponent<BehaviorGraphAgent>();
-        if (agent != null && agent.GetVariable("OnDamagedEventChannel", out BlackboardVariable<OnDamagedEventChannel> channelVar))
-            onDamagedChannel = channelVar.Value;
     }
 
     protected virtual void HandleDamageEvent(object sender, ShipBase attacker)
     {
-        if (onDamagedChannel != null)
-            onDamagedChannel.SendEventMessage(gameObject, attacker.gameObject);
+        OnDamaged?.Invoke(attacker);
     }
 
     protected virtual void HandleSeekerFired(object sender, WeaponsBase seeker)

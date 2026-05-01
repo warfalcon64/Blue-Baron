@@ -596,8 +596,7 @@ GameObject:
   - component: {fileID: 8497475259681279299}
   - component: {fileID: 7822955055012356335}
   - component: {fileID: 8497475259681279297}
-  - component: {fileID: 1798488539491713676}
-  - component: {fileID: 5704743084018683553}
+  - component: {fileID: 8946631493711677627}
   m_Layer: 7
   m_Name: Blue Fighter
   m_TagString: Blue
@@ -748,10 +747,10 @@ MonoBehaviour:
   lowHealth: 25
   smoke: {fileID: 8897038711605021268}
   deathVFXEvent: OnDeath
-  deathVFXLifetime: 2
+  deathVFXLifetime: 1.7
   godMode: 0
   isPlayer: 0
---- !u!114 &1798488539491713676
+--- !u!114 &8946631493711677627
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -760,39 +759,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8497475259681279303}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
+  m_Script: {fileID: 11500000, guid: e5e560d7d74ad39468caa957930a1f65, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::FighterController
   ship: {fileID: 8497475259681279297}
---- !u!114 &5704743084018683553
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8497475259681279303}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
-  m_Graph: {fileID: 8189240705440538767, guid: e646d03e9a9cf5c44a0cf934a8d7bc60, type: 2}
-  m_BlackboardVariableOverridesList:
-  - rid: 3797905620617135094
-  m_OriginalGraph: {fileID: 8189240705440538767, guid: e646d03e9a9cf5c44a0cf934a8d7bc60, type: 2}
-  m_IsInitialised: 0
-  m_IsStarted: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 3797905620617135094
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        m_Value: {fileID: 8497475259681279303}
+  tickInterval: 0.1
+  missileEvadeRange: 15
+  squad: {fileID: 0}
 --- !u!1 &9045316319554966681
 GameObject:
   m_ObjectHideFlags: 0

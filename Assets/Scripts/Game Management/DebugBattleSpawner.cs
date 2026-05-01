@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.Behavior;
 using UnityEngine;
 
 [DefaultExecutionOrder(-50)]
@@ -56,10 +55,6 @@ public class DebugBattleSpawner : MonoBehaviour
             AIControllerBase aiController = playerShip.GetComponent<AIControllerBase>();
             if (aiController != null)
                 aiController.enabled = false;
-
-            BehaviorGraphAgent graphAgent = playerShip.GetComponent<BehaviorGraphAgent>();
-            if (graphAgent != null)
-                graphAgent.enabled = false;
 
             PlayerController pc = playerShip.gameObject.AddComponent<PlayerController>();
             playerShip.isPlayer = true;

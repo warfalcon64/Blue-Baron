@@ -491,8 +491,7 @@ GameObject:
   - component: {fileID: 8941532685634839918}
   - component: {fileID: 4108526075727501089}
   - component: {fileID: 6372454098448783548}
-  - component: {fileID: -2540090203102408868}
-  - component: {fileID: 6946207469076967532}
+  - component: {fileID: 1519386512171939405}
   m_Layer: 7
   m_Name: Orange Fighter
   m_TagString: Red
@@ -646,7 +645,7 @@ MonoBehaviour:
   deathVFXLifetime: 2
   godMode: 0
   isPlayer: 0
---- !u!114 &-2540090203102408868
+--- !u!114 &1519386512171939405
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -655,39 +654,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 6137092292395479709}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3700e7a029b4294288254678f2713f8, type: 3}
+  m_Script: {fileID: 11500000, guid: e5e560d7d74ad39468caa957930a1f65, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::FighterController
   ship: {fileID: 6372454098448783548}
---- !u!114 &6946207469076967532
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6137092292395479709}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
-  m_Graph: {fileID: 8189240705440538767, guid: e646d03e9a9cf5c44a0cf934a8d7bc60, type: 2}
-  m_BlackboardVariableOverridesList:
-  - rid: 2696805781800222988
-  m_OriginalGraph: {fileID: 8189240705440538767, guid: e646d03e9a9cf5c44a0cf934a8d7bc60, type: 2}
-  m_IsInitialised: 0
-  m_IsStarted: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2696805781800222988
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        m_Value: {fileID: 6137092292395479709}
+  tickInterval: 0.1
+  missileEvadeRange: 15
+  squad: {fileID: 0}
 --- !u!1 &7180944070711932923
 GameObject:
   m_ObjectHideFlags: 0

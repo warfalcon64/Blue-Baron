@@ -320,11 +320,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   gizmoColor: {r: 0, g: 1, b: 0, a: 1}
---- !u!2083052967 &71915775 stripped
-VisualEffect:
-  m_CorrespondingSourceObject: {fileID: 2555077082242172787, guid: 0756d354c730517419536cf487ad61c8, type: 3}
-  m_PrefabInstance: {fileID: 363482493}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &83062488
 GameObject:
   m_ObjectHideFlags: 0
@@ -759,18 +754,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1562954570}
     m_Modifications:
-    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
-      propertyPath: godMode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
-      propertyPath: deathExplosion
-      value: 
-      objectReference: {fileID: 71915775}
-    - target: {fileID: 8497475259681279297, guid: 0756d354c730517419536cf487ad61c8, type: 3}
-      propertyPath: deathVFXLifetime
-      value: 1.7
-      objectReference: {fileID: 0}
     - target: {fileID: 8497475259681279302, guid: 0756d354c730517419536cf487ad61c8, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.7795
@@ -3350,7 +3333,6 @@ MonoBehaviour:
   shipData: {fileID: 11400000, guid: 6cb2b35daab4fe5488cc5b43e30bd944, type: 2}
   mainCam: {fileID: 519420033}
   minimapCam: {fileID: 1096590109}
-  spectatorMode: 1
 --- !u!1 &2138508682
 GameObject:
   m_ObjectHideFlags: 0
