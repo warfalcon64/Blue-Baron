@@ -733,14 +733,14 @@ MonoBehaviour:
   - groupName: Primary
     fireMode: 1
     autonomous: 0
-    enabled: 0
+    enabled: 1
     hardpoints:
     - {fileID: 6855967242540894086}
     - {fileID: 7745746146600437085}
   - groupName: Secondary
     fireMode: 0
     autonomous: 0
-    enabled: 0
+    enabled: 1
     hardpoints:
     - {fileID: 3655943799203410016}
   combatSystem: {fileID: 535438237622943709}
@@ -765,6 +765,7 @@ MonoBehaviour:
   ship: {fileID: 8497475259681279297}
   tickInterval: 0.1
   missileEvadeRange: 15
+  formationTolerance: 3
   squad: {fileID: 0}
 --- !u!1 &9045316319554966681
 GameObject:

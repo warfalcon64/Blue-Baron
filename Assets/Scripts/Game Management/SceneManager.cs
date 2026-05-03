@@ -20,6 +20,9 @@ public class SceneManager : MonoBehaviour
     public List<ShipBase> redShips = new List<ShipBase>();
     public List<ShipBase> deadRedShips;
 
+    [Header("Squads")]
+    public List<Squad> squads = new List<Squad>();
+
     [Header("Managers")]
     public UIManager uiManager;
     public PlayerManager playerManager;
@@ -247,6 +250,17 @@ public class SceneManager : MonoBehaviour
             mainCam.player = destShip;
             vfxManager.GetComponent<FollowPlayer>().player = destShip;
         }
+    }
+
+    public void RegisterSquad(Squad squad)
+    {
+        if (squad == null || squads.Contains(squad)) return;
+        squads.Add(squad);
+    }
+
+    public void UnregisterSquad(Squad squad)
+    {
+        squads.Remove(squad);
     }
 
     public List<ShipBase> GetLiveEnemies(string team)

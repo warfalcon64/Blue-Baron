@@ -10,6 +10,11 @@ public class FighterController : AIControllerBase
     [Header("Combat")]
     [SerializeField] private float missileEvadeRange = 15f;
 
+    [Header("Formation")]
+    [Tooltip("Distance from slot under which the fighter stops actively steering toward the slot " +
+             "and matches the squad heading instead.")]
+    [SerializeField] private float formationTolerance = 3f;
+
     [Header("Squad")]
     public Squad squad;
     public FighterOrder currentOrder;
@@ -29,8 +34,8 @@ public class FighterController : AIControllerBase
     private float disengageSampleTimer;
     private float disengageThreshold = 2f;
     private float disengageTimeLimit;
-    private float disengageTimeLimitMin = 0.5f;
-    private float disengageTimeLimitMax = 2f;
+    private float disengageTimeLimitMin = 0.25f;
+    private float disengageTimeLimitMax = 1f;
     private float disengageSampleInterval = 0.5f;
 
     private bool isDisengaging;
@@ -69,9 +74,17 @@ public class FighterController : AIControllerBase
         if (squad == null)
             UpdateSoloOrder();
 
+        // Sync the AIControllerBase target with the order so missile seeker handoff and
+        // damage attribution use the same target the squad assigned.
+        if (currentOrder.target != null)
+            SetTarget(currentOrder.target.gameObject);
+
         FighterMode effectiveMode = currentOrder.mode;
         if (HasCloseIncomingMissile(missileEvadeRange))
             effectiveMode = FighterMode.Evade;
+        else if (effectiveMode == FighterMode.Engage && Time.time < currentOrder.orderTimestamp)
+            // Staggered break: hold formation until our peel-off timestamp arrives.
+            effectiveMode = FighterMode.Holdout;
 
         switch (effectiveMode)
         {
@@ -345,8 +358,35 @@ public class FighterController : AIControllerBase
 
     private void TickHoldout()
     {
-        ship.SetShipTurn(0f);
+        Vector2 myPos = rb.position;
+        Vector2 forward = transform.up;
 
+        // Velocity matching: aim slightly ahead of the slot so we don't lag a moving formation.
+        Vector2 desiredPos = currentOrder.slotPosition + currentOrder.squadVelocity * tickInterval;
+        Vector2 toSlot = desiredPos - myPos;
+        float distToSlot = toSlot.magnitude;
+
+        Vector2 desiredHeading;
+        if (distToSlot < formationTolerance)
+            desiredHeading = currentOrder.squadHeading.sqrMagnitude > 0.0001f
+                ? currentOrder.squadHeading
+                : forward;
+        else
+            desiredHeading = toSlot / distToSlot;
+
+        float angle = Vector2.SignedAngle(forward, desiredHeading);
+        float turn = Mathf.Abs(angle) > 1f ? Mathf.Clamp(angle / 45f, -1f, 1f) : 0f;
+        ship.SetShipTurn(turn);
+
+        // Throttle: chase the slot when behind, ease off when nestled in.
+        if (distToSlot > formationTolerance)
+            ship.Accelerate(0.2f);
+        else if (distToSlot < formationTolerance * 0.5f)
+            ship.Decelerate(0.1f);
+        else
+            ship.Accelerate(0.1f);
+
+        // Opportunistic plasma fire while in formation — don't break heading for it.
         ShipBase t = currentOrder.target;
         if (t != null && t.gameObject.activeInHierarchy)
         {
@@ -378,6 +418,7 @@ public class FighterController : AIControllerBase
             if (isMissileGroup)
             {
                 if (!allowMissileGate) continue;
+                if (Time.time < currentOrder.missileFireTime) continue;
                 if (angleToTarget > 45f) continue;
             }
 

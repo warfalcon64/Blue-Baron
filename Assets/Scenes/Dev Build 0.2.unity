@@ -1714,11 +1714,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DebugBattleSpawner
   blueFighterPrefab: {fileID: 8497475259681279303, guid: 0756d354c730517419536cf487ad61c8, type: 3}
   redFighterPrefab: {fileID: 6137092292395479709, guid: 096037752844de448b3ac6b45d5ea476, type: 3}
-  blueTeamSize: 500
-  redTeamSize: 500
-  shipSpacing: 5
+  blueTeamSize: 3
+  redTeamSize: 3
+  squadSize: 15
+  squadSeparation: 80
+  formationSpacing: 5
   teamSeparation: 200
-  maxColumns: 5
   assignPlayer: 0
   sceneManager: {fileID: 1974449429}
 --- !u!4 &994846338
@@ -3327,6 +3328,7 @@ MonoBehaviour:
   - {fileID: 499907813}
   - {fileID: 172967891}
   deadRedShips: []
+  squads: []
   uiManager: {fileID: 496189971}
   playerManager: {fileID: 1030809738}
   vfxManager: {fileID: 1947919600}

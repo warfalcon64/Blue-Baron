@@ -9,4 +9,7 @@ public struct FighterOrder
     public ShipBase target;
     public bool authorizeMissile;
     public float orderTimestamp;
+    // Earliest Time.time at which this fighter may launch a missile-flagged weapon group.
+    // Used by the squad to phase-stagger members' first volley against point defense.
+    public float missileFireTime;
 }
