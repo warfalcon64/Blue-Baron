@@ -740,7 +740,7 @@ MonoBehaviour:
   - groupName: Secondary
     fireMode: 0
     autonomous: 0
-    enabled: 1
+    enabled: 0
     hardpoints:
     - {fileID: 3655943799203410016}
   combatSystem: {fileID: 535438237622943709}

@@ -75,6 +75,10 @@ crashlytics-build.properties
 .claude/
 CLAUDE.md
 CURRENT_OBJECTIVE.md
+.claude-notes/
+
+# Machine-specific dev tooling (perf-throttle scripts, etc.)
+/DevTools/
 
 # Unimported source art files
 Unimported Images/
