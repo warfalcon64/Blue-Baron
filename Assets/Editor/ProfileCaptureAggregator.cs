@@ -29,6 +29,108 @@ public static class ProfileCaptureAggregator
         DumpFrame(path, frameIndex: -1);
     }
 
+    [MenuItem("Tools/Profile Aggregate/Dump Worst-Cost Frame From Latest")]
+    public static void DumpWorstFrameFromLatest()
+    {
+        string path = FindLatestCapture();
+        if (path == null) return;
+        DumpFrame(path, frameIndex: -2);
+    }
+
+    // Comma-separated marker names whose per-frame CALL COUNT is tracked in the tick timeline.
+    private static readonly string[] TimelineCallMarkers =
+    {
+        "Assembly-CSharp.dll!::FighterController.Update() [Invoke]",
+        "Assembly-CSharp.dll!::Squad.Update() [Invoke]",
+    };
+    // Marker whose per-frame TOTAL MS is tracked in the tick timeline.
+    private const string TimelineMsMarker = "BehaviourUpdate";
+
+    [MenuItem("Tools/Profile Aggregate/Dump Tick Timeline From Latest")]
+    public static void DumpTickTimelineFromLatest()
+    {
+        string path = FindLatestCapture();
+        if (path == null) return;
+        DumpTickTimeline(path);
+    }
+
+    public static void DumpTickTimeline(string path)
+    {
+        Debug.Log($"[ProfileAggregator] Loading: {path}");
+        ProfilerDriver.LoadProfile(path, false);
+        int firstFrame = ProfilerDriver.firstFrameIndex;
+        int lastFrame = ProfilerDriver.lastFrameIndex;
+        int scanLast = lastFrame > firstFrame ? lastFrame - 1 : lastFrame;
+
+        var children = new List<int>(64);
+        var stack = new Stack<int>(256);
+
+        var sb = new StringBuilder();
+        sb.AppendLine($"Capture: {path}");
+        sb.AppendLine("Per-frame tick timeline. If the staggered tickers are phase-locked, FighterTicks/SquadTicks");
+        sb.AppendLine("spike periodically (a few frames carry nearly all ticks, the rest carry ~0).");
+        sb.AppendLine();
+        sb.AppendLine("VfxInst = live VisualEffect instances (~live plasma bolts, +small constant of other VFX).");
+        sb.AppendLine($"{"Frame",7} {"FrameMs",9} {"VfxInst",8} {"SquadTk",8} {"BehavMs",9} {"PhysMs",9} {"InstMs",9} {"VfxMs",8} {"RendMs",8}");
+        sb.AppendLine(new string('-', 90));
+
+        // Running stats to summarize spread.
+        var fighterCounts = new List<int>(scanLast - firstFrame + 1);
+        var squadCounts = new List<int>(scanLast - firstFrame + 1);
+
+        for (int f = firstFrame; f <= scanLast; f++)
+        {
+            using (var view = ProfilerDriver.GetHierarchyFrameDataView(
+                f, 0, HierarchyFrameDataView.ViewModes.MergeSamplesWithTheSameName,
+                HierarchyFrameDataView.columnTotalTime, false))
+            {
+                if (view == null || !view.valid) continue;
+
+                int fighterCalls = 0, squadCalls = 0, vfxInst = 0;
+                float behaviourMs = 0f, physMs = 0f, instMs = 0f, vfxMs = 0f, rendMs = 0f;
+
+                stack.Clear();
+                children.Clear();
+                view.GetItemChildren(view.GetRootItemID(), children);
+                for (int i = 0; i < children.Count; i++) stack.Push(children[i]);
+                while (stack.Count > 0)
+                {
+                    int id = stack.Pop();
+                    string name = view.GetItemName(id);
+                    float ms = view.GetItemColumnDataAsFloat(id, HierarchyFrameDataView.columnTotalTime);
+                    if (name == TimelineCallMarkers[0])
+                        fighterCalls += (int)view.GetItemColumnDataAsFloat(id, HierarchyFrameDataView.columnCalls);
+                    else if (name == TimelineCallMarkers[1])
+                        squadCalls += (int)view.GetItemColumnDataAsFloat(id, HierarchyFrameDataView.columnCalls);
+                    else if (name == "VisualEffect.Update")
+                        vfxInst += (int)view.GetItemColumnDataAsFloat(id, HierarchyFrameDataView.columnCalls);
+                    else if (name == TimelineMsMarker) behaviourMs += ms;
+                    else if (name == "Physics2D.Simulate") physMs += ms;
+                    else if (name == "Instantiate") instMs += ms;
+                    else if (name == "VFX.Update") vfxMs += ms;
+                    else if (name == "RenderPlayModeViewCameras") rendMs += ms;
+
+                    children.Clear();
+                    view.GetItemChildren(id, children);
+                    for (int i = 0; i < children.Count; i++) stack.Push(children[i]);
+                }
+
+                fighterCounts.Add(fighterCalls);
+                squadCounts.Add(squadCalls);
+                sb.AppendLine($"{f,7} {view.frameTimeMs,9:F2} {vfxInst,8} {squadCalls,8} {behaviourMs,9:F2} {physMs,9:F2} {instMs,9:F2} {vfxMs,8:F2} {rendMs,8:F2}");
+            }
+        }
+
+        string outPath = Path.Combine(CaptureDir, "tick_timeline.txt");
+        File.WriteAllText(outPath, sb.ToString());
+        Debug.Log($"[ProfileAggregator] Wrote {fighterCounts.Count} frames to {outPath}. " +
+                  $"FighterTicks max={Max(fighterCounts)} mean={Mean(fighterCounts):F1}; " +
+                  $"SquadTicks max={Max(squadCounts)} mean={Mean(squadCounts):F1}");
+    }
+
+    private static int Max(List<int> xs) { int m = 0; foreach (var x in xs) if (x > m) m = x; return m; }
+    private static float Mean(List<int> xs) { if (xs.Count == 0) return 0; long s = 0; foreach (var x in xs) s += x; return (float)s / xs.Count; }
+
     [MenuItem("Tools/Profile Aggregate/Dump Specific Frame From Latest")]
     public static void DumpSpecificFrameFromLatest()
     {
@@ -191,31 +293,26 @@ public static class ProfileCaptureAggregator
 
         if (frameIndex < 0)
         {
+            bool wantWorst = frameIndex == -2;
             int totalFrames = lastFrame - firstFrame + 1;
             int analyzedFirst = firstFrame + Mathf.Min(SkipLeadingFrames, Mathf.Max(0, totalFrames - 1));
             var totals = new List<(int idx, float total)>(totalFrames);
-            for (int f = analyzedFirst; f <= lastFrame; f++)
+            // Skip the final frame: the last captured frame is often incomplete (0 ms).
+            int scanLast = lastFrame > analyzedFirst ? lastFrame - 1 : lastFrame;
+            for (int f = analyzedFirst; f <= scanLast; f++)
             {
                 using (var view = ProfilerDriver.GetHierarchyFrameDataView(
                     f, 0, HierarchyFrameDataView.ViewModes.Default,
                     HierarchyFrameDataView.columnTotalTime, false))
                 {
                     if (view == null || !view.valid) continue;
-                    int rootId = view.GetRootItemID();
-                    var rootChildren = new List<int>();
-                    view.GetItemChildren(rootId, rootChildren);
-                    float t = 0;
-                    foreach (var c in rootChildren)
-                    {
-                        if (view.GetItemName(c) == "PlayerLoop")
-                            t = view.GetItemColumnDataAsFloat(c, HierarchyFrameDataView.columnTotalTime);
-                    }
-                    totals.Add((f, t));
+                    totals.Add((f, view.frameTimeMs));
                 }
             }
             totals.Sort((a, b) => a.total.CompareTo(b.total));
-            frameIndex = totals[totals.Count / 2].idx;
-            Debug.Log($"[ProfileAggregator] Median-cost frame is index {frameIndex} ({totals[totals.Count / 2].total:F2} ms)");
+            var pick = wantWorst ? totals[totals.Count - 1] : totals[totals.Count / 2];
+            frameIndex = pick.idx;
+            Debug.Log($"[ProfileAggregator] {(wantWorst ? "Worst" : "Median")}-cost frame is index {frameIndex} ({pick.total:F2} ms)");
         }
 
         if (frameIndex < firstFrame || frameIndex > lastFrame)
