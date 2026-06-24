@@ -123,42 +123,51 @@ public abstract class ShipBase : MonoBehaviour
     }
 
     // move vfx code from here and playvfx to vfx manager
+    // Physical weapons (e.g. missiles) hit the ship via their collider's trigger overlap.
+    // Non-physical weapons (e.g. plasma) detect the hit themselves and call ApplyWeaponDamage directly.
     protected virtual void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.GetComponent<Rigidbody2D>() != null && !collider.CompareTag(tag))
         {
-            if (godMode) { return; }
             WeaponsBase weapon = collider.gameObject.GetComponent<WeaponsBase>();
-            string type = weapon.damageType;
-            float damage = weapon.GetDamage();
+            if (weapon != null)
+                ApplyWeaponDamage(weapon);
+        }
+    }
 
+    // Applies a weapon's damage (with type modifiers) to this ship and raises the damage event.
+    // Single entry point for both trigger-based and cast-based hit detection. The caller is
+    // responsible for the team check (don't call this for friendly fire).
+    public virtual void ApplyWeaponDamage(WeaponsBase weapon)
+    {
+        if (godMode) { return; }
 
-            // Determine the type of damage weapon deals, apply modifiers accordingly
-            // * Move damage code into the respective projectiles: they calculate damage with modifiers then tell ship the total damage, ship then applies damage to itself
-            switch (type)
-            {
-                case "Plasma":
-                    if (shield <= 0) damage *= 2;
-                    break;
+        string type = weapon.damageType;
+        float damage = weapon.GetDamage();
 
-                case "High Explosive":
-                    damage *= 2;
-                    break;
+        // Determine the type of damage weapon deals, apply modifiers accordingly
+        switch (type)
+        {
+            case "Plasma":
+                if (shield <= 0) damage *= 2;
+                break;
 
-                default:
-                    print("MISC DAMAGE APPLIED:" + type);
-                    break;
-            }
+            case "High Explosive":
+                damage *= 2;
+                break;
 
-            health -= damage;
-            OnShipDamage?.Invoke(this, weapon.GetSource());
+            default:
+                print("MISC DAMAGE APPLIED:" + type);
+                break;
+        }
 
+        health -= damage;
+        OnShipDamage?.Invoke(this, weapon.GetSource());
 
-            if (health <= lowHealth && !isSmoking)
-            {
-                isSmoking = true;
-                shipEffects.SendEvent("OnDamage");
-            }
+        if (health <= lowHealth && !isSmoking)
+        {
+            isSmoking = true;
+            shipEffects.SendEvent("OnDamage");
         }
     }
 
