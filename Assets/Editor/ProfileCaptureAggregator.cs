@@ -297,16 +297,37 @@ public static class ProfileCaptureAggregator
             int totalFrames = lastFrame - firstFrame + 1;
             int analyzedFirst = firstFrame + Mathf.Min(SkipLeadingFrames, Mathf.Max(0, totalFrames - 1));
             var totals = new List<(int idx, float total)>(totalFrames);
+            var scanChildren = new List<int>(64);
+            var scanStack = new Stack<int>(256);
             // Skip the final frame: the last captured frame is often incomplete (0 ms).
             int scanLast = lastFrame > analyzedFirst ? lastFrame - 1 : lastFrame;
             for (int f = analyzedFirst; f <= scanLast; f++)
             {
                 using (var view = ProfilerDriver.GetHierarchyFrameDataView(
-                    f, 0, HierarchyFrameDataView.ViewModes.Default,
+                    f, 0, HierarchyFrameDataView.ViewModes.MergeSamplesWithTheSameName,
                     HierarchyFrameDataView.columnTotalTime, false))
                 {
                     if (view == null || !view.valid) continue;
-                    totals.Add((f, view.frameTimeMs));
+                    // Subtract profiler-capture overhead (the screenshot taken when saving a
+                    // capture can cost hundreds of ms) so an artifact frame isn't picked as worst.
+                    float overhead = 0f;
+                    scanStack.Clear();
+                    scanChildren.Clear();
+                    view.GetItemChildren(view.GetRootItemID(), scanChildren);
+                    for (int i = 0; i < scanChildren.Count; i++) scanStack.Push(scanChildren[i]);
+                    while (scanStack.Count > 0)
+                    {
+                        int id = scanStack.Pop();
+                        if (view.GetItemName(id) == "Profiler.ScreenshotUpdate")
+                        {
+                            overhead += view.GetItemColumnDataAsFloat(id, HierarchyFrameDataView.columnTotalTime);
+                            continue;
+                        }
+                        scanChildren.Clear();
+                        view.GetItemChildren(id, scanChildren);
+                        for (int i = 0; i < scanChildren.Count; i++) scanStack.Push(scanChildren[i]);
+                    }
+                    totals.Add((f, view.frameTimeMs - overhead));
                 }
             }
             totals.Sort((a, b) => a.total.CompareTo(b.total));
