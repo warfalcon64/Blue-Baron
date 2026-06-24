@@ -1717,7 +1717,7 @@ MonoBehaviour:
   blueTeamSize: 500
   redTeamSize: 500
   squadSize: 15
-  squadSeparation: 80
+  squadSeparation: 50
   formationSpacing: 5
   teamSeparation: 200
   assignPlayer: 0
