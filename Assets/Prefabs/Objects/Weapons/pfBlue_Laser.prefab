@@ -151,6 +151,10 @@ MonoBehaviour:
   impactVFX: {fileID: 243465907846405162}
   impactVFXEvent: LaserHit
   impactVFXLifetime: 1
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  castRadius: 0.08
 --- !u!1 &6156919709817765738
 GameObject:
   m_ObjectHideFlags: 0

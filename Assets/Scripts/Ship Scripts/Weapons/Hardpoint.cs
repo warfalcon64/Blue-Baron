@@ -21,7 +21,13 @@ public class Hardpoint : MonoBehaviour
             shootDirection = toAim.normalized;
         float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
-        WeaponsBase projectile = Instantiate(weaponPrefab, spawnPos, rotation);
+        // Managed projectiles (plasma, etc.) come from the pool and return to it on Despawn;
+        // unmanaged weapons (missiles) keep their Instantiate/Destroy lifecycle.
+        WeaponsBase projectile;
+        if (weaponPrefab is ManagedProjectile managed)
+            projectile = ObjectPoolManager.SpawnObject(weaponPrefab, spawnPos, rotation, managed.PoolType);
+        else
+            projectile = Instantiate(weaponPrefab, spawnPos, rotation);
         projectile.Setup(shootDirection, shipVelocity, source);
         nextFireTime = Time.time + GetCooldown();
         return projectile;

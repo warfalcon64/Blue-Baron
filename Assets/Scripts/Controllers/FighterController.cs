@@ -386,7 +386,7 @@ public class FighterController : AIControllerBase
         else
             ship.Accelerate(0.1f);
 
-        // Opportunistic plasma fire while in formation — don't break heading for it.
+        // Opportunistic plasma fire while in formation but don't break heading for it.
         ShipBase t = currentOrder.target;
         if (t != null && t.gameObject.activeInHierarchy)
         {

@@ -11,6 +11,8 @@ public class WeaponsPlasma : ManagedProjectile
     private Vector2 velocity;
     private float expireTime;
 
+    public override ObjectPoolManager.PoolType PoolType => ObjectPoolManager.PoolType.Plasma;
+
     private void Awake()
     {
         if (hitLayers == 0)
