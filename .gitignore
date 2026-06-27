@@ -57,6 +57,7 @@ sysinfo.txt
 *.unitypackage
 /[Tt]est[Bb]uilds/
 /[Tt]est?[Bb]uilds/
+/[Tt]est[Bb]uilds*/
 
 # Profiler captures (large binary files, machine-specific)
 /ProfilerCaptures/
