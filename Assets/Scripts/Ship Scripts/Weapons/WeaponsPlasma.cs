@@ -50,7 +50,7 @@ public class WeaponsPlasma : ManagedProjectile
                 if (ship != null && !ship.CompareTag(tag))
                 {
                     ship.ApplyWeaponDamage(this);
-                    SpawnImpactVFX();
+                    SpawnImpactVFX(velocity);
                     return false;
                 }
             }

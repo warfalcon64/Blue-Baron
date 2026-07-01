@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.VFX;
 
 public abstract class WeaponsBase : MonoBehaviour
 {
@@ -25,9 +24,8 @@ public abstract class WeaponsBase : MonoBehaviour
     [SerializeField] protected float lifetime = 5f;
 
     [Header("Impact VFX")]
-    [SerializeField] protected VisualEffect impactVFX;
-    [SerializeField] protected string impactVFXEvent = "OnHit";
-    [SerializeField] protected float impactVFXLifetime = 1f;
+    [Tooltip("Event fired on the central VFXManager graph when this projectile hits.")]
+    [SerializeField] protected string impactVFXEvent = "OnImpact";
 
     protected GameObject target;
     protected ShipBase source;
@@ -92,12 +90,12 @@ public abstract class WeaponsBase : MonoBehaviour
         target = newTarget;
     }
 
-    protected void SpawnImpactVFX()
+    // impactVelocity (the projectile's velocity at the moment of impact) is passed so the spark can
+    // inherit a fraction of the projectile's momentum, like real spall. Defaults to zero for callers
+    // (e.g. missiles) that don't supply it.
+    protected void SpawnImpactVFX(Vector2 impactVelocity = default)
     {
-        if (impactVFX == null) return;
-        impactVFX.transform.SetParent(null);
-        impactVFX.SetVector3("Position", impactVFX.transform.position);
-        impactVFX.SendEvent(impactVFXEvent);
-        Destroy(impactVFX.gameObject, impactVFXLifetime);
+        if (VFXManager.Instance != null)
+            VFXManager.Instance.PlayImpact(transform.position, impactVelocity, impactVFXEvent);
     }
 }
