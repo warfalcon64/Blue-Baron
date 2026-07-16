@@ -152,3 +152,5 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   castRadius: 0.08
+  drawCastGizmo: 0
+  previewSweepHz: 0
