@@ -493,9 +493,7 @@ MonoBehaviour:
   isSeeker: 1
   usage: 17
   lifetime: 1000
-  impactVFX: {fileID: 2280369305905011339}
   impactVFXEvent: OnDeath
-  impactVFXLifetime: 1.7
   seekerHalfAngle: 45
   seekerSweepRate: 400
   beamHalfWidth: 5

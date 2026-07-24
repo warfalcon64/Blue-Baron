@@ -15,6 +15,7 @@ public class ObjectPoolManager : MonoBehaviour
 
     private static GameObject _gameObjectsEmpty;
     private static GameObject _plasmaProjectilesEmpty;
+    private static GameObject _missilesEmpty;
 
     private static Dictionary<GameObject, ObjectPool<GameObject>> _objectPools;
     private static Dictionary<GameObject, GameObject> _cloneToPrefabMap;
@@ -22,7 +23,8 @@ public class ObjectPoolManager : MonoBehaviour
     public enum PoolType
     {
         GameObjects,
-        Plasma
+        Plasma,
+        Missile
     }
 
     public static PoolType PoolingType;
@@ -63,6 +65,9 @@ public class ObjectPoolManager : MonoBehaviour
 
         _plasmaProjectilesEmpty = new GameObject("Plasma Projectiles");
         _plasmaProjectilesEmpty.transform.SetParent(_emptyHolder.transform);
+
+        _missilesEmpty = new GameObject("Missiles");
+        _missilesEmpty.transform.SetParent(_emptyHolder.transform);
 
         if (_addToDontDestroyOnLoad)
         {
@@ -124,6 +129,9 @@ public class ObjectPoolManager : MonoBehaviour
             case PoolType.Plasma:
 
                 return _plasmaProjectilesEmpty;
+            case PoolType.Missile:
+
+                return _missilesEmpty;
             default:
                 return null;
         }

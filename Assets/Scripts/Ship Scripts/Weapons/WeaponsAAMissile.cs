@@ -59,6 +59,13 @@ public class WeaponsAAMissile : WeaponsBase
     private Rigidbody2D rb;
     private TrailRenderer engineTrail;
 
+    private float expireTime;
+    // Guards against double pool-release when several trigger contacts land in one physics step.
+    private bool live;
+
+    public override bool IsPooled => true;
+    public override ObjectPoolManager.PoolType PoolType => ObjectPoolManager.PoolType.Missile;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -67,6 +74,12 @@ public class WeaponsAAMissile : WeaponsBase
 
     private void FixedUpdate()
     {
+        if (Time.time >= expireTime)
+        {
+            Despawn();
+            return;
+        }
+
         float dt = Time.fixedDeltaTime;
 
         if (source == null && !oneTurnComplete)
@@ -186,7 +199,24 @@ public class WeaponsAAMissile : WeaponsBase
         hasLock = true;
         timeSinceLastContact = 0f;
         revisitTimer = 0f;
-        Destroy(gameObject, lifetime);
+
+        // Reset state a recycled missile carries over from its previous flight.
+        seekerCurrentAngle = 0f;
+        seekerSweepRight = true;
+        lockHoldTimer = 0f;
+        hadTargetLastFrame = false;
+        target = null;
+        previousTarget = null;
+        if (engineTrail != null)
+        {
+            // Clear() drops the trail points left at the previous death position, otherwise the
+            // teleport from pool parking to this spawn draws a streak across the battlefield.
+            engineTrail.Clear();
+            engineTrail.emitting = true;
+        }
+
+        live = true;
+        expireTime = Time.time + lifetime;
     }
 
 
@@ -557,7 +587,22 @@ public class WeaponsAAMissile : WeaponsBase
         }
     }
 
-    private void OnDestroy()
+    // Return to the pool. Drops this missile from its target's incoming list immediately, so AI
+    // never sees a recycled missile as still inbound on itself.
+    private void Despawn()
+    {
+        if (!live) return;
+        live = false;
+
+        ReleaseIncomingTracking();
+        target = null;
+        previousTarget = null;
+        rb.linearVelocity = Vector2.zero;
+
+        ObjectPoolManager.ReturnObjectToPool(gameObject, PoolType);
+    }
+
+    private void ReleaseIncomingTracking()
     {
         if (previousTarget != null)
         {
@@ -567,12 +612,20 @@ public class WeaponsAAMissile : WeaponsBase
         }
     }
 
+    private void OnDestroy()
+    {
+        // Scene teardown / editor stop; pooled despawn already nulled previousTarget.
+        ReleaseIncomingTracking();
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!live) return;
+
         if (collision.GetComponent<Rigidbody2D>() != null && !collision.CompareTag(tag))
         {
             SpawnImpactVFX();
-            Destroy(gameObject);
+            Despawn();
         }
     }
 }

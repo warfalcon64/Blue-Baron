@@ -30,6 +30,11 @@ public abstract class WeaponsBase : MonoBehaviour
     protected GameObject target;
     protected ShipBase source;
 
+    // Pooled weapons are spawned via ObjectPoolManager and must return themselves to PoolType when
+    // finished instead of calling Destroy. Unpooled weapons keep the Instantiate/Destroy lifecycle.
+    public virtual bool IsPooled => false;
+    public virtual ObjectPoolManager.PoolType PoolType => ObjectPoolManager.PoolType.GameObjects;
+
     public virtual void Setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
     {
         throw new NotImplementedException();
