@@ -80,6 +80,14 @@ public class WeaponsAAMissile : WeaponsBase
             return;
         }
 
+        // A despawned pooled flare (or a dead, deactivated ship) never becomes null — release
+        // the lock explicitly so a recycled flare can't drag the seeker to its new position.
+        if (target != null && !target.activeInHierarchy)
+        {
+            target = null;
+            hasLock = false;
+        }
+
         float dt = Time.fixedDeltaTime;
 
         if (source == null && !oneTurnComplete)

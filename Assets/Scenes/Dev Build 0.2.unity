@@ -548,6 +548,9 @@ MonoBehaviour:
   - prefab: {fileID: 8761973139800477723, guid: 171cd3993c5e9cd49b6020729512f542, type: 3}
     count: 1500
     poolType: 2
+  - prefab: {fileID: 2541679667156767606, guid: f826b97a08569e249b7e502cbd5e3743, type: 3}
+    count: 1000
+    poolType: 3
 --- !u!4 &180549090
 Transform:
   m_ObjectHideFlags: 0

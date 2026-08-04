@@ -33,7 +33,7 @@ public class FlareLauncher : CombatSystemBase
             Vector2 direction = Quaternion.Euler(0, 0, angle) * backward;
 
             Vector2 spawnPos = (Vector2)transform.position;
-            Flare flare = Instantiate(flarePrefab, spawnPos, Quaternion.identity);
+            Flare flare = ObjectPoolManager.SpawnObject(flarePrefab, spawnPos, Quaternion.identity, ObjectPoolManager.PoolType.Flare);
             flare.Setup(direction, ship.GetRigidBody().linearVelocity, ship);
 
             if (i < flareCount - 1)
