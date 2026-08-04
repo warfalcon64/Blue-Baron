@@ -4,6 +4,10 @@ public abstract class ManagedProjectile : WeaponsBase, IManagedProjectile
 {
     public int ManagerIndex { get; set; } = -1;
 
+    public float LodAccumulator { get; set; }
+
+    public virtual Vector2 Position => transform.position;
+
     public override bool IsPooled => true;
 
     // Which pool bucket this projectile is spawned from and returned to. No default, every

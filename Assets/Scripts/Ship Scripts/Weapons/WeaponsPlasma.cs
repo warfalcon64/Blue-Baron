@@ -9,6 +9,11 @@ public class WeaponsPlasma : ManagedProjectile
     [SerializeField] private float castRadius = 0.08f;
 
 #if UNITY_EDITOR
+    // Scene-view verification for the viewport LOD: tint bolts by the step size they received
+    // (white = full rate, cyan = low rate). Toggled via Tools/Plasma LOD; watch in the Scene view
+    // while the Game view camera defines the LOD bounds. Editor-only — builds never tint.
+    public static bool TintByLodTier = false;
+
     [Header("Debug Gizmos (editor only)")]
     [Tooltip("Draw this step's swept CircleCast capsule in the Scene view (green = clear, red = hit).")]
     [SerializeField] private bool drawCastGizmo = false;
@@ -19,25 +24,38 @@ public class WeaponsPlasma : ManagedProjectile
     private Vector2 gizOrigin, gizDir, gizHitPoint;
     private float gizDist;
     private bool gizHit;
+    private SpriteRenderer tintRenderer;
 #endif
 
     private Vector2 velocity;
+    private Vector2 position;
     private float expireTime;
 
     public override ObjectPoolManager.PoolType PoolType => ObjectPoolManager.PoolType.Plasma;
+
+    // Cached so the manager's per-frame LOD test never touches the transform of a skipped bolt.
+    public override Vector2 Position => position;
 
     private void Awake()
     {
         if (hitLayers == 0)
             hitLayers = LayerMask.GetMask("Ships");
+#if UNITY_EDITOR
+        tintRenderer = GetComponentInChildren<SpriteRenderer>();
+#endif
     }
 
     public override void Setup(Vector2 shootDirection, Vector2 shipVelocity, ShipBase source)
     {
         shootDirection = shootDirection.normalized;
         velocity = (shootDirection * speed) + shipVelocity;
+        position = transform.position;
         this.source = source;
         expireTime = Time.time + lifetime;
+#if UNITY_EDITOR
+        if (!TintByLodTier && tintRenderer != null)
+            tintRenderer.color = Color.white;
+#endif
 
         EnterManager();
     }
@@ -47,7 +65,12 @@ public class WeaponsPlasma : ManagedProjectile
         if (Time.time >= expireTime)
             return false;
 
-        Vector2 pos = transform.position;
+#if UNITY_EDITOR
+        if (TintByLodTier && tintRenderer != null)
+            tintRenderer.color = deltaTime >= 0.05f ? Color.cyan : Color.white;
+#endif
+
+        Vector2 pos = position;
         Vector2 step = velocity * deltaTime;
         float dist = step.magnitude;
 
@@ -75,7 +98,8 @@ public class WeaponsPlasma : ManagedProjectile
             }
         }
 
-        transform.position = pos + step;
+        position = pos + step;
+        transform.position = position;
         return true;
     }
 
