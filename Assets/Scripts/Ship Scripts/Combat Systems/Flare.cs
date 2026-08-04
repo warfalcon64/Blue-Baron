@@ -34,8 +34,6 @@ public class Flare : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         smokeVelocityID = Shader.PropertyToID("SmokeVelocity");
         smokeSizeID = Shader.PropertyToID("SmokeSize");
-        // Captured once here: FixedUpdate fades the sprite and shrinks the smoke size over the
-        // flare's life, so a recycled flare must restore these rather than re-read decayed values.
         baseColor = spriteRenderer.color;
         initialSmokeSize = flareTrail.GetFloat(smokeSizeID);
         smokeLifetime = flareTrail.GetFloat(Shader.PropertyToID("SmokeLifetime"));
@@ -95,9 +93,6 @@ public class Flare : MonoBehaviour
         baseColor.a = 1f;
         spriteRenderer.color = baseColor;
         flareTrail.SetFloat(smokeSizeID, initialSmokeSize);
-        // Reinit drops smoke particles left at the previous death position, otherwise the
-        // teleport from pool parking smears a stale trail across the battlefield; it also
-        // restarts the effect after the zero-speed Stop() from the previous flight.
         flareTrail.Reinit();
         flareTrail.SendEvent("OnDamage");
         expireTime = Time.time + totalLifetime;
