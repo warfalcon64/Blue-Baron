@@ -14,7 +14,6 @@ public class DebugBattleSpawner : MonoBehaviour
 
     [Header("Squads")]
     [SerializeField, Range(1, 50)] private int squadSize = 15;
-    // A 15-ship vee at formationSpacing=5 is ~70 wide x ~35 deep — separation must clear that.
     [SerializeField] private float squadSeparation = 80f;
     [SerializeField] private float formationSpacing = 5f;
 
@@ -32,7 +31,7 @@ public class DebugBattleSpawner : MonoBehaviour
         DestroyExistingShips(sceneManager.blueShips);
         DestroyExistingShips(sceneManager.redShips);
 
-        // Blue team: centered at -X, facing +X (rotation -90 in this Y-up convention).
+        // Blue team: centered at -X, facing +X (rotation -90 in this Y-up convention). * Temp spawn location
         List<ShipBase> blueShips = SpawnTeam(
             blueFighterPrefab,
             blueTeamSize,
@@ -42,7 +41,7 @@ public class DebugBattleSpawner : MonoBehaviour
             sceneManager.shipData.blueTag
         );
 
-        // Red team: centered at +X, facing -X (rotation +90).
+        // Red team: centered at +X, facing -X (rotation +90). * Temp spawn location
         List<ShipBase> redShips = SpawnTeam(
             redFighterPrefab,
             redTeamSize,
@@ -52,8 +51,7 @@ public class DebugBattleSpawner : MonoBehaviour
             sceneManager.shipData.redTag
         );
 
-        // Player takes the first blue ship and is excluded from squad membership for now —
-        // squad/player integration (anchor adaptation, ship-swap) is a later step.
+
         if (assignPlayer && blueShips.Count > 0)
         {
             ShipBase playerShip = blueShips[0];
@@ -61,8 +59,12 @@ public class DebugBattleSpawner : MonoBehaviour
             FighterController fc = playerShip.GetComponent<FighterController>();
             if (fc != null)
             {
-                if (fc.squad != null)
-                    fc.squad.UnregisterMember(fc);
+                Squad squad = fc.squad;
+                if (squad != null)
+                {
+                    squad.UnregisterMember(fc);
+                    squad.SetLeader(playerShip);
+                }
                 fc.enabled = false;
             }
 
@@ -79,7 +81,6 @@ public class DebugBattleSpawner : MonoBehaviour
         List<ShipBase> ships = new List<ShipBase>(count);
         Transform teamParent = new GameObject($"{teamLabel} Team").transform;
 
-        // Heading vector (+Y rotated by rotationZ). Used both for ship facing and for vee orientation.
         float headingRad = (rotationZ + 90f) * Mathf.Deg2Rad;
         Vector2 heading = new Vector2(Mathf.Cos(headingRad), Mathf.Sin(headingRad));
         Quaternion rot = Quaternion.Euler(0f, 0f, rotationZ);

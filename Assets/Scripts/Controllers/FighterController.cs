@@ -15,6 +15,10 @@ public class FighterController : AIControllerBase
              "and matches the squad heading instead.")]
     [SerializeField] private float formationTolerance = 3f;
 
+    [Tooltip("Converts along-track slot error (units) into a speed offset from the squad speed " +
+             "(units/s) while holding formation: behind the slot -> faster, ahead -> slower.")]
+    [SerializeField] private float catchUpGain = 1.5f;
+
     [Header("Squad")]
     public Squad squad;
     public FighterOrder currentOrder;
@@ -378,13 +382,23 @@ public class FighterController : AIControllerBase
         float turn = Mathf.Abs(angle) > 1f ? Mathf.Clamp(angle / 45f, -1f, 1f) : 0f;
         ship.SetShipTurn(turn);
 
-        // Throttle: chase the slot when behind, ease off when nestled in.
-        if (distToSlot > formationTolerance)
-            ship.Accelerate(0.2f);
-        else if (distToSlot < formationTolerance * 0.5f)
-            ship.Decelerate(0.1f);
-        else
-            ship.Accelerate(0.1f);
+        // Throttle: match the squad's speed, corrected by the along-track slot error so we
+        // speed up when trailing the slot and ease off when ahead of it.
+        Vector2 alongAxis = currentOrder.squadHeading.sqrMagnitude > 0.0001f
+            ? currentOrder.squadHeading
+            : forward;
+        float alongTrack = Vector2.Dot(toSlot, alongAxis);
+        float desiredSpeed = Mathf.Clamp(
+            currentOrder.squadVelocity.magnitude + alongTrack * catchUpGain,
+            ship.GetShipMinSpeed(), ship.GetShipMaxSpeed());
+
+        // Step at most 0.2 per tick toward the desired speed, and never past it — Accelerate is
+        // all-or-nothing at the maxSpeed clamp, so an overshooting step would silently no-op.
+        float speedDiff = desiredSpeed - ship.GetShipSpeed();
+        if (speedDiff > 0.05f)
+            ship.Accelerate(Mathf.Min(speedDiff, 0.2f));
+        else if (speedDiff < -0.05f)
+            ship.Decelerate(Mathf.Min(-speedDiff, 0.2f));
 
         // Opportunistic plasma fire while in formation but don't break heading for it.
         ShipBase t = currentOrder.target;

@@ -40,14 +40,14 @@ public class Squad : MonoBehaviour
 
     private readonly List<FighterController> members = new List<FighterController>();
 
+    private ShipBase leader;
+
     public Vector2 anchorPos { get; private set; }
     public Vector2 anchorVelocity { get; private set; }
     public Vector2 anchorHeading { get; private set; } = Vector2.up;
 
     private float nextTickTime;
 
-    // Stable across an engagement: anchor for missile stagger times so each member's gate
-    // doesn't shift between squad ticks. Reset to -1 when the squad drops out of engagement.
     private float engagementStartTime = -1f;
 
     // Reused per-tick scratch buffers.
@@ -74,6 +74,19 @@ public class Squad : MonoBehaviour
             brain.squad = null;
     }
 
+    /// <summary>
+    /// Makes the squad form on this ship. The leader holds the vee tip and the other members
+    /// trail behind it. It may be one of the squad's own AI members (which then navigates for
+    /// the squad) or an external ship such as the player's. Passing null (or leader death)
+    /// causes the first surviving member to be promoted on the next tick.
+    /// </summary>
+    public void SetLeader(ShipBase ship)
+    {
+        leader = ship;
+    }
+
+    public ShipBase GetLeader() => leader;
+
     public IReadOnlyList<FighterController> GetMembers() => members;
 
     /// <summary>Index of a fighter in the squad's slot ordering. -1 if not a member.</summary>
@@ -88,6 +101,9 @@ public class Squad : MonoBehaviour
 
     private void Tick()
     {
+        if (leader != null && !leader.gameObject.activeInHierarchy)
+            leader = null;
+
         PruneDeadMembers();
         if (members.Count == 0)
         {
@@ -95,32 +111,33 @@ public class Squad : MonoBehaviour
             return;
         }
 
+        if (leader == null)
+            leader = members[0].ship;
+        int leaderMemberIndex = FindLeaderMemberIndex();
+
         UpdateAnchor();
         BuildEngagementSet();
 
         bool engaged = engagementSet.Count > 0;
 
         // Anchor missile-stagger times on the moment we first entered this engagement so per-member
-        // fire windows stay stable across squad ticks; weapon cooldowns then carry the stagger forward.
+        // fire windows stay stable across squad ticks. Weapon cooldowns then carry the stagger forward.
         if (engaged && engagementStartTime < 0f) engagementStartTime = Time.time;
         else if (!engaged) engagementStartTime = -1f;
 
-        // Cruise: when no enemies in our bubble but enemies still exist somewhere, head toward
-        // the nearest one. Override anchorHeading so the vee orients toward the enemy, and bias
-        // each slot forward so fighters in Holdout perpetually chase a slot that's ahead of them.
         bool cruising = false;
-        Vector2 cruiseDir = Vector2.zero;
-        Vector2 cruiseSlotBias = Vector2.zero;
-        Vector2 cruiseOrderVelocity = anchorVelocity;
-        if (!engaged)
+        Vector2 leaderCruiseSlot = anchorPos;
+        Vector2 leaderCruiseVelocity = anchorVelocity;
+        Vector2 leaderCruiseHeading = anchorHeading;
+        if (!engaged && leaderMemberIndex >= 0)
         {
-            cruiseDir = FindCruiseDirection();
+            Vector2 cruiseDir = FindCruiseDirection();
             if (cruiseDir.sqrMagnitude > 0.0001f)
             {
                 cruising = true;
-                anchorHeading = cruiseDir;
-                cruiseSlotBias = cruiseDir * cruiseLookahead;
-                cruiseOrderVelocity = cruiseDir * cruiseSpeed;
+                leaderCruiseSlot = anchorPos + cruiseDir * cruiseLookahead;
+                leaderCruiseVelocity = cruiseDir * cruiseSpeed;
+                leaderCruiseHeading = cruiseDir;
             }
         }
 
@@ -131,10 +148,27 @@ public class Squad : MonoBehaviour
             ? Mathf.Max(1, Mathf.CeilToInt((float)members.Count / engagementSet.Count))
             : 0;
 
+        int formationIndex = 0;
         for (int i = 0; i < members.Count; i++)
         {
             FighterController member = members[i];
-            Vector2 slotWorld = ComputeSlotWorld(i) + cruiseSlotBias;
+
+            Vector2 slotWorld;
+            Vector2 orderVelocity;
+            Vector2 orderHeading;
+            if (i == leaderMemberIndex)
+            {
+                slotWorld = cruising ? leaderCruiseSlot : anchorPos;
+                orderVelocity = cruising ? leaderCruiseVelocity : anchorVelocity;
+                orderHeading = cruising ? leaderCruiseHeading : anchorHeading;
+            }
+            else
+            {
+                slotWorld = ComputeSlotWorld(formationIndex);
+                orderVelocity = anchorVelocity;
+                orderHeading = anchorHeading;
+                formationIndex++;
+            }
 
             ShipBase assignedTarget = null;
             if (engaged)
@@ -157,8 +191,8 @@ public class Squad : MonoBehaviour
             {
                 mode = mode,
                 slotPosition = slotWorld,
-                squadVelocity = cruising ? cruiseOrderVelocity : anchorVelocity,
-                squadHeading = anchorHeading,
+                squadVelocity = orderVelocity,
+                squadHeading = orderHeading,
                 target = assignedTarget,
                 authorizeMissile = (mode == FighterMode.Engage),
                 orderTimestamp = orderTimestamp,
@@ -166,6 +200,18 @@ public class Squad : MonoBehaviour
             };
             member.currentOrder = order;
         }
+    }
+
+    /// <summary>Index of the leader in the member list, or -1 when the leader is external.</summary>
+    private int FindLeaderMemberIndex()
+    {
+        if (leader == null) return -1;
+        GameObject leaderObj = leader.gameObject;
+        for (int i = 0; i < members.Count; i++)
+        {
+            if (members[i].gameObject == leaderObj) return i;
+        }
+        return -1;
     }
 
     /// <summary>
@@ -209,31 +255,15 @@ public class Squad : MonoBehaviour
         }
     }
 
+    // Leader is guaranteed non-null here: Tick promotes a member before updating the anchor.
     private void UpdateAnchor()
     {
-        Vector2 sumPos = Vector2.zero;
-        Vector2 sumVel = Vector2.zero;
-        Vector2 sumHeading = Vector2.zero;
-        int count = 0;
-
-        for (int i = 0; i < members.Count; i++)
-        {
-            FighterController m = members[i];
-            Rigidbody2D mrb = m.rb;
-            sumPos += mrb.position;
-            sumVel += mrb.linearVelocity;
-            sumHeading += (Vector2)m.transform.up;
-            count++;
-        }
-
-        if (count == 0) return;
-
-        float inv = 1f / count;
-        anchorPos = sumPos * inv;
-        anchorVelocity = sumVel * inv;
-        Vector2 heading = sumHeading * inv;
-        if (heading.sqrMagnitude > 0.0001f)
-            anchorHeading = heading.normalized;
+        Rigidbody2D lrb = leader.GetRigidBody();
+        anchorPos = lrb.position;
+        anchorVelocity = lrb.linearVelocity;
+        Vector2 up = leader.transform.up;
+        if (up.sqrMagnitude > 0.0001f)
+            anchorHeading = up.normalized;
     }
 
     private void BuildEngagementSet()
@@ -296,14 +326,13 @@ public class Squad : MonoBehaviour
     }
 
     /// <summary>
-    /// Vee formation: slot 0 at tip; subsequent pairs trail diagonally back-left and back-right.
-    /// Slot positions are in world space, oriented by anchor heading and centered on the
-    /// formation's geometric centroid (so the runtime anchorPos — which IS the centroid — lines
-    /// up with the natural center of the vee).
+    /// Vee formation hanging off the leader's tail: the leader holds raw slot 0 (the tip), so
+    /// follower <paramref name="formationIndex"/> f takes raw slot f+1 behind it, in world
+    /// space, oriented by the leader's heading.
     /// </summary>
-    private Vector2 ComputeSlotWorld(int slotIndex)
+    private Vector2 ComputeSlotWorld(int formationIndex)
     {
-        Vector2 local = ComputeVeeSlotCentered(slotIndex, members.Count, formationSpacing);
+        Vector2 local = VeeSlotRaw(formationIndex + 1, formationSpacing);
 
         Vector2 forward = anchorHeading;
         Vector2 right = new Vector2(forward.y, -forward.x);

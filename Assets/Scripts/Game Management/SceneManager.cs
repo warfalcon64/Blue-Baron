@@ -188,7 +188,19 @@ public class SceneManager : MonoBehaviour
         if (!inSwapMode)
         {
             playerShip = destShip;
-            playerShip.GetComponent<AIControllerBase>().enabled = false;
+            AIControllerBase ai = playerShip.GetComponent<AIControllerBase>();
+            ai.enabled = false;
+
+            // If the ship belonged to a squad, the player takes over as its leader: the AI
+            // member slot is vacated and the rest of the squad forms up on the player.
+            FighterController fc = ai as FighterController;
+            if (fc != null && fc.squad != null)
+            {
+                Squad squad = fc.squad;
+                squad.UnregisterMember(fc);
+                squad.SetLeader(playerShip);
+            }
+
             pc = playerShip.AddComponent<PlayerController>();
             pc.TransferShipValues(destShip);
             pc.SwapShip += EnableShipSwapping;
