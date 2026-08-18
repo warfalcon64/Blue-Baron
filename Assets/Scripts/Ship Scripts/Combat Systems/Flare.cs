@@ -23,7 +23,7 @@ public class Flare : MonoBehaviour
     private float spawnTime;
     private float initialSmokeSize;
     private float smokeLifetime;
-    private float expireTime;
+    private float effectTime;
     private float currentT;
     private bool stopped;
 
@@ -39,13 +39,18 @@ public class Flare : MonoBehaviour
         smokeLifetime = flareTrail.GetFloat(Shader.PropertyToID("SmokeLifetime"));
     }
 
+    // Pool return is driven by effect time, not wall time: the smoke trail simulates at most
+    // VFXManager.maxDeltaTime per frame, so a wall-clock expiry would recycle the flare with its
+    // smoke still mid-life whenever frames run long.
+    private void Update()
+    {
+        effectTime += Mathf.Min(Time.deltaTime, UnityEngine.VFX.VFXManager.maxDeltaTime);
+        if (effectTime >= totalLifetime)
+            Despawn();
+    }
+
     private void FixedUpdate()
     {
-        if (Time.time >= expireTime)
-        {
-            Despawn();
-            return;
-        }
 
         float currentSpeed = rb.linearVelocity.magnitude;
 
@@ -95,7 +100,7 @@ public class Flare : MonoBehaviour
         flareTrail.SetFloat(smokeSizeID, initialSmokeSize);
         flareTrail.Reinit();
         flareTrail.SendEvent("OnDamage");
-        expireTime = Time.time + totalLifetime;
+        effectTime = 0f;
     }
 
     private void Despawn()

@@ -8,20 +8,11 @@ public class ProjectileManager : MonoBehaviour
 {
     public static ProjectileManager Instance { get; private set; }
 
-    // Viewport LOD: bolts inside the expanded camera AABB step every frame at dt; bolts outside
-    // accumulate dt and step at ~1/OffscreenInterval Hz with the accumulated time. Trajectories,
-    // hit detection and expiry stay exact — a low-rate step sweeps one long CircleCast capsule
-    // instead of several short ones, covering the same corridor with a tenth of the casts.
     private const float OffscreenInterval = 0.1f;
 
-    // The AABB is expanded so bolts about to enter the view are already stepping at full rate
-    // (no visible pop at the screen edge): margin >= max bolt speed (plasma 25 + ship ~10) *
-    // OffscreenInterval, with headroom for the camera tracking the player.
+    // *** Make this proportional to fastest projectile instead of hard coded
     private const float ViewMargin = 5f;
 
-    // Verification aids, usable in builds. InvertLodTiers is a positive control: on-screen bolts
-    // get the low rate, so a visible 10 Hz stutter proves the tier machinery works. The overlay
-    // prints per-frame tier counts.
     public static bool InvertLodTiers = false;
     public static bool ShowDebugOverlay = false;
     public int FullRateCount { get; private set; }
@@ -88,14 +79,8 @@ public class ProjectileManager : MonoBehaviour
             IManagedProjectile p = projectiles[i];
             float acc = p.LodAccumulator + dt;
 
-            bool fullRate = true;
-            if (hasViewBounds)
-            {
-                Vector2 pos = p.Position;
-                fullRate = pos.x >= viewXMin && pos.x <= viewXMax
-                        && pos.y >= viewYMin && pos.y <= viewYMax;
-                if (InvertLodTiers) fullRate = !fullRate;
-            }
+            bool fullRate = IsInView(p.Position);
+            if (InvertLodTiers && hasViewBounds) fullRate = !fullRate;
 
             if (fullRate) fullCount++;
             else lowCount++;
@@ -106,8 +91,6 @@ public class ProjectileManager : MonoBehaviour
                 continue;
             }
 
-            // Full-rate bolts step with plain dt (their accumulator is always 0); a bolt that just
-            // crossed into view catches up with its accumulated time in this same swept step.
             p.LodAccumulator = 0f;
             if (!p.Step(acc))
             {
@@ -119,6 +102,14 @@ public class ProjectileManager : MonoBehaviour
 
         FullRateCount = fullCount;
         LowRateCount = lowCount;
+    }
+
+
+    public bool IsInView(Vector2 pos)
+    {
+        if (!hasViewBounds) return true;
+        return pos.x >= viewXMin && pos.x <= viewXMax
+            && pos.y >= viewYMin && pos.y <= viewYMax;
     }
 
     private void UpdateViewBounds()

@@ -111,7 +111,9 @@ public abstract class ShipBase : MonoBehaviour
         shipEffects.SendEvent(deathVFXEvent);
         shipEffects.Play();
         float maxLifetime = shipEffects.GetFloat(Shader.PropertyToID("SmokeLifetime"));
-        Destroy(smoke.gameObject, Mathf.Max(maxLifetime, deathVFXLifetime));
+        // Effect-time countdown rather than Destroy(obj, t): in heavy frames VFX simulation runs
+        // slower than wall time, and a wall-clock timer would cut the explosion off mid-fade.
+        VFXAutoDestroy.Attach(smoke.gameObject, Mathf.Max(maxLifetime, deathVFXLifetime));
 
         if (isPlayer)
         {
